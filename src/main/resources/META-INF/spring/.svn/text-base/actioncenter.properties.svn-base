@@ -1,0 +1,14 @@
+#lottery\u9879\u76ee\u8bf7\u6c42\u5730\u5740
+lotteryurl=${lotteryurl}
+#chargecenter\u9879\u76ee\u8bf7\u6c42\u5730\u5740
+chargecenterurl=${chargecenterurl}
+#jms\u8bf7\u6c42\u5730\u5740
+jms.new-issue.brokerURL=${jms.new-issue.brokerURL}
+#camel.jmxAgent\u6ce8\u518c\u7aef\u53e3\u53f7
+camel.jmxAgent.registryPort=${camel.jmxAgent.registryPort}
+#\u96c6\u4e2dcache\u8bf7\u6c42\u5730\u5740
+memcache.client.ip=${memcache.client.ip}
+#\u5982\u610f\u5f69\u7528\u6237\u7f16\u53f7
+ruyicaiUserno=${ruyicaiUserno}
+#\u8ffd\u53f7\u5957\u9910\u5f00\u5173
+addNumOneYearSwitch=0

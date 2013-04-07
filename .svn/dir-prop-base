@@ -1,0 +1,13 @@
+K 10
+svn:ignore
+V 89
+.classpath
+.project
+.settings
+log.roo
+target
+复件 .roo-dbre
+activemq-data
+.springBeans
+
+END
