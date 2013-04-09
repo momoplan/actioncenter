@@ -1,3 +1,3 @@
 ## actioncenter
 ---
-基于lottery的活动中心管理
+One of the satellite-system  based on lottery
