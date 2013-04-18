@@ -32,14 +32,14 @@
 		<repository>
 			<id>ruyicai</id>
 			<name>Ruyicai Repository</name>
-			<url>http://202.43.152.162:8181/nexus/content/repositories/public/</url>
+			<url>http://202.43.152.168/nexus/content/repositories/public/</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>ruyicai</id>
 			<name>Ruyicai Repository</name>
-			<url>http://202.43.152.162:8181/nexus/content/repositories/public/</url>
+			<url>http://202.43.152.168/nexus/content/repositories/public/</url>
 		</pluginRepository>
 	</pluginRepositories>
 	<dependencies>
