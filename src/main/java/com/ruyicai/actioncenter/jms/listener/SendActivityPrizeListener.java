@@ -52,22 +52,6 @@ public class SendActivityPrizeListener {
 						}
 					}
 				}
-				/*
-				 * if (actionJmsType ==
-				 * ActionJmsType.OLD_USER_CHONGZHI_ZENGSONG.value) { if
-				 * (StringUtils.isNotBlank(detail.getUserno())) {
-				 * logger.info("赠送成功更新updateStateDisable,userno:" +
-				 * detail.getUserno()); try {
-				 * OldUser.updateStateDisable(detail.getUserno(), true); } catch
-				 * (Exception e) {
-				 * logger.error("赠送成功更新updateStateDisable error", e); } } } if
-				 * (actionJmsType ==
-				 * ActionJmsType.Encash_DuoLeCai_AddPrize.value) { String day =
-				 * DateUtil.format("yyyy-MM-dd", new Date()); try {
-				 * SSCPrizedDetail.addPrize(tuserinfo.getUserno(), day,
-				 * detail.getAmt()); } catch (Exception e) {
-				 * logger.error("更新多乐彩11选5用户中奖累计金额异常", e); } }
-				 */
 			} else {
 				detail.setState(2);
 				logger.error("TuserPrizeDetail id:{},prizeAmt:{},userno:{},actionJmsType:{}.奖励失败", new String[] {

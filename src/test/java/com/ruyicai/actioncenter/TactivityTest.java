@@ -60,13 +60,6 @@ public class TactivityTest {
 		String express2 = JsonUtil.toJson(map2);
 		Tactivity.saveOrUpdate(null, null, "00092493", null, ActionJmsType.AddNumOneYear.value, express2, 1, null);
 
-		Map<String, Object> map4 = new LinkedMap();
-		map4.put("step", 2000);
-		map4.put("prizeamt", 1000);
-		String express4 = JsonUtil.toJson(map4);
-		Tactivity.saveOrUpdate(null, null, "00092493", null, ActionJmsType.OLD_USER_CHONGZHI_ZENGSONG.value, express4,
-				1, ActionJmsType.OLD_USER_CHONGZHI_ZENGSONG.memo);
-
 		Map<String, Object> map5 = new LinkedMap();
 		map5.put("step", 500000);
 		map5.put("present", 2);
@@ -220,6 +213,17 @@ public class TactivityTest {
 				ActionJmsType.SuNing_REGISTER.memo);
 		Tactivity.saveOrUpdate(null, null, "00092493", "902", ActionJmsType.SuNing_REGISTER.value, express3, 1,
 				ActionJmsType.SuNing_REGISTER.memo);
+	}
+
+	@Test
+	public void testCreateTactivity12() {
+		Map<String, Object> map3 = new LinkedMap();
+		map3.put("percent", 6);
+		map3.put("beforedate", "2013-05-01 00:00:00");
+		map3.put("maxamt", 60000);
+		String express3 = JsonUtil.toJson(map3);
+		Tactivity.saveOrUpdate(null, null, "00092493", null, ActionJmsType.OLD_USER_CHONGZHI_ZENGSONG.value, express3,
+				1, ActionJmsType.OLD_USER_CHONGZHI_ZENGSONG.memo);
 	}
 
 	@Test

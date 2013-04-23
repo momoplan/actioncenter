@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.domain.Chong20Mobile;
+import com.ruyicai.actioncenter.domain.OldUserChongZhi;
 import com.ruyicai.actioncenter.domain.SendMoneyDetails;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.TaddNumActivity;
@@ -58,18 +59,67 @@ public class TactionService {
 			return;
 		}
 		BigDecimal amt = new BigDecimal(amtLong);
-		if (actionJmsType == ActionJmsType.CHONGZHI_SUCCESS.value) {
-			logger.info("充值成功事件");
-			/** 充值满百送5%活动 */
-			chongzhiManBaiZengSong(ttransactionid, ladderpresentflag, userno, amt);
-			/** 第一次充值活动 */
-			firshChongzhiZengSong(ttransactionid, userno, amt);
+		try {
+			if (actionJmsType == ActionJmsType.CHONGZHI_SUCCESS.value) {
+				logger.info("充值成功事件");
+				/** 充值满百送5%活动 */
+				chongzhiManBaiZengSong(ttransactionid, ladderpresentflag, userno, amt);
+				/** 第一次充值活动 */
+				firshChongzhiZengSong(ttransactionid, userno, amt);
+				/** 2013.5.1老用户充值赠送 */
+				oldUserZengSong(ttransactionid, userno, amt);
+			}
+			if (actionJmsType == ActionJmsType.GOUCAI_SUCCESS.value) {
+				logger.info("购彩成功事件");
+				/** vip 购彩 活动 */
+				vipCase(userno, amt, businessId, businessType);
+			}
+		} catch (Exception e) {
+			logger.error("活动异常  userno:" + userno + ",amt:" + amtLong + ",actionJmsType:" + actionJmsType, e);
 		}
-		if (actionJmsType == ActionJmsType.GOUCAI_SUCCESS.value) {
-			logger.info("购彩成功事件");
-			/** vip 购彩 活动 */
-			vipCase(userno, amt, businessId, businessType);
+	}
+
+	@Transactional
+	public Boolean oldUserZengSong(String ttransactionid, String userno, BigDecimal amt) {
+		logger.info("老用户充值赠送");
+		Boolean flag = false;
+		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
+		if (tuserinfo == null) {
+			logger.info("用户不存在userno:" + userno);
+			return flag;
 		}
+		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+				ActionJmsType.OLD_USER_CHONGZHI_ZENGSONG.value);
+		if (tactivity == null) {
+			logger.info("老用户充值赠送活动未开启");
+			return flag;
+		}
+		OldUserChongZhi oucz = OldUserChongZhi.findOldUserChongZhi(userno);
+		if (oucz != null) {
+			logger.info("活动已参加userno:" + userno);
+			return flag;
+		}
+		String express = tactivity.getExpress();
+		Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+		Integer percent = (Integer) activity.get("percent");
+		String dateStr = (String) activity.get("beforedate");
+		Integer maxamt = (Integer) activity.get("maxamt");
+		Date date = DateUtil.parse(dateStr);
+		Date regtime = tuserinfo.getRegtime();
+		if (date.compareTo(regtime) > 0) {
+			BigDecimal prizeamt = amt.multiply(new BigDecimal(percent)).divideToIntegralValue(new BigDecimal(100));
+			if (prizeamt.compareTo(new BigDecimal(maxamt)) > 0) {
+				prizeamt = new BigDecimal(maxamt);
+			}
+			logger.info("老用户充值赠送,userno:{},amt:{},prizeamt:{}", new String[] { userno, amt + "", prizeamt + "" });
+			OldUserChongZhi.createOldUserChongZhi(userno, amt, prizeamt);
+			sendPrize2UserJMS(tuserinfo.getUserno(), prizeamt, ActionJmsType.OLD_USER_CHONGZHI_ZENGSONG,
+					ttransactionid, ttransactionid, tactivity.getMemo());
+			flag = true;
+		} else {
+			logger.info("用户注册时间" + regtime + "不在" + dateStr + "之前");
+		}
+		return flag;
 	}
 
 	@Transactional
@@ -96,10 +146,6 @@ public class TactionService {
 				} else {
 					logger.info("不满足充值满百赠送条件,amt:" + amt + ",userno:" + userno);
 				}
-				/*
-				 * } else { logger.info("不参加活动 ladderpresentflag:" +
-				 * ladderpresentflag); }
-				 */
 			} else {
 				logger.info("充值满百赠送活动未开启");
 			}

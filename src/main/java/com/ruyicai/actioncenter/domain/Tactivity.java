@@ -180,7 +180,7 @@ public class Tactivity implements Serializable {
 		Tactivity tactivity = null;
 		EntityManager em = Tactivity.entityManager();
 		StringBuffer sql = new StringBuffer(
-				"SELECT o FROM Tactivity AS o WHERE o.state = '1' AND o.activityType = :activityType");
+				"SELECT o FROM Tactivity AS o WHERE o.activityType = :activityType");
 		if (StringUtils.isNotBlank(lotno)) {
 			sql.append(" AND o.lotno = :lotno");
 		}
