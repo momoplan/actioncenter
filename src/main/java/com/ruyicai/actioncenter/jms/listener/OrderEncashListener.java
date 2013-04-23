@@ -59,6 +59,69 @@ public class OrderEncashListener {
 		addPrizeDaXiaoDanShuang(order, orderUserInfo);
 		addPrizeZuCai(order, orderUserInfo);
 		addPrizeLanQiu(order, orderUserInfo);
+		addPrizeJingcai2chuan1(order, orderUserInfo);
+	}
+
+	@Transactional
+	public void addPrizeJingcai2chuan1(Torder order, Tuserinfo orderUserInfo) {
+		String userno = null;
+		Tuserinfo tuserinfo = null;
+		Long orderprizeamt = 0L;// order.getOrderprizeamt().longValue();
+		if (StringUtils.isNotBlank(order.getTlotcaseid())) {
+			return;
+		}
+		userno = orderUserInfo.getUserno();
+		tuserinfo = orderUserInfo;
+		orderprizeamt = order.getOrderprizeamt().longValue();
+		if (userno.equals(ruyicaiUserno)) {
+			logger.info("如意彩账户购买,不加奖");
+			return;
+		}
+		String lotno = order.getLotno();
+		if (!lotno.startsWith("J")) {
+			return;
+		}
+		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+				ActionJmsType.Encash_Jingcai_2Chan1.value);
+		if (tactivity != null) {
+			if (orderprizeamt > 0) {
+				BigDecimal prize = BigDecimal.ZERO;
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Integer step1 = (Integer) activity.get("step1");
+				Integer step1prize = (Integer) activity.get("step1prize");
+				Integer step2 = (Integer) activity.get("step2");
+				Integer step2prize = (Integer) activity.get("step2prize");
+				Integer step3 = (Integer) activity.get("step3");
+				Integer step3prize = (Integer) activity.get("step3prize");
+				Integer step4 = (Integer) activity.get("step4");
+				Integer step4prize = (Integer) activity.get("step4prize");
+				Integer step5 = (Integer) activity.get("step5");
+				Integer step5prize = (Integer) activity.get("step5prize");
+				Integer step6 = (Integer) activity.get("step6");
+				Integer step6prize = (Integer) activity.get("step6prize");
+				if (orderprizeamt >= step1 && orderprizeamt < step2) {
+					prize = new BigDecimal(step1prize);
+				} else if (orderprizeamt >= step2 && orderprizeamt < step3) {
+					prize = new BigDecimal(step2prize);
+				} else if (orderprizeamt >= step3 && orderprizeamt < step4) {
+					prize = new BigDecimal(step3prize);
+				} else if (orderprizeamt >= step4 && orderprizeamt < step5) {
+					prize = new BigDecimal(step4prize);
+				} else if (orderprizeamt >= step5 && orderprizeamt < step6) {
+					prize = new BigDecimal(step5prize);
+				} else if (orderprizeamt >= step6) {
+					prize = new BigDecimal(step6prize);
+				}
+				if (prize.compareTo(BigDecimal.ZERO) > 0) {
+					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_Jingcai_2Chan1)) {
+						logger.info(tactivity.getMemo() + prize);
+						sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_Jingcai_2Chan1, order.getId(),
+								tactivity.getMemo());
+					}
+				}
+			}
+		}
 	}
 
 	@Transactional

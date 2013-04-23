@@ -54,6 +54,59 @@ public class DispatchCaseLotFinishListener {
 		}
 		addPrize2Chuan1(caseLot, torder, userInfo);
 		addPrizeLanQiu(caseLot, torder, userInfo);
+		addPrizeJingcai2chuan1(caseLot, torder, userInfo);
+	}
+
+	@Transactional
+	public void addPrizeJingcai2chuan1(CaseLot caseLot, Torder torder, Tuserinfo userinfo) {
+		String userno = userinfo.getUserno();
+		String lotno = torder.getLotno();
+		if (!lotno.startsWith("J")) {
+			return;
+		}
+		Tactivity tactivity = Tactivity.findTactivity(null, null, userinfo.getSubChannel(), null,
+				ActionJmsType.Encash_Jingcai_2Chan1.value);
+		if (tactivity != null) {
+			String caselotId = caseLot.getId();
+			Integer caselotprize = lotteryService.findCaseLotBuyAllPrizeamtById(caselotId, userinfo.getUserno());
+			if (caselotprize > 0) {
+				BigDecimal prize = BigDecimal.ZERO;
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Integer step1 = (Integer) activity.get("step1");
+				Integer step1prize = (Integer) activity.get("step1prize");
+				Integer step2 = (Integer) activity.get("step2");
+				Integer step2prize = (Integer) activity.get("step2prize");
+				Integer step3 = (Integer) activity.get("step3");
+				Integer step3prize = (Integer) activity.get("step3prize");
+				Integer step4 = (Integer) activity.get("step4");
+				Integer step4prize = (Integer) activity.get("step4prize");
+				Integer step5 = (Integer) activity.get("step5");
+				Integer step5prize = (Integer) activity.get("step5prize");
+				Integer step6 = (Integer) activity.get("step6");
+				Integer step6prize = (Integer) activity.get("step6prize");
+				if (caselotprize >= step1 && caselotprize < step2) {
+					prize = new BigDecimal(step1prize);
+				} else if (caselotprize >= step2 && caselotprize < step3) {
+					prize = new BigDecimal(step2prize);
+				} else if (caselotprize >= step3 && caselotprize < step4) {
+					prize = new BigDecimal(step3prize);
+				} else if (caselotprize >= step4 && caselotprize < step5) {
+					prize = new BigDecimal(step4prize);
+				} else if (caselotprize >= step5 && caselotprize < step6) {
+					prize = new BigDecimal(step5prize);
+				} else if (caselotprize >= step6) {
+					prize = new BigDecimal(step6prize);
+				}
+				if (prize.compareTo(BigDecimal.ZERO) > 0) {
+					if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_Jingcai_2Chan1)) {
+						logger.info(tactivity.getMemo() + prize);
+						orderEncashListener.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_Jingcai_2Chan1,
+								caselotId, tactivity.getMemo());
+					}
+				}
+			}
+		}
 	}
 
 	@Transactional
@@ -77,7 +130,7 @@ public class DispatchCaseLotFinishListener {
 					if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_2chuan1_AddPrize)) {
 						logger.info(tactivity.getMemo() + "合买中奖加奖prize:" + prize.longValue());
 						orderEncashListener.sendPrize2UserJMS(userinfo.getUserno(), prize,
-								ActionJmsType.Encash_2chuan1_AddPrize, caseLot.getId(), tactivity.getMemo());
+								ActionJmsType.Encash_2chuan1_AddPrize, caselotId, tactivity.getMemo());
 					}
 				}
 			}
@@ -112,7 +165,7 @@ public class DispatchCaseLotFinishListener {
 					if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_LanQiu_AddPrize)) {
 						logger.info(tactivity.getMemo() + "合买中奖加奖prize:" + prize.longValue());
 						orderEncashListener.sendPrize2UserJMS(userinfo.getUserno(), prize,
-								ActionJmsType.Encash_LanQiu_AddPrize, caseLot.getId(), tactivity.getMemo());
+								ActionJmsType.Encash_LanQiu_AddPrize, caselotId, tactivity.getMemo());
 					}
 				}
 			}

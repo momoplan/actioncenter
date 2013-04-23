@@ -227,6 +227,26 @@ public class TactivityTest {
 	}
 
 	@Test
+	public void testCreateTactivity13() {
+		Map<String, Object> map3 = new LinkedMap();
+		map3.put("step1", 20000);
+		map3.put("step1prize", 1800);
+		map3.put("step2", 50000);
+		map3.put("step2prize", 3800);
+		map3.put("step3", 200000);
+		map3.put("step3prize", 6800);
+		map3.put("step4", 500000);
+		map3.put("step4prize", 12800);
+		map3.put("step5", 1000000);
+		map3.put("step5prize", 68800);
+		map3.put("step6", 5000000);
+		map3.put("step6prize", 388800);
+		String express3 = JsonUtil.toJson(map3);
+		Tactivity.saveOrUpdate(null, null, "00092493", null, ActionJmsType.Encash_Jingcai_2Chan1.value, express3, 1,
+				ActionJmsType.Encash_Jingcai_2Chan1.memo);
+	}
+
+	@Test
 	public void testCreateTactivity17() {
 		Map<String, Object> map = new LinkedMap();
 		map.put("step1min", 2000);
