@@ -81,7 +81,7 @@ public class OrderEncashListener {
 		if (!lotno.startsWith("J")) {
 			return;
 		}
-		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = Tactivity.findTactivity(null, order.getPlaytype(), tuserinfo.getSubChannel(), null,
 				ActionJmsType.Encash_Jingcai_2Chan1.value);
 		if (tactivity != null) {
 			if (orderprizeamt > 0) {

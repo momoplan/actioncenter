@@ -218,6 +218,7 @@ public class TactivityTest {
 	@Test
 	public void testCreateTactivity12() {
 		Map<String, Object> map3 = new LinkedMap();
+		map3.put("minChargeAmt",10000);
 		map3.put("percent", 6);
 		map3.put("beforedate", "2013-05-01 00:00:00");
 		map3.put("maxamt", 60000);
@@ -242,7 +243,7 @@ public class TactivityTest {
 		map3.put("step6", 5000000);
 		map3.put("step6prize", 388800);
 		String express3 = JsonUtil.toJson(map3);
-		Tactivity.saveOrUpdate(null, null, "00092493", null, ActionJmsType.Encash_Jingcai_2Chan1.value, express3, 1,
+		Tactivity.saveOrUpdate(null, "502", "00092493", null, ActionJmsType.Encash_Jingcai_2Chan1.value, express3, 1,
 				ActionJmsType.Encash_Jingcai_2Chan1.memo);
 	}
 

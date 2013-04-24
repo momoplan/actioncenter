@@ -18,7 +18,7 @@ public enum ActionJmsType {
 	OLD_USER_CHONGZHI_ZENGSONG(8, "老用户充值赠送"),
 	VIP_USER_GOUCAI_ZENGSONG(9, "大户购彩赠送"),
 	Encash_2chuan1_AddPrize(10, "竞彩足球2串1加奖"),
-	Encash_DuoLeCai_AddPrize(11, "十一运夺金加奖"),
+	Encash_DuoLeCai_AddPrize(11, "广东11选5加奖"),
 	Encash_DaXiaoDanShuang_AddPrize(12, "大小单双加奖"),
 	Encash_ZuCai_AddPrize(13, "足彩加奖"),
 	SUNING_ZENGSONG(14,"苏宁首次充值赠送"),

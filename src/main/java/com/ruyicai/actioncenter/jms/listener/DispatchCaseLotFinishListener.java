@@ -64,7 +64,7 @@ public class DispatchCaseLotFinishListener {
 		if (!lotno.startsWith("J")) {
 			return;
 		}
-		Tactivity tactivity = Tactivity.findTactivity(null, null, userinfo.getSubChannel(), null,
+		Tactivity tactivity = Tactivity.findTactivity(null, torder.getPlaytype(), userinfo.getSubChannel(), null,
 				ActionJmsType.Encash_Jingcai_2Chan1.value);
 		if (tactivity != null) {
 			String caselotId = caseLot.getId();

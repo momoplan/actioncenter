@@ -101,9 +101,14 @@ public class TactionService {
 		}
 		String express = tactivity.getExpress();
 		Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+		Integer minChargeAmt = (Integer) activity.get("minChargeAmt");
 		Integer percent = (Integer) activity.get("percent");
 		String dateStr = (String) activity.get("beforedate");
 		Integer maxamt = (Integer) activity.get("maxamt");
+		if (amt.compareTo(new BigDecimal(minChargeAmt)) < 0) {
+			logger.info("用户{}充值金额{}不满足活动最小充值金额{}", new String[] { userno, amt + "", minChargeAmt + "" });
+			return flag;
+		}
 		Date date = DateUtil.parse(dateStr);
 		Date regtime = tuserinfo.getRegtime();
 		if (date.compareTo(regtime) > 0) {
