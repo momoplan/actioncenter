@@ -11,13 +11,17 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.domain.Chong20Mobile;
+import com.ruyicai.actioncenter.domain.FirstChargeUser;
 import com.ruyicai.actioncenter.domain.SuningRegister;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
+import com.ruyicai.actioncenter.service.TactionService;
 import com.ruyicai.actioncenter.util.DateUtil;
 import com.ruyicai.actioncenter.util.JsonUtil;
 import com.ruyicai.lottery.domain.Tuserinfo;
@@ -26,6 +30,9 @@ import com.ruyicai.lottery.domain.Tuserinfo;
 public class SuningRegisterListener {
 
 	private Logger logger = LoggerFactory.getLogger(SuningRegisterListener.class);
+
+	@Autowired
+	private TactionService tactionService;
 
 	@Produce(uri = "jms:topic:sendActivityPrize")
 	private ProducerTemplate sendActivityPrizeProducer;
@@ -36,6 +43,58 @@ public class SuningRegisterListener {
 
 	public void userModifyCustomer(@Body String userInfoJson) {
 		suningRegisterAction(userInfoJson);
+		try {
+			firstCharge(userInfoJson);
+		} catch (Exception e) {
+			logger.error("首次充值后完善信息赠送异常", e);
+		}
+	}
+
+	@Transactional
+	public void firstCharge(String userInfoJson) {
+		if (StringUtils.isBlank(userInfoJson)) {
+			logger.error("the arguments userInfoJson is blank");
+			return;
+		}
+		Tuserinfo tuserinfo = Tuserinfo.fromJsonToTuserinfo(userInfoJson);
+		if (tuserinfo == null || StringUtils.isBlank(tuserinfo.getUserno())
+				|| StringUtils.isBlank(tuserinfo.getChannel())) {
+			logger.error("用户为空或用户编号为空或channel为空");
+			return;
+		}
+		String userno = tuserinfo.getUserno();
+		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+				ActionJmsType.FIRST_CHONGZHI_ZENGSONG.value);
+		if (tactivity != null) {
+			logger.info("首次充值用户信息修改userno:" + userno);
+			if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {
+				Chong20Mobile chong20Mobile = Chong20Mobile.findChong20Mobile(tuserinfo.getMobileid());
+				if (chong20Mobile != null) {
+					logger.info("第一次充值活动,用户手机号已赠送过.mobileid:{},userno:{}", new String[] { tuserinfo.getMobileid(),
+							userno });
+					return;
+				}
+				FirstChargeUser fcu = FirstChargeUser.findFirstChargeUser(userno, true);
+				if (fcu == null || fcu.getState() == 1) {
+					logger.info("非首次充值用户或已赠送userno:" + userno);
+					return;
+				}
+				String todayStr = DateUtil.format("yyyyMMdd", new Date());
+				String createTimeStr = DateUtil.format("yyyyMMdd", fcu.getCreateTime());
+				if (!todayStr.equals(createTimeStr)) {
+					logger.info("首次充值用户不是在同一天完善的信息today:" + todayStr + ",createTime:" + createTimeStr);
+				}
+				logger.info("首次充值后完善信息,userno:" + userno);
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Integer prizeamt = (Integer) activity.get("prizeamt");
+				Chong20Mobile.createChong20Mobile(tuserinfo.getMobileid(), userno);
+				FirstChargeUser.updateFirstChargeUser(fcu, 1);
+				tactionService.sendPrize2UserJMS(tuserinfo.getUserno(), new BigDecimal(prizeamt),
+						ActionJmsType.FIRST_CHONGZHI_ZENGSONG, fcu.getTtransactionid(), fcu.getTtransactionid(),
+						tactivity.getMemo());
+			}
+		}
 	}
 
 	@Transactional
