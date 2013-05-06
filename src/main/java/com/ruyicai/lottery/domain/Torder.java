@@ -92,10 +92,17 @@ public class Torder {
 
 	private String playtype;
 
+	private String latedteamid;
+
+	private Date lastprinttime;
+
+	private String errorcode;
+
+	private Date successtime;
+
 	private transient BigDecimal orderamt;
 
 	private transient Date modifytime;
 
 	private transient BigDecimal orderprize;
-
 }

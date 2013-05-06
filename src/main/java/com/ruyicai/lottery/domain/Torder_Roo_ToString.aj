@@ -24,10 +24,13 @@ privileged aspect Torder_Roo_ToString {
         sb.append("Desc: ").append(getDesc()).append(", ");
         sb.append("Encashtime: ").append(getEncashtime()).append(", ");
         sb.append("Endtime: ").append(getEndtime()).append(", ");
+        sb.append("Errorcode: ").append(getErrorcode()).append(", ");
         sb.append("Eventcode: ").append(getEventcode()).append(", ");
         sb.append("Hasachievement: ").append(getHasachievement()).append(", ");
         sb.append("Id: ").append(getId()).append(", ");
         sb.append("Instate: ").append(getInstate()).append(", ");
+        sb.append("Lastprinttime: ").append(getLastprinttime()).append(", ");
+        sb.append("Latedteamid: ").append(getLatedteamid()).append(", ");
         sb.append("Lotmulti: ").append(getLotmulti()).append(", ");
         sb.append("Lotno: ").append(getLotno()).append(", ");
         sb.append("LotsType: ").append(getLotsType()).append(", ");
@@ -44,6 +47,7 @@ privileged aspect Torder_Roo_ToString {
         sb.append("Prizestate: ").append(getPrizestate()).append(", ");
         sb.append("Subaccount: ").append(getSubaccount()).append(", ");
         sb.append("Subchannel: ").append(getSubchannel()).append(", ");
+        sb.append("Successtime: ").append(getSuccesstime()).append(", ");
         sb.append("Tlotcaseid: ").append(getTlotcaseid()).append(", ");
         sb.append("Tsubscribeflowno: ").append(getTsubscribeflowno()).append(", ");
         sb.append("Userno: ").append(getUserno()).append(", ");

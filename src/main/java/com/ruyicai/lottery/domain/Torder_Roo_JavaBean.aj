@@ -321,4 +321,36 @@ privileged aspect Torder_Roo_JavaBean {
         this.playtype = playtype;
     }
     
+    public String Torder.getLatedteamid() {
+        return this.latedteamid;
+    }
+    
+    public void Torder.setLatedteamid(String latedteamid) {
+        this.latedteamid = latedteamid;
+    }
+    
+    public Date Torder.getLastprinttime() {
+        return this.lastprinttime;
+    }
+    
+    public void Torder.setLastprinttime(Date lastprinttime) {
+        this.lastprinttime = lastprinttime;
+    }
+    
+    public String Torder.getErrorcode() {
+        return this.errorcode;
+    }
+    
+    public void Torder.setErrorcode(String errorcode) {
+        this.errorcode = errorcode;
+    }
+    
+    public Date Torder.getSuccesstime() {
+        return this.successtime;
+    }
+    
+    public void Torder.setSuccesstime(Date successtime) {
+        this.successtime = successtime;
+    }
+    
 }

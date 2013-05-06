@@ -43,7 +43,7 @@ public class OrderAfterBetListener {
 		if (StringUtils.isBlank(orderJson)) {
 			return;
 		}
-		Torder order = Torder.fromJsonToTorder(orderJson);
+		Torder order = JsonUtil.fromJsonToObject(orderJson, Torder.class);
 		if (order == null) {
 			return;
 		}
