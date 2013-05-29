@@ -165,6 +165,10 @@ public class TactionService {
 		logger.info("第一次充值开始");
 		Boolean flag = false;
 		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
+		if (tuserinfo.getSubChannel().equals("984") || tuserinfo.getSubChannel().equals("985")) {
+			logger.info("U付如意彩用户不参与活动,user:" + userno);
+			return flag;
+		}
 		if (tuserinfo != null) {
 			Tactivity suningtactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(),
 					tuserinfo.getChannel(), ActionJmsType.SUNING_ZENGSONG.value);

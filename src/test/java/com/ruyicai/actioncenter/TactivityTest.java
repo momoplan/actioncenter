@@ -218,7 +218,7 @@ public class TactivityTest {
 	@Test
 	public void testCreateTactivity12() {
 		Map<String, Object> map3 = new LinkedMap();
-		map3.put("minChargeAmt",10000);
+		map3.put("minChargeAmt", 10000);
 		map3.put("percent", 6);
 		map3.put("beforedate", "2013-05-01 00:00:00");
 		map3.put("maxamt", 60000);
@@ -264,6 +264,59 @@ public class TactivityTest {
 				1, ActionJmsType.Encash_LanQiu_AddPrize.memo);
 		Tactivity.saveOrUpdate("J00008", null, "00092493", null, ActionJmsType.Encash_LanQiu_AddPrize.value, express3,
 				1, ActionJmsType.Encash_LanQiu_AddPrize.memo);
+	}
+
+	@Test
+	public void testCreateTactivity18() {
+		Map<String, Object> map = new LinkedMap();
+		map.put("minprizeamt", 10000);
+		map.put("percent", 5);
+		map.put("topprize", 60000);
+		String express3 = JsonUtil.toJson(map);
+		Tactivity.saveOrUpdate("F47107", null, "00092493", null, ActionJmsType.Kuai3_JiaJiang.value, express3, 1,
+				ActionJmsType.Kuai3_JiaJiang.memo);
+	}
+	
+	@Test
+	public void testCreateTactivity19() {
+		Map<String, Object> map = new LinkedMap();
+		map.put("step", 16000);
+		map.put("prizeamt", 2000);
+		map.put("topprize", 40000);
+		String express3 = JsonUtil.toJson(map);
+		//组六
+		Tactivity.saveOrUpdate("F47103", "12", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
+				ActionJmsType.FuCai3D_JiaJiang.memo);
+		Tactivity.saveOrUpdate("F47103", "32", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
+				ActionJmsType.FuCai3D_JiaJiang.memo);
+		//组三
+		map.put("step", 32000);
+		map.put("prizeamt", 4000);
+		map.put("topprize", 80000);
+		express3 = JsonUtil.toJson(map);
+		Tactivity.saveOrUpdate("F47103", "01", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
+				ActionJmsType.FuCai3D_JiaJiang.memo);
+		Tactivity.saveOrUpdate("F47103", "11", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
+				ActionJmsType.FuCai3D_JiaJiang.memo);
+		Tactivity.saveOrUpdate("F47103", "31", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
+				ActionJmsType.FuCai3D_JiaJiang.memo);
+		//单选
+		map.put("step", 100000);
+		map.put("prizeamt", 10000);
+		map.put("topprize", 200000);
+		express3 = JsonUtil.toJson(map);
+		Tactivity.saveOrUpdate("F47103", "00", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
+				ActionJmsType.FuCai3D_JiaJiang.memo);
+		Tactivity.saveOrUpdate("F47103", "02", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
+				ActionJmsType.FuCai3D_JiaJiang.memo);
+		Tactivity.saveOrUpdate("F47103", "10", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
+				ActionJmsType.FuCai3D_JiaJiang.memo);
+		Tactivity.saveOrUpdate("F47103", "20", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
+				ActionJmsType.FuCai3D_JiaJiang.memo);
+		Tactivity.saveOrUpdate("F47103", "34", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
+				ActionJmsType.FuCai3D_JiaJiang.memo);
+		Tactivity.saveOrUpdate("F47103", "54", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
+				ActionJmsType.FuCai3D_JiaJiang.memo);
 	}
 
 	@Test

@@ -60,6 +60,85 @@ public class OrderEncashListener {
 		addPrizeZuCai(order, orderUserInfo);
 		addPrizeLanQiu(order, orderUserInfo);
 		addPrizeJingcai2chuan1(order, orderUserInfo);
+		addPrizeKuai3(order, orderUserInfo);
+		addPrize3D(order, orderUserInfo);
+	}
+
+	@Transactional
+	public void addPrize3D(Torder order, Tuserinfo orderUserInfo) {
+		String userno = orderUserInfo.getUserno();
+		if (userno.equals(ruyicaiUserno)) {
+			logger.info("如意彩账户购买,不加奖");
+			return;
+		}
+		Tuserinfo tuserinfo = orderUserInfo;
+		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(),
+				null, ActionJmsType.FuCai3D_JiaJiang.value);
+		if (tactivity != null) {
+			Long orderprizeamt = order.getOrderprizeamt().longValue();
+			if (orderprizeamt > 0) {
+				BigDecimal prize = BigDecimal.ZERO;
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Integer step = (Integer) activity.get("step");
+				Integer prizeamt = (Integer) activity.get("prizeamt");
+				Integer topprize = (Integer) activity.get("topprize");
+				int multiple = orderprizeamt.intValue() / step;
+				if (multiple > 0) {
+					prize = new BigDecimal(multiple * prizeamt);
+				}
+				if (prize.compareTo(new BigDecimal(topprize)) > 0) {
+					prize = new BigDecimal(topprize);
+				}
+				if (prize.compareTo(BigDecimal.ZERO) > 0) {
+					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.FuCai3D_JiaJiang)) {
+						logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
+						sendPrize2UserJMS(userno, prize, ActionJmsType.FuCai3D_JiaJiang, order.getId(),
+								tactivity.getMemo());
+					}
+				}
+			}
+		}
+	}
+
+	@Transactional
+	public void addPrizeKuai3(Torder order, Tuserinfo orderUserInfo) {
+		String userno = orderUserInfo.getUserno();
+		if (userno.equals(ruyicaiUserno)) {
+			logger.info("如意彩账户购买,不加奖");
+			return;
+		}
+		Tuserinfo tuserinfo = orderUserInfo;
+		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
+				ActionJmsType.Kuai3_JiaJiang.value);
+		if (tactivity != null) {
+			Long orderprizeamt = order.getOrderprizeamt().longValue();
+			if (orderprizeamt > 0) {
+				BigDecimal prize = BigDecimal.ZERO;
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Integer minprize = (Integer) activity.get("minprize");
+				Integer percent = (Integer) activity.get("percent");
+				Integer topprize = (Integer) activity.get("topprize");
+
+				if (orderprizeamt >= minprize) {
+					prize = new BigDecimal(orderprizeamt).multiply(new BigDecimal(percent)).divide(new BigDecimal(100));
+					if (prize.compareTo(new BigDecimal(topprize)) > 0) {
+						prize = new BigDecimal(topprize);
+					}
+					if (prize.compareTo(BigDecimal.ZERO) > 0) {
+						if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Kuai3_JiaJiang)) {
+							logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
+							sendPrize2UserJMS(userno, prize, ActionJmsType.Kuai3_JiaJiang, order.getId(),
+									tactivity.getMemo());
+						}
+					}
+				} else {
+					logger.info("中奖金额小于" + minprize + "不参与活动");
+				}
+
+			}
+		}
 	}
 
 	@Transactional

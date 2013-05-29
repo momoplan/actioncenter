@@ -25,7 +25,9 @@ public enum ActionJmsType {
 	Friday_SSQ_ZENGSONG(15,"购买双色球赠送"),
 	SuNing_REGISTER(16,"苏宁新用户注册赠送"),
 	Encash_LanQiu_AddPrize(17,"竞彩篮球加奖"),
-	Encash_Jingcai_2Chan1(18,"竞彩2串1加奖");
+	Encash_Jingcai_2Chan1(18,"竞彩2串1加奖"),
+	Kuai3_JiaJiang(19,"快3加奖"),
+	FuCai3D_JiaJiang(20,"3D加奖");
 
 	public int value;
 
