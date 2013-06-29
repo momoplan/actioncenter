@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Chong20Mobile;
 import com.ruyicai.actioncenter.domain.FirstChargeUser;
 import com.ruyicai.actioncenter.domain.OldUserChongZhi;
@@ -43,6 +44,9 @@ public class TactionService {
 	@Autowired
 	private LotteryService lotteryService;
 
+	@Autowired
+	private TuserPrizeDetailDao tuserPrizeDetailDao;
+
 	@Produce(uri = "jms:topic:sendActivityPrize")
 	private ProducerTemplate sendActivityPrizeProducer;
 
@@ -63,6 +67,7 @@ public class TactionService {
 		try {
 			if (actionJmsType == ActionJmsType.CHONGZHI_SUCCESS.value) {
 				logger.info("充值成功事件");
+				save2cashTransaction(ttransactionid, userno, amt);
 				/** 充值满百送5%活动 */
 				chongzhiManBaiZengSong(ttransactionid, ladderpresentflag, userno, amt);
 				/** 第一次充值活动 */
@@ -78,6 +83,12 @@ public class TactionService {
 		} catch (Exception e) {
 			logger.error("活动异常  userno:" + userno + ",amt:" + amtLong + ",actionJmsType:" + actionJmsType, e);
 		}
+	}
+
+	private Boolean save2cashTransaction(String ttransactionid, String userno, BigDecimal amt) {
+		logger.info("保存充值等待可提现ttransactionid:{},userno:{},amt:{}", new String[] { ttransactionid, userno, amt + "" });
+		Boolean flag = false;
+		return flag;
 	}
 
 	@Transactional
@@ -399,7 +410,7 @@ public class TactionService {
 	@Transactional
 	public void sendPrize2UserJMS(String userno, BigDecimal amt, ActionJmsType actionJmsType, String ttransactionid,
 			String businessId, String memo) {
-		TuserPrizeDetail userPrizeDetail = TuserPrizeDetail.createTprizeUserBuyLog(userno, amt, actionJmsType,
+		TuserPrizeDetail userPrizeDetail = tuserPrizeDetailDao.createTprizeUserBuyLog(userno, amt, actionJmsType,
 				businessId);
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("prizeDetailId", userPrizeDetail.getId());

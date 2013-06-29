@@ -382,6 +382,7 @@ public class LotteryService {
 	 * @param userno
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public Integer findCaseLotBuyAllPrizeamtById(String caselotid, String userno) {
 		Integer allprizeamt = 0;
 		if (StringUtils.isBlank(caselotid)) {

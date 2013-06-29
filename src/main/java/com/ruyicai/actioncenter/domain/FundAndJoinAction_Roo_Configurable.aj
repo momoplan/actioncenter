@@ -5,8 +5,8 @@ package com.ruyicai.actioncenter.domain;
 
 import org.springframework.beans.factory.annotation.Configurable;
 
-privileged aspect TuserPrizeDetail_Roo_Configurable {
+privileged aspect FundAndJoinAction_Roo_Configurable {
     
-    declare @type: TuserPrizeDetail: @Configurable;
+    declare @type: FundAndJoinAction: @Configurable;
     
 }

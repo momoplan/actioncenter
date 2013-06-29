@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
 import com.ruyicai.actioncenter.exception.RuyicaiException;
@@ -26,6 +27,9 @@ public class TactivityController {
 
 	@Autowired
 	private SendActivityPrizeListener sendActivityPrizeListener;
+
+	@Autowired
+	private TuserPrizeDetailDao tuserPrizeDetailDao;
 
 	@RequestMapping(value = "/updateState", method = RequestMethod.POST)
 	public @ResponseBody
@@ -127,7 +131,7 @@ public class TactivityController {
 		ResponseData rd = new ResponseData();
 		ErrorCode result = ErrorCode.OK;
 		try {
-			List<TuserPrizeDetail> list = TuserPrizeDetail.findFailingAgencyPrizeDetails();
+			List<TuserPrizeDetail> list = tuserPrizeDetailDao.findFailingAgencyPrizeDetails();
 			for (TuserPrizeDetail detail : list) {
 				sendActivityPrizeListener.sendActivityPrizeCustomer(detail.getId(), detail.getActivityType(), null,
 						null);

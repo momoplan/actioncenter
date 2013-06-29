@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.TaddNumActivity;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
@@ -31,6 +32,9 @@ public class AddNumSuccessListener {
 
 	@Autowired
 	private LotteryService lotteryService;
+
+	@Autowired
+	private TuserPrizeDetailDao tuserPrizeDetailDao;
 
 	@Produce(uri = "jms:topic:sendActivityPrize")
 	private ProducerTemplate sendActivityPrizeProducer;
@@ -54,7 +58,7 @@ public class AddNumSuccessListener {
 		if (tactivity == null) {
 			return;
 		}
-		TuserPrizeDetail prizeDetail = TuserPrizeDetail.findTuserPrizeDetailByUsernoAndActivityType(userno,
+		TuserPrizeDetail prizeDetail = tuserPrizeDetailDao.findTuserPrizeDetailByUsernoAndActivityType(userno,
 				ActionJmsType.AddNumOneYear.value);
 		String express = tactivity.getExpress();
 		Map<String, Object> activity = JsonUtil.transferJson2Map(express);
@@ -95,7 +99,7 @@ public class AddNumSuccessListener {
 	}
 
 	private void sendPrize2UserJMS(String userno, BigDecimal amt, ActionJmsType actionJmsType, String memo) {
-		TuserPrizeDetail userPrizeDetail = TuserPrizeDetail.createTprizeUserBuyLog(userno, amt, actionJmsType);
+		TuserPrizeDetail userPrizeDetail = tuserPrizeDetailDao.createTprizeUserBuyLog(userno, amt, actionJmsType);
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("prizeDetailId", userPrizeDetail.getId());
 		headers.put("actionJmsType", actionJmsType.value);

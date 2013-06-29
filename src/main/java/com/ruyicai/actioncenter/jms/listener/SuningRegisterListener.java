@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Chong20Mobile;
 import com.ruyicai.actioncenter.domain.FirstChargeUser;
 import com.ruyicai.actioncenter.domain.SuningRegister;
@@ -33,6 +34,9 @@ public class SuningRegisterListener {
 
 	@Autowired
 	private TactionService tactionService;
+
+	@Autowired
+	private TuserPrizeDetailDao tuserPrizeDetailDao;
 
 	@Produce(uri = "jms:topic:sendActivityPrize")
 	private ProducerTemplate sendActivityPrizeProducer;
@@ -147,7 +151,7 @@ public class SuningRegisterListener {
 	@Transactional
 	public void sendPrize2UserJMS(String userno, BigDecimal amt, ActionJmsType actionJmsType, String ttransactionid,
 			String memo) {
-		TuserPrizeDetail userPrizeDetail = TuserPrizeDetail.createTprizeUserBuyLog(userno, amt, actionJmsType);
+		TuserPrizeDetail userPrizeDetail = tuserPrizeDetailDao.createTprizeUserBuyLog(userno, amt, actionJmsType);
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("prizeDetailId", userPrizeDetail.getId());
 		headers.put("actionJmsType", actionJmsType.value);

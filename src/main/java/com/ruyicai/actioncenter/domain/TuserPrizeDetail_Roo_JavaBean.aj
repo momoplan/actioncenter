@@ -4,11 +4,20 @@
 package com.ruyicai.actioncenter.domain;
 
 import java.lang.Integer;
+import java.lang.Long;
 import java.lang.String;
 import java.math.BigDecimal;
 import java.util.Date;
 
 privileged aspect TuserPrizeDetail_Roo_JavaBean {
+    
+    public Long TuserPrizeDetail.getId() {
+        return this.id;
+    }
+    
+    public void TuserPrizeDetail.setId(Long id) {
+        this.id = id;
+    }
     
     public String TuserPrizeDetail.getUserno() {
         return this.userno;

@@ -12,6 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.TaddNumActivity;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
@@ -39,6 +40,9 @@ public class TactivityTest {
 
 	@Autowired
 	FundJmsListener fundJmsListener;
+
+	@Autowired
+	TuserPrizeDetailDao tuserPrizeDetailDao;
 
 	@Test
 	@SuppressWarnings("unchecked")
@@ -276,7 +280,7 @@ public class TactivityTest {
 		Tactivity.saveOrUpdate("F47107", null, "00092493", null, ActionJmsType.Kuai3_JiaJiang.value, express3, 1,
 				ActionJmsType.Kuai3_JiaJiang.memo);
 	}
-	
+
 	@Test
 	public void testCreateTactivity19() {
 		Map<String, Object> map = new LinkedMap();
@@ -284,12 +288,12 @@ public class TactivityTest {
 		map.put("prizeamt", 2000);
 		map.put("topprize", 40000);
 		String express3 = JsonUtil.toJson(map);
-		//组六
+		// 组六
 		Tactivity.saveOrUpdate("F47103", "12", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
 				ActionJmsType.FuCai3D_JiaJiang.memo);
 		Tactivity.saveOrUpdate("F47103", "32", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
 				ActionJmsType.FuCai3D_JiaJiang.memo);
-		//组三
+		// 组三
 		map.put("step", 32000);
 		map.put("prizeamt", 4000);
 		map.put("topprize", 80000);
@@ -300,7 +304,7 @@ public class TactivityTest {
 				ActionJmsType.FuCai3D_JiaJiang.memo);
 		Tactivity.saveOrUpdate("F47103", "31", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
 				ActionJmsType.FuCai3D_JiaJiang.memo);
-		//单选
+		// 单选
 		map.put("step", 100000);
 		map.put("prizeamt", 10000);
 		map.put("topprize", 200000);
@@ -364,7 +368,7 @@ public class TactivityTest {
 	@Test
 	public void testfindTuserPrizeDetailByPage() {
 		Page<TuserPrizeDetail> page = new Page<TuserPrizeDetail>(0, 20);
-		TuserPrizeDetail.findTuserPrizeDetailByPage(new HashMap<String, Object>(), page);
+		tuserPrizeDetailDao.findTuserPrizeDetailByPage(new HashMap<String, Object>(), page);
 		for (TuserPrizeDetail detail : page.getList()) {
 			System.out.println(detail);
 		}

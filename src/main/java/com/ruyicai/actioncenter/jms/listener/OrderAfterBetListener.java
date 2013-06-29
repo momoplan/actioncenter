@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
@@ -32,6 +33,9 @@ public class OrderAfterBetListener {
 
 	@Autowired
 	private LotteryService lotteryService;
+	
+	@Autowired
+	private TuserPrizeDetailDao tuserPrizeDetailDao;
 
 	@Produce(uri = "jms:topic:sendActivityPrize")
 	private ProducerTemplate sendActivityPrizeProducer;
@@ -89,7 +93,7 @@ public class OrderAfterBetListener {
 	@Transactional
 	public void sendPrize2UserJMS(String userno, BigDecimal amt, ActionJmsType actionJmsType, String businessId,
 			String memo) {
-		TuserPrizeDetail userPrizeDetail = TuserPrizeDetail.createTprizeUserBuyLog(userno, amt, actionJmsType,
+		TuserPrizeDetail userPrizeDetail = tuserPrizeDetailDao.createTprizeUserBuyLog(userno, amt, actionJmsType,
 				businessId);
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("prizeDetailId", userPrizeDetail.getId());

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
+import com.ruyicai.actioncenter.domain.FundAndJoinAction;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
 import com.ruyicai.actioncenter.service.LotteryService;
@@ -22,6 +24,9 @@ public class SendActivityPrizeListener {
 	@Autowired
 	private LotteryService lotteryService;
 
+	@Autowired
+	private TuserPrizeDetailDao tuserPrizeDetailDao;
+
 	@Transactional
 	public void sendActivityPrizeCustomer(@Header("prizeDetailId") Long prizeDetailId,
 			@Header("actionJmsType") Integer actionJmsType, @Header("ttransactionid") String ttransactionid,
@@ -33,7 +38,7 @@ public class SendActivityPrizeListener {
 				memo = type.memo;
 			}
 		}
-		TuserPrizeDetail detail = TuserPrizeDetail.findTuserPrizeDetail(prizeDetailId, true);
+		TuserPrizeDetail detail = tuserPrizeDetailDao.findTuserPrizeDetail(prizeDetailId, true);
 		if (detail != null && detail.getState() == 0) {
 			Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(detail.getUserno());
 			Boolean flag = lotteryService.directChargeProcess(tuserinfo.getUserno(), detail.getAmt(),
@@ -46,9 +51,13 @@ public class SendActivityPrizeListener {
 					if (Tjmsservice.createTjmsservice(ttransactionid + actionJmsType,
 							ActionJmsType.SEND_ACTION_PRIZE_SUCCESS)) {
 						try {
-							lotteryService.deductDrawBalance(tuserinfo.getUserno(), ttransactionid);
+							FundAndJoinAction.createFundAndJoinAction(ttransactionid, detail.getUserno(),
+									actionJmsType, detail.getId());
+							// lotteryService.deductDrawBalance(tuserinfo.getUserno(),
+							// ttransactionid);
 						} catch (Exception e) {
-							logger.error("减少可提现金额失败", e);
+							// logger.error("减少可提现金额失败", e);
+							logger.error("保存参与活动的充值记录失败", e);
 						}
 					}
 				}
@@ -57,7 +66,7 @@ public class SendActivityPrizeListener {
 				logger.error("TuserPrizeDetail id:{},prizeAmt:{},userno:{},actionJmsType:{}.奖励失败", new String[] {
 						prizeDetailId + "", detail.getAmt() + "", detail.getUserno(), actionJmsType + "" });
 			}
-			detail.merge();
+			tuserPrizeDetailDao.merge(detail);
 		}
 	}
 }
