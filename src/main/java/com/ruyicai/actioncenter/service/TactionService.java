@@ -96,15 +96,12 @@ public class TactionService {
 		Boolean flag = false;
 		Tactivity tactivity = Tactivity.findTactivity(null, null, "00092493", null, ActionJmsType.Fund2Draw.value);
 		if (tactivity != null) {
-			String express = tactivity.getExpress();
-			Map<String, Object> activity = JsonUtil.transferJson2Map(express);
-			Integer state = (Integer) activity.get("state");
-			if (state != null && state == 1) {
-				Fund2Draw draw = fund2DrawDao.createFund2Draw(ttransactionid, userno, amt);
-				if (draw != null) {
-					flag = true;
-				}
+			Fund2Draw draw = fund2DrawDao.createFund2Draw(ttransactionid, userno, amt);
+			if (draw != null) {
+				flag = true;
 			}
+		} else {
+			logger.info("未开启");
 		}
 		return flag;
 	}

@@ -39,18 +39,15 @@ public class Fund2DrawService {
 	public void quartzFindFund2Draw() {
 		Tactivity tactivity = Tactivity.findTactivity(null, null, "00092493", null, ActionJmsType.Fund2Draw.value);
 		if (tactivity != null) {
-			String express = tactivity.getExpress();
-			Map<String, Object> activity = JsonUtil.transferJson2Map(express);
-			Integer state = (Integer) activity.get("state");
-			if (state != null && state == 1) {
-				logger.info("查询待增加可提现充值");
-				List<Fund2Draw> list = fund2DrawDao.findCanFund2Draw(Fund2DrawState.waitToDraw.value(), new Date());
-				for (Fund2Draw draw : list) {
-					if (draw != null && draw.getTtransactionid() != null) {
-						sendFund2DrawJMS(draw.getTtransactionid());
-					}
+			logger.info("查询待增加可提现充值");
+			List<Fund2Draw> list = fund2DrawDao.findCanFund2Draw(Fund2DrawState.waitToDraw.value(), new Date());
+			for (Fund2Draw draw : list) {
+				if (draw != null && draw.getTtransactionid() != null) {
+					sendFund2DrawJMS(draw.getTtransactionid());
 				}
 			}
+		} else {
+			logger.info("增加可提现充值未开启");
 		}
 	}
 
