@@ -13,6 +13,7 @@ privileged aspect Fund2Draw_Roo_ToString {
         sb.append("CreateTime: ").append(getCreateTime()).append(", ");
         sb.append("DrawTime: ").append(getDrawTime()).append(", ");
         sb.append("State: ").append(getState()).append(", ");
+        sb.append("SuccessTime: ").append(getSuccessTime()).append(", ");
         sb.append("Ttransactionid: ").append(getTtransactionid()).append(", ");
         sb.append("Userno: ").append(getUserno());
         return sb.toString();

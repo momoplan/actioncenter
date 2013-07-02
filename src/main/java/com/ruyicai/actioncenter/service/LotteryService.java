@@ -70,7 +70,6 @@ public class LotteryService {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("请求" + url + "失败" + e.getMessage());
 			throw new RuyicaiException(ErrorCode.ERROR);
 		}
@@ -112,7 +111,6 @@ public class LotteryService {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("请求" + url + "失败" + e.getMessage());
 			throw new RuyicaiException("请求lottery失败");
 		}
@@ -157,7 +155,6 @@ public class LotteryService {
 				flag = false;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("请求" + url + ",参数 " + params.toString() + ".失败" + e.getMessage());
 			throw new RuyicaiException("请求lottery失败");
 		}
@@ -195,7 +192,6 @@ public class LotteryService {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("请求" + url + ",参数 " + params.toString() + ".失败" + e.getMessage(), e);
 			throw new RuyicaiException("请求lottery失败");
 		}
@@ -230,7 +226,6 @@ public class LotteryService {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("请求" + url + "失败" + e.getMessage());
 			throw new RuyicaiException("请求lottery失败");
 		}
@@ -263,7 +258,6 @@ public class LotteryService {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("请求" + url + ",参数 " + params.toString() + ".失败" + e.getMessage());
 			throw new RuyicaiException("请求lottery失败");
 		}
@@ -307,7 +301,6 @@ public class LotteryService {
 				return null;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("请求" + url + "失败" + e.getMessage());
 			throw new RuyicaiException("请求lottery失败.url:" + url);
 		}
@@ -336,10 +329,43 @@ public class LotteryService {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("请求" + url + ",参数 " + params.toString() + ".失败" + e.getMessage());
 			throw new RuyicaiException("请求chargecenter失败");
 		}
+	}
+
+	/**
+	 * 增加可提现金额
+	 * 
+	 * @param ttransactionid
+	 * @return
+	 */
+	public boolean fund2Draw(String ttransactionid) {
+		boolean flag = false;
+		if (StringUtils.isBlank(ttransactionid)) {
+			throw new IllegalArgumentException("the argument ttransactionid is required");
+		}
+		logger.info("增加可提现金额ttransactionid:{}", new String[] { ttransactionid });
+		String url = lotteryurl + "/taccounts/addDraw";
+		String params = "ttransactionid=" + ttransactionid;
+		try {
+			String result = HttpUtil.post(url, params);
+			logger.info("deductDrawBalance result:" + result);
+			if (StringUtils.isNotBlank(result)) {
+				JSONObject jsonObject = new JSONObject(result);
+				String errorCode = jsonObject.getString("errorCode");
+				if (errorCode.equals(ErrorCode.OK.value)) {
+					logger.info("增加可提现金额成功ttransactionid:" + ttransactionid);
+					flag = true;
+				} else {
+					logger.error("增加可提现金额失败" + ttransactionid);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("请求" + url + ",参数 " + params.toString() + ".失败" + e.getMessage(), e);
+			throw new RuyicaiException("请求chargecenter失败");
+		}
+		return flag;
 	}
 
 	/**
@@ -368,7 +394,6 @@ public class LotteryService {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("请求" + url + "失败" + e.getMessage());
 			throw new RuyicaiException("请求lottery失败");
 		}
@@ -404,7 +429,6 @@ public class LotteryService {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("请求" + url + "失败" + e.getMessage());
 			throw new RuyicaiException("请求lottery失败");
 		}
@@ -428,7 +452,6 @@ public class LotteryService {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("请求" + url + "失败" + e.getMessage());
 			throw new RuyicaiException("请求lottery失败");
 		}

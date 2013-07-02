@@ -41,6 +41,9 @@ public class Fund2Draw {
 
 	@Column(name = "DRAWTIME")
 	private Date drawTime;
+	
+	@Column(name = "SUCCESSTIME")
+	private Date successTime;
 
 	/**
 	 * 0:未增加提现，1:以增加提现，2:参与活动不能提现

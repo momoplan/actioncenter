@@ -44,6 +44,8 @@ public class RoutesConfiguration {
 						"bean:suningRegisterListener?method=userCreatedCustomer").routeId("actioncenter用户注册活动监听");
 				from("jms:queue:VirtualTopicConsumers.actioncenter.userModify?concurrentConsumers=10").to(
 						"bean:suningRegisterListener?method=userModifyCustomer").routeId("actioncenter用户修改活动监听");
+				from("jms:queue:VirtualTopicConsumers.actioncenter.sendFund2Draw?concurrentConsumers=10").to(
+						"bean:fund2DrawService?method=fund2Draw").routeId("增加用户可提现");
 			}
 		});
 	}

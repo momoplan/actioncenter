@@ -2,14 +2,17 @@ package com.ruyicai.actioncenter.dao;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ruyicai.actioncenter.consts.Const;
 import com.ruyicai.actioncenter.domain.Fund2Draw;
 
 @Component
@@ -51,11 +54,13 @@ public class Fund2DrawDao {
 	}
 
 	public Fund2Draw createFund2Draw(String ttransactionid, String userno, BigDecimal amt) {
+		Date date = new Date();
 		Fund2Draw draw = new Fund2Draw();
 		draw.setTtransactionid(ttransactionid);
 		draw.setUserno(userno);
 		draw.setAmt(amt);
-		draw.setCreateTime(new Date());
+		draw.setCreateTime(date);
+		draw.setDrawTime(new Date(date.getTime()+Const.delayDay));
 		draw.setState(0);
 		this.persist(draw);
 		return draw;
@@ -82,5 +87,19 @@ public class Fund2DrawDao {
 			this.merge(draw);
 		}
 		return draw;
+	}
+
+	public List<Fund2Draw> findCanFund2Draw(Integer state, Date date) {
+		if (state == null || date == null) {
+			throw new IllegalArgumentException("the argument state and date are both require");
+		}
+		TypedQuery<Fund2Draw> q = this.entityManager
+				.createQuery(
+						"SELECT o FROM Fund2Draw AS o WHERE o.state = :state AND o.drawTime >= :drawTime order by o.createTime desc",
+						Fund2Draw.class);
+		q.setParameter("state", state);
+		q.setParameter("drawTime", date);
+		q.setMaxResults(5000);
+		return q.getResultList();
 	}
 }

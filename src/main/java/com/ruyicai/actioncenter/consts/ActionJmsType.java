@@ -28,7 +28,8 @@ public enum ActionJmsType {
 	Encash_Jingcai_2Chan1(18,"竞彩2串1加奖"),
 	Kuai3_JiaJiang(19,"快3加奖"),
 	FuCai3D_JiaJiang(20,"3D加奖"),
-	CashTransaction(21,"充值金额可提现");
+	CashTransaction(21,"充值金额可提现"),
+	Fund2Draw(22,"增加可提现金额");
 
 	public int value;
 

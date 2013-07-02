@@ -17,9 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.Fund2DrawDao;
 import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Chong20Mobile;
 import com.ruyicai.actioncenter.domain.FirstChargeUser;
+import com.ruyicai.actioncenter.domain.Fund2Draw;
 import com.ruyicai.actioncenter.domain.OldUserChongZhi;
 import com.ruyicai.actioncenter.domain.SendMoneyDetails;
 import com.ruyicai.actioncenter.domain.Tactivity;
@@ -53,6 +55,9 @@ public class TactionService {
 	@Value("${addNumOneYearSwitch}")
 	private String addNumOneYearSwitch;
 
+	@Autowired
+	private Fund2DrawDao fund2DrawDao;
+
 	@Transactional
 	public void processFundJMSCustomer(String ttransactionid, Long ladderpresentflag, String userno, Long amtLong,
 			Integer actionJmsType, String businessId, Integer businessType) {
@@ -85,9 +90,22 @@ public class TactionService {
 		}
 	}
 
+	@Transactional
 	private Boolean save2cashTransaction(String ttransactionid, String userno, BigDecimal amt) {
 		logger.info("保存充值等待可提现ttransactionid:{},userno:{},amt:{}", new String[] { ttransactionid, userno, amt + "" });
 		Boolean flag = false;
+		Tactivity tactivity = Tactivity.findTactivity(null, null, "00092493", null, ActionJmsType.Fund2Draw.value);
+		if (tactivity != null) {
+			String express = tactivity.getExpress();
+			Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+			Integer state = (Integer) activity.get("state");
+			if (state != null && state == 1) {
+				Fund2Draw draw = fund2DrawDao.createFund2Draw(ttransactionid, userno, amt);
+				if (draw != null) {
+					flag = true;
+				}
+			}
+		}
 		return flag;
 	}
 

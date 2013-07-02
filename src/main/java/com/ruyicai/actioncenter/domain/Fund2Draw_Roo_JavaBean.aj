@@ -49,6 +49,14 @@ privileged aspect Fund2Draw_Roo_JavaBean {
         this.drawTime = drawTime;
     }
     
+    public Date Fund2Draw.getSuccessTime() {
+        return this.successTime;
+    }
+    
+    public void Fund2Draw.setSuccessTime(Date successTime) {
+        this.successTime = successTime;
+    }
+    
     public int Fund2Draw.getState() {
         return this.state;
     }
