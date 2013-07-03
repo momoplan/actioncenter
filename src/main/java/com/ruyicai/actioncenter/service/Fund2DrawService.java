@@ -20,7 +20,6 @@ import com.ruyicai.actioncenter.dao.Fund2DrawDao;
 import com.ruyicai.actioncenter.domain.Fund2Draw;
 import com.ruyicai.actioncenter.domain.FundAndJoinAction;
 import com.ruyicai.actioncenter.domain.Tactivity;
-import com.ruyicai.actioncenter.util.JsonUtil;
 
 @Service
 public class Fund2DrawService {

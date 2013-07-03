@@ -95,7 +95,7 @@ public class Fund2DrawDao {
 		}
 		TypedQuery<Fund2Draw> q = this.entityManager
 				.createQuery(
-						"SELECT o FROM Fund2Draw AS o WHERE o.state = :state AND o.drawTime >= :drawTime order by o.createTime desc",
+						"SELECT o FROM Fund2Draw AS o WHERE o.state = :state AND o.drawTime <= :drawTime order by o.createTime desc",
 						Fund2Draw.class);
 		q.setParameter("state", state);
 		q.setParameter("drawTime", date);
