@@ -74,7 +74,7 @@ public class Fund2DrawService {
 		Boolean flag = lotteryService.fund2Draw(ttransactionid);
 		if (flag) {
 			draw.setState(Fund2DrawState.haveDraw.value());
-			draw.setDrawTime(new Date());
+			draw.setSuccessTime(new Date());
 			fund2DrawDao.merge(draw);
 			logger.info("充值增加提现ttransactionid:" + ttransactionid + "已调用lottery完毕");
 		} else {
