@@ -33,7 +33,7 @@ public class OrderAfterBetListener {
 
 	@Autowired
 	private LotteryService lotteryService;
-	
+
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
 
@@ -47,6 +47,7 @@ public class OrderAfterBetListener {
 		if (StringUtils.isBlank(orderJson)) {
 			return;
 		}
+		logger.info("订单出票成功orderJson:" + orderJson);
 		Torder order = JsonUtil.fromJsonToObject(orderJson, Torder.class);
 		if (order == null) {
 			return;
