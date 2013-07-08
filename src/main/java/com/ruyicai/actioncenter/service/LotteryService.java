@@ -458,4 +458,27 @@ public class LotteryService {
 		return order;
 	}
 
+	public BigDecimal selectMinAmtBySubscribeno(String flowno) {
+		BigDecimal minAmt = BigDecimal.ZERO;
+		if (StringUtils.isBlank(flowno)) {
+			return minAmt;
+		}
+		String url = lotteryurl + "/select/selectMinAmtBySubscribeno?flowno=" + flowno;
+		try {
+			String result = HttpUtil.getResultMessage(url.toString());
+			if (StringUtils.isNotBlank(result)) {
+				JSONObject jsonObject = new JSONObject(result);
+				String errorCode = jsonObject.getString("errorCode");
+				if (errorCode.equals(ErrorCode.OK.value)) {
+					String value = jsonObject.getString("value");
+					minAmt = new BigDecimal(value);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("请求" + url + "失败" + e.getMessage());
+			throw new RuyicaiException("请求lottery失败");
+		}
+		return minAmt;
+	}
+
 }

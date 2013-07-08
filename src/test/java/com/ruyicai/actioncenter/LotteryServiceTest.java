@@ -62,10 +62,16 @@ public class LotteryServiceTest {
 		String json = "{\"batchcode\":\"2012240\",\"buyAmtByFollower\":54000,\"buyAmtByStarter\":2000,\"caselotinfo\":null,\"commisionRatio\":10,\"content\":null,\"description\":\"昨晚就差一个数，希望今天可以中，20元的投注会有几倍的回报，大家谨慎投注！\",\"displayState\":2,\"displayStateMemo\":\"满员\",\"endTime\":null,\"full\":true,\"hasachievement\":0,\"id\":\"C00000005838929\",\"isWinner\":0,\"lotno\":\"F47103\",\"lotsType\":1,\"minAmt\":2000,\"orderid\":\"BJ2012090303906675\",\"participantCount\":25,\"playtype\":\"32\",\"safeAmt\":0,\"sortState\":0,\"startTime\":1346628259435,\"starter\":\"00000042\",\"state\":3,\"title\":null,\"totalAmt\":56000,\"visibility\":1,\"winBigAmt\":0,\"winDetail\":null,\"winEndTime\":null,\"winFlag\":null,\"winLittleAmt\":null,\"winPreAmt\":0,\"winStartTime\":null}";
 		caselotBetFullListener.encashCustomer(json);
 	}
-	
+
 	@Test
-	public void testfindCaseLotBuyAllPrizeamtById(){
+	public void testfindCaseLotBuyAllPrizeamtById() {
 		Integer prize = lotteryService.findCaseLotBuyAllPrizeamtById("C00000000584537", "00000138");
 		System.out.println(prize);
+	}
+
+	@Test
+	public void testSelectMinAmt() {
+		BigDecimal minAmt = lotteryService.selectMinAmtBySubscribeno("0000000002408095");
+		System.out.println(minAmt);
 	}
 }

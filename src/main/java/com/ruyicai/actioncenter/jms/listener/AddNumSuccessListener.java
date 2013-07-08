@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.camel.Body;
 import org.apache.camel.Header;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -23,6 +24,7 @@ import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
 import com.ruyicai.actioncenter.service.LotteryService;
 import com.ruyicai.actioncenter.util.DateUtil;
 import com.ruyicai.actioncenter.util.JsonUtil;
+import com.ruyicai.lottery.domain.Tsubscribe;
 import com.ruyicai.lottery.domain.Tuserinfo;
 
 @Service
@@ -107,4 +109,43 @@ public class AddNumSuccessListener {
 		sendActivityPrizeProducer.sendBodyAndHeaders(null, headers);
 	}
 
+	@Transactional
+	public void addNumSuccessJsonCustomer(@Body String body) {
+		if (StringUtils.isBlank(body)) {
+			logger.info("null return");
+			return;
+		}
+		logger.info("addnumsuccessjson:" + body);
+		Tsubscribe tsubscribe = Tsubscribe.fromJsonToTsubscribe(body);
+		if (tsubscribe == null) {
+			logger.info("null return");
+			return;
+		}
+		String userno = tsubscribe.getUserno();
+		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
+		if (tuserinfo == null) {
+			logger.info("null return");
+			return;
+		}
+		Tactivity addNum15 = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+				ActionJmsType.AddNum15.value);
+		if (addNum15 != null) {
+			String express = addNum15.getExpress();
+			Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+			Integer addnum = (Integer) activity.get("addnum");
+			Integer maxprizeamt = (Integer) activity.get("maxprizeamt");
+			if (tsubscribe.getHasAddBatchCount() == addnum) {
+				BigDecimal minAmt = lotteryService.selectMinAmtBySubscribeno(tsubscribe.getFlowno());
+				if (minAmt == null || minAmt.compareTo(BigDecimal.ZERO) <= 0) {
+					logger.info("最小金额为空或小于等于0");
+					return;
+				}
+				if (minAmt.compareTo(new BigDecimal(maxprizeamt)) > 0) {
+					minAmt = new BigDecimal(maxprizeamt);
+				}
+				logger.info("追号15期赠送" + minAmt);
+				sendPrize2UserJMS(userno, minAmt, ActionJmsType.AddNum15, addNum15.getMemo());
+			}
+		}
+	}
 }

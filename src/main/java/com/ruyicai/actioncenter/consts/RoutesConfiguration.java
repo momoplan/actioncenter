@@ -33,6 +33,8 @@ public class RoutesConfiguration {
 						"bean:caselotBetFullListener?method=encashCustomer").routeId("actioncenter合买成功");
 				from("jms:queue:VirtualTopicConsumers.actioncenter.addnumsuccess?concurrentConsumers=20").to(
 						"bean:addNumSuccessListener?method=addNumSuccessCustomer").routeId("actioncenter追号成功");
+				from("jms:queue:VirtualTopicConsumers.actioncenter.addnumsuccessjson?concurrentConsumers=20").to(
+						"bean:addNumSuccessListener?method=addNumSuccessJsonCustomer").routeId("追号成功Body");
 				from("jms:queue:VirtualTopicConsumers.actioncenter.orderPirzeend?concurrentConsumers=20").to(
 						"bean:orderEncashListener?method=orderEncashCustomer").routeId("actioncenter派奖加奖");
 				from("jms:queue:VirtualTopicConsumers.actioncenter.dispatchCaseLotFinish?concurrentConsumers=20").to(

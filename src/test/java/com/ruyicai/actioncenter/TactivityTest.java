@@ -322,6 +322,16 @@ public class TactivityTest {
 		Tactivity.saveOrUpdate("F47103", "54", "00092493", null, ActionJmsType.FuCai3D_JiaJiang.value, express3, 1,
 				ActionJmsType.FuCai3D_JiaJiang.memo);
 	}
+	
+	@Test
+	public void testCreateTactivity20() {
+		Map<String, Object> map = new LinkedMap();
+		map.put("addnum", 15);
+		map.put("maxprizeamt", 8800);
+		String express3 = JsonUtil.toJson(map);
+		Tactivity.saveOrUpdate(null, null, "00092493", null, ActionJmsType.AddNum15.value, express3, 1,
+				ActionJmsType.AddNum15.memo);
+	}
 
 	@Test
 	public void testCaselotBetFull() throws InterruptedException {
