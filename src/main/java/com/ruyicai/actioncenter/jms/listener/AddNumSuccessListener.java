@@ -69,21 +69,10 @@ public class AddNumSuccessListener {
 		if (prizeDetail == null) {
 			logger.info("第一次赠送追号包年套餐奖金");
 			sendPrize2UserJMS(addNumActivity.getUserno(), new BigDecimal(prize), ActionJmsType.AddNumOneYear,
-					tactivity.getMemo());
+					tactivity.getMemo(), flowno);
 		} else {
 			date = prizeDetail.getCreateTime();
 			String dateStr = DateUtil.format(date);
-			/*
-			 * Long count = lotteryService.findTtransactionCount(userno,
-			 * dateStr); if (count != null) { if (count == 0) {
-			 * logger.info("取消用户追号包年套餐userno:" + userno);
-			 * addNumActivity.setAddNumState(BigDecimal.ZERO);
-			 * addNumActivity.setModifyTime(new Date()); addNumActivity.merge();
-			 * } else if (count > 0) { logger.info("赠送用户追号包年套餐userno:" + userno
-			 * + ",prize:" + prize);
-			 * sendPrize2UserJMS(addNumActivity.getUserno(), new
-			 * BigDecimal(prize), ActionJmsType.AddNumOneYear); } }
-			 */
 			BigDecimal count = lotteryService.findTtransactionSum(userno, dateStr);
 			if (count != null) {
 				if (count.compareTo(new BigDecimal(200)) < 0) {
@@ -94,14 +83,16 @@ public class AddNumSuccessListener {
 				} else {
 					logger.info("赠送用户追号包年套餐userno:" + userno + ",prize:" + prize);
 					sendPrize2UserJMS(addNumActivity.getUserno(), new BigDecimal(prize), ActionJmsType.AddNumOneYear,
-							tactivity.getMemo());
+							tactivity.getMemo(), flowno);
 				}
 			}
 		}
 	}
 
-	private void sendPrize2UserJMS(String userno, BigDecimal amt, ActionJmsType actionJmsType, String memo) {
-		TuserPrizeDetail userPrizeDetail = tuserPrizeDetailDao.createTprizeUserBuyLog(userno, amt, actionJmsType);
+	private void sendPrize2UserJMS(String userno, BigDecimal amt, ActionJmsType actionJmsType, String memo,
+			String businessId) {
+		TuserPrizeDetail userPrizeDetail = tuserPrizeDetailDao.createTprizeUserBuyLog(userno, amt, actionJmsType,
+				businessId);
 		Map<String, Object> headers = new HashMap<String, Object>();
 		headers.put("prizeDetailId", userPrizeDetail.getId());
 		headers.put("actionJmsType", actionJmsType.value);
@@ -149,7 +140,7 @@ public class AddNumSuccessListener {
 					minAmt = new BigDecimal(maxprizeamt);
 				}
 				logger.info("追号15期赠送" + minAmt);
-				sendPrize2UserJMS(userno, minAmt, ActionJmsType.AddNum15, addNum15.getMemo());
+				sendPrize2UserJMS(userno, minAmt, ActionJmsType.AddNum15, addNum15.getMemo(), tsubscribe.getFlowno());
 			}
 		}
 	}
