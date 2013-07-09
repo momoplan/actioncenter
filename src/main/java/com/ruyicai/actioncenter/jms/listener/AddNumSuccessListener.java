@@ -121,6 +121,10 @@ public class AddNumSuccessListener {
 			logger.info("null return");
 			return;
 		}
+		if (tsubscribe.getBatchnum() == null || tsubscribe.getLastnum() == null) {
+			logger.info("Batchnum or Lastnum is null");
+			return;
+		}
 		String userno = tsubscribe.getUserno();
 		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
 		if (tuserinfo == null) {
@@ -134,7 +138,8 @@ public class AddNumSuccessListener {
 			Map<String, Object> activity = JsonUtil.transferJson2Map(express);
 			Integer addnum = (Integer) activity.get("addnum");
 			Integer maxprizeamt = (Integer) activity.get("maxprizeamt");
-			if (tsubscribe.getHasAddBatchCount() == addnum) {
+			BigDecimal subtract = tsubscribe.getBatchnum().subtract(tsubscribe.getLastnum());
+			if (subtract.compareTo(new BigDecimal(addnum)) == 0) {
 				BigDecimal minAmt = lotteryService.selectMinAmtBySubscribeno(tsubscribe.getFlowno());
 				if (minAmt == null || minAmt.compareTo(BigDecimal.ZERO) <= 0) {
 					logger.info("最小金额为空或小于等于0");
