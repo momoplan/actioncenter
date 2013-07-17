@@ -777,7 +777,7 @@
 		<profile>
 			<id>beijing</id>
 			<properties>
-				<database.url>jdbc:mysql://192.168.99.120:3306/actioncenter</database.url>
+				<database.url>jdbc:mysql://192.168.99.18:3306/actioncenter</database.url>
 				<database.driverClassName>com.mysql.jdbc.Driver</database.driverClassName>
 				<database.username>jrtConsole</database.username>
 				<database.password>jrtConsole</database.password>
