@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
+import com.ruyicai.actioncenter.domain.FirstOrder;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
@@ -61,6 +62,49 @@ public class OrderAfterBetListener {
 		if (tuserinfo == null) {
 			return;
 		}
+		ssqzengsong(order, tuserinfo);
+		try {
+			firstorder(order, tuserinfo);
+		} catch (Exception e) {
+			logger.error("广东快乐十分首单活动异常", e);
+		}
+	}
+
+	@Transactional
+	public void firstorder(Torder order, Tuserinfo tuserinfo) {
+		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
+				ActionJmsType.First_Order.value);
+		if (tactivity != null) {
+			String express = tactivity.getExpress();
+			Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+			Integer amt = (Integer) activity.get("amt");
+			Integer prize = (Integer) activity.get("prize");
+			if (amt == null || prize == null) {
+				logger.error("参数不正确amt:{},prize:{}", new String[] { amt + "", prize + "" });
+				return;
+			}
+			BigDecimal orderAmt = order.getAmt();
+			if (orderAmt.compareTo(new BigDecimal(amt)) >= 0) {
+				FirstOrder firstOrder = FirstOrder.findFirstOrder(tuserinfo.getUserno());
+				if (firstOrder != null) {
+					logger.info(tactivity.getMemo() + "活动已参加过userno:" + tuserinfo.getUserno());
+					return;
+				} else {
+					FirstOrder fo = new FirstOrder();
+					fo.setUserno(tuserinfo.getUserno());
+					fo.setOrderid(order.getId());
+					fo.persist();
+					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.First_Order)) {
+						logger.info(ActionJmsType.First_Order.memo + "prize:" + prize.longValue());
+						sendPrize2UserJMS(tuserinfo.getUserno(), new BigDecimal(prize), ActionJmsType.First_Order,
+								order.getId(), tactivity.getMemo());
+					}
+				}
+			}
+		}
+	}
+
+	public void ssqzengsong(Torder order, Tuserinfo tuserinfo) {
 		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.Friday_SSQ_ZENGSONG.value);
 		if (tactivity != null) {
@@ -82,8 +126,8 @@ public class OrderAfterBetListener {
 					if (prize.compareTo(BigDecimal.ZERO) > 0) {
 						if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Friday_SSQ_ZENGSONG)) {
 							logger.info(ActionJmsType.Friday_SSQ_ZENGSONG.memo + "prize:" + prize.longValue());
-							sendPrize2UserJMS(userno, prize, ActionJmsType.Friday_SSQ_ZENGSONG, order.getId(),
-									tactivity.getMemo());
+							sendPrize2UserJMS(tuserinfo.getUserno(), prize, ActionJmsType.Friday_SSQ_ZENGSONG,
+									order.getId(), tactivity.getMemo());
 						}
 					}
 				}
