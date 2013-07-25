@@ -32,14 +32,14 @@
 		<repository>
 			<id>ruyicai</id>
 			<name>Ruyicai Repository</name>
-			<url>http://202.43.152.168/nexus/content/repositories/public/</url>
+			<url>http://www.g3cai.cn/nexus/content/repositories/public/</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>ruyicai</id>
 			<name>Ruyicai Repository</name>
-			<url>http://202.43.152.168/nexus/content/repositories/public/</url>
+			<url>http://www.g3cai.cn/nexus/content/repositories/public/</url>
 		</pluginRepository>
 	</pluginRepositories>
 	<dependencies>
@@ -777,7 +777,7 @@
 		<profile>
 			<id>beijing</id>
 			<properties>
-				<database.url>jdbc:mysql://192.168.99.18:3306/actioncenter</database.url>
+				<database.url>jdbc:mysql://192.168.99.33:3306/actioncenter</database.url>
 				<database.driverClassName>com.mysql.jdbc.Driver</database.driverClassName>
 				<database.username>jrtConsole</database.username>
 				<database.password>jrtConsole</database.password>
@@ -789,24 +789,6 @@
 				<memcache.client.ip>192.168.99.30:12000,192.168.99.31:12000</memcache.client.ip>
 				<lotteryurl>http://192.168.99.6/lotteryprize</lotteryurl>
 				<chargecenterurl>http://192.168.99.121:8088/ChargeCenter</chargecenterurl>
-			</properties>
-		</profile>
-		<profile>
-			<id>product</id>
-			<properties>
-				<database.url>jdbc:mysql://192.168.102.2:3306/actioncenter</database.url>
-				<database.driverClassName>com.mysql.jdbc.Driver</database.driverClassName>
-				<database.username>jrtConsole</database.username>
-				<database.password>jrtConsole</database.password>
-				<tomcat.manager.url>http://192.168.102.100:8888/manager</tomcat.manager.url>
-				<tomcat.manager.port>9080</tomcat.manager.port>
-				<maven.test.skip>true</maven.test.skip>
-				<jms.new-issue.brokerURL>failover://(tcp://192.168.102.100:61616,tcp://192.168.102.109:61616)?randomize=false</jms.new-issue.brokerURL>
-				<ruyicaiUserno>00808738</ruyicaiUserno>
-				<camel.jmxAgent.registryPort>2099</camel.jmxAgent.registryPort>
-				<memcache.client.ip>192.168.102.109:12000,192.168.102.108:12000</memcache.client.ip>
-				<lotteryurl>http://192.168.102.100/lottery</lotteryurl>
-				<chargecenterurl>http://192.168.102.106:8090/ChargeCenter</chargecenterurl>
 			</properties>
 		</profile>
 	</profiles>

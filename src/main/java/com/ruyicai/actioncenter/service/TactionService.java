@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.dao.Fund2DrawDao;
 import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
+import com.ruyicai.actioncenter.dao.VipUserDao;
 import com.ruyicai.actioncenter.domain.Chong20Mobile;
 import com.ruyicai.actioncenter.domain.FirstChargeUser;
 import com.ruyicai.actioncenter.domain.Fund2Draw;
@@ -48,6 +49,9 @@ public class TactionService {
 
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
+
+	@Autowired
+	private VipUserDao vipUserDao;
 
 	@Produce(uri = "jms:topic:sendActivityPrize")
 	private ProducerTemplate sendActivityPrizeProducer;
@@ -351,12 +355,14 @@ public class TactionService {
 		}
 		String currentMonth = DateUtil.format("yyyy-MM", new Date());
 		if (tuserinfo != null) {
-			VipUser currentMonthVipUser = VipUser.findIfNotExistsCreate(userno, currentMonth);
-			if (currentMonthVipUser != null) {
-				currentMonthVipUser.setBuyamt(currentMonthVipUser.getBuyamt() == null ? amt : currentMonthVipUser
-						.getBuyamt().add(amt));
-				currentMonthVipUser.setModifyTime(new Date());
-				currentMonthVipUser.merge();
+			VipUser vipUser = vipUserDao.findVipUser(userno, currentMonth, true);
+			if (vipUser == null) {
+				vipUser = vipUserDao.createVipUser(userno, currentMonth);
+			}
+			if (vipUser != null) {
+				vipUser.setBuyamt(vipUser.getBuyamt() == null ? amt : vipUser.getBuyamt().add(amt));
+				vipUser.setModifyTime(new Date());
+				vipUserDao.merge(vipUser);
 				logger.info("大客户userno:{},增加购买金额{}", new String[] { userno, amt + "" });
 			}
 		}
@@ -372,7 +378,7 @@ public class TactionService {
 
 				calendar.add(Calendar.MONTH, -1);
 				String lastMonth = DateUtil.format("yyyy-MM", calendar.getTime());
-				VipUser lastMonthVipUser = VipUser.findIfNotExistsCreate(userno, lastMonth);
+				VipUser lastMonthVipUser = vipUserDao.findVipUser(userno, lastMonth, false);
 				if (lastMonthVipUser != null && lastMonthVipUser.getBuyamt().compareTo(new BigDecimal(step)) >= 0) {
 					if (amt.compareTo(BigDecimal.ZERO) >= 0) {
 						flag = true;
