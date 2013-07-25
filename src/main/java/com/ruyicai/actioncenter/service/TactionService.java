@@ -62,7 +62,6 @@ public class TactionService {
 	@Autowired
 	private Fund2DrawDao fund2DrawDao;
 
-	@Transactional
 	public void processFundJMSCustomer(String ttransactionid, Long ladderpresentflag, String userno, Long amtLong,
 			Integer actionJmsType, String businessId, Integer businessType) {
 		logger.info(
