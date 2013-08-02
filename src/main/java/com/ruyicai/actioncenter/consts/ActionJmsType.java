@@ -30,7 +30,8 @@ public enum ActionJmsType {
 	FuCai3D_JiaJiang(20,"3D加奖"),
 	AddNum15(21,"追号满15期赠送"),
 	Fund2Draw(22,"增加可提现金额"),
-	First_Order(23,"广东快乐十分首单赠送");
+	First_Order(23,"广东快乐十分首单赠送"),
+	Coupon(24,"兑换券赠送彩金");
 
 	public int value;
 
