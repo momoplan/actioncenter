@@ -62,6 +62,10 @@ public class OrderAfterBetListener {
 		if (tuserinfo == null) {
 			return;
 		}
+		if (tuserinfo.getChannel() != null && tuserinfo.getChannel().equals("991")) {
+			logger.info("如意彩大户渠道不参加活动userno:" + userno);
+			return;
+		}
 		ssqzengsong(order, tuserinfo);
 		try {
 			firstorder(order, tuserinfo);

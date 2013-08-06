@@ -66,6 +66,10 @@ public class SuningRegisterListener {
 			logger.error("用户为空或用户编号为空或channel为空");
 			return;
 		}
+		if (tuserinfo != null && tuserinfo.getChannel() != null && tuserinfo.getChannel().equals("991")) {
+			logger.info("如意彩大户渠道不参加活动");
+			return;
+		}
 		String userno = tuserinfo.getUserno();
 		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.FIRST_CHONGZHI_ZENGSONG.value);
@@ -111,6 +115,10 @@ public class SuningRegisterListener {
 		if (tuserinfo == null || StringUtils.isBlank(tuserinfo.getUserno())
 				|| StringUtils.isBlank(tuserinfo.getChannel())) {
 			logger.error("用户为空或用户编号为空或channel为空");
+			return;
+		}
+		if (tuserinfo != null && tuserinfo.getChannel() != null && tuserinfo.getChannel().equals("991")) {
+			logger.info("如意彩大户渠道不参加活动");
 			return;
 		}
 		String userno = tuserinfo.getUserno();

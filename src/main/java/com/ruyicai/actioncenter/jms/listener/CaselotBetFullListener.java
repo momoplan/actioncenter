@@ -30,7 +30,7 @@ public class CaselotBetFullListener {
 
 	@Autowired
 	private LotteryService lotteryService;
-	
+
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
 
@@ -50,6 +50,12 @@ public class CaselotBetFullListener {
 		if (tuserinfo == null) {
 			logger.error("合买发起人从lottery中没有查询到");
 			return;
+		}
+		if (tuserinfo != null && tuserinfo.getChannel() != null) {
+			if (tuserinfo.getChannel().equals("991")) {
+				logger.info("如意彩大户渠道不参加活动userno:" + starter);
+				return;
+			}
 		}
 		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.CASELOT_SUCCESS.value);

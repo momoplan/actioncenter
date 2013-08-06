@@ -36,7 +36,7 @@ public class OrderEncashListener {
 
 	@Autowired
 	private LotteryService lotteryService;
-	
+
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
 
@@ -57,6 +57,10 @@ public class OrderEncashListener {
 		}
 		String userno = order.getUserno();
 		Tuserinfo orderUserInfo = lotteryService.findTuserinfoByUserno(userno);
+		if (orderUserInfo != null && orderUserInfo.getChannel() != null && orderUserInfo.getChannel().equals("991")) {
+			logger.info("如意彩大户渠道不参加活动userno:" + userno);
+			return;
+		}
 		addPrizeSSC(order, orderUserInfo);
 		addPrize2Chuan1(order, orderUserInfo);
 		addPrize11Xuan5(order, orderUserInfo);

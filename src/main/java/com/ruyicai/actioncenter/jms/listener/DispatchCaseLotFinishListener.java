@@ -48,6 +48,12 @@ public class DispatchCaseLotFinishListener {
 		if (userInfo == null) {
 			return;
 		}
+		if (userInfo != null && userInfo.getChannel() != null) {
+			if (userInfo.getChannel().equals("991")) {
+				logger.info("如意彩大户渠道不参加活动userno:" + starter);
+				return;
+			}
+		}
 		Torder torder = lotteryService.findTorderById(caseLot.getOrderid());
 		if (torder == null) {
 			return;

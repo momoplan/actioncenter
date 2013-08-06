@@ -55,6 +55,12 @@ public class AddNumSuccessListener {
 		if (tuserinfo == null) {
 			return;
 		}
+		if (tuserinfo != null && tuserinfo.getChannel() != null) {
+			if (tuserinfo.getChannel().equals("991")) {
+				logger.info("如意彩大户渠道不参加活动userno:" + userno);
+				return;
+			}
+		}
 		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.AddNumOneYear.value);
 		if (tactivity == null) {

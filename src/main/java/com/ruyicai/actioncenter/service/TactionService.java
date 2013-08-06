@@ -74,19 +74,34 @@ public class TactionService {
 		BigDecimal amt = new BigDecimal(amtLong);
 		try {
 			if (actionJmsType == ActionJmsType.CHONGZHI_SUCCESS.value) {
-				logger.info("充值成功事件");
+				/** 充值可提现功能 */
 				save2cashTransaction(ttransactionid, userno, amt);
+			}
+		} catch (Exception e) {
+			logger.error("充值可提现功能异常  userno:" + userno + ",amt:" + amtLong + ",actionJmsType:" + actionJmsType, e);
+		}
+
+		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
+		if (tuserinfo == null) {
+			return;
+		}
+		if (tuserinfo.getChannel() != null && tuserinfo.getChannel().equals("991")) {
+			logger.info("如意彩大户渠道不参加活动userno:" + userno);
+			return;
+		}
+		try {
+			if (actionJmsType == ActionJmsType.CHONGZHI_SUCCESS.value) {
 				/** 充值满百送5%活动 */
-				chongzhiManBaiZengSong(ttransactionid, ladderpresentflag, userno, amt);
+				chongzhiManBaiZengSong(ttransactionid, ladderpresentflag, tuserinfo, amt);
 				/** 第一次充值活动 */
-				firshChongzhiZengSong(ttransactionid, userno, amt);
+				firshChongzhiZengSong(ttransactionid, tuserinfo, amt);
 				/** 2013.5.1老用户充值赠送 */
-				oldUserZengSong(ttransactionid, userno, amt);
+				oldUserZengSong(ttransactionid, tuserinfo, amt);
 			}
 			if (actionJmsType == ActionJmsType.GOUCAI_SUCCESS.value) {
 				logger.info("购彩成功事件");
 				/** vip 购彩 活动 */
-				vipCase(userno, amt, businessId, businessType);
+				vipCase(tuserinfo, amt, businessId, businessType);
 			}
 		} catch (Exception e) {
 			logger.error("活动异常  userno:" + userno + ",amt:" + amtLong + ",actionJmsType:" + actionJmsType, e);
@@ -110,12 +125,10 @@ public class TactionService {
 	}
 
 	@Transactional
-	public Boolean oldUserZengSong(String ttransactionid, String userno, BigDecimal amt) {
+	public Boolean oldUserZengSong(String ttransactionid, Tuserinfo tuserinfo, BigDecimal amt) {
 		logger.info("老用户充值赠送");
 		Boolean flag = false;
-		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
 		if (tuserinfo == null) {
-			logger.info("用户不存在userno:" + userno);
 			return flag;
 		}
 		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
@@ -124,9 +137,9 @@ public class TactionService {
 			logger.info("老用户充值赠送活动未开启");
 			return flag;
 		}
-		OldUserChongZhi oucz = OldUserChongZhi.findOldUserChongZhi(userno);
+		OldUserChongZhi oucz = OldUserChongZhi.findOldUserChongZhi(tuserinfo.getUserno());
 		if (oucz != null) {
-			logger.info("活动已参加userno:" + userno);
+			logger.info("活动已参加userno:" + tuserinfo.getUserno());
 			return flag;
 		}
 		String express = tactivity.getExpress();
@@ -136,7 +149,7 @@ public class TactionService {
 		String dateStr = (String) activity.get("beforedate");
 		Integer maxamt = (Integer) activity.get("maxamt");
 		if (amt.compareTo(new BigDecimal(minChargeAmt)) < 0) {
-			logger.info("用户{}充值金额{}不满足活动最小充值金额{}", new String[] { userno, amt + "", minChargeAmt + "" });
+			logger.info("用户{}充值金额{}不满足活动最小充值金额{}", new String[] { tuserinfo.getUserno(), amt + "", minChargeAmt + "" });
 			return flag;
 		}
 		Date date = DateUtil.parse(dateStr);
@@ -146,8 +159,9 @@ public class TactionService {
 			if (prizeamt.compareTo(new BigDecimal(maxamt)) > 0) {
 				prizeamt = new BigDecimal(maxamt);
 			}
-			logger.info("老用户充值赠送,userno:{},amt:{},prizeamt:{}", new String[] { userno, amt + "", prizeamt + "" });
-			OldUserChongZhi.createOldUserChongZhi(userno, amt, prizeamt);
+			logger.info("老用户充值赠送,userno:{},amt:{},prizeamt:{}", new String[] { tuserinfo.getUserno(), amt + "",
+					prizeamt + "" });
+			OldUserChongZhi.createOldUserChongZhi(tuserinfo.getUserno(), amt, prizeamt);
 			sendPrize2UserJMS(tuserinfo.getUserno(), prizeamt, ActionJmsType.OLD_USER_CHONGZHI_ZENGSONG,
 					ttransactionid, ttransactionid, tactivity.getMemo());
 			flag = true;
@@ -158,10 +172,10 @@ public class TactionService {
 	}
 
 	@Transactional
-	public Boolean chongzhiManBaiZengSong(String ttransactionid, Long ladderpresentflag, String userno, BigDecimal amt) {
+	public Boolean chongzhiManBaiZengSong(String ttransactionid, Long ladderpresentflag, Tuserinfo tuserinfo,
+			BigDecimal amt) {
 		logger.info("充值满百开始");
 		Boolean flag = false;
-		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
 		if (tuserinfo != null) {
 			Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 					ActionJmsType.CHONGZHI_100_ZENGSONG.value);
@@ -175,11 +189,12 @@ public class TactionService {
 					flag = true;
 					BigDecimal prizeamt = amt.multiply(new BigDecimal(present)).divideToIntegralValue(
 							new BigDecimal(100));
-					logger.info("充值满百赠送,userno:{},amt:{},prizeamt:{}", new String[] { userno, amt + "", prizeamt + "" });
+					logger.info("充值满百赠送,userno:{},amt:{},prizeamt:{}", new String[] { tuserinfo.getUserno(), amt + "",
+							prizeamt + "" });
 					sendPrize2UserJMS(tuserinfo.getUserno(), prizeamt, ActionJmsType.CHONGZHI_100_ZENGSONG,
 							ttransactionid, ttransactionid, tactivity.getMemo());
 				} else {
-					logger.info("不满足充值满百赠送条件,amt:" + amt + ",userno:" + userno);
+					logger.info("不满足充值满百赠送条件,amt:" + amt + ",userno:" + tuserinfo.getUserno());
 				}
 			} else {
 				logger.info("充值满百赠送活动未开启");
@@ -190,12 +205,11 @@ public class TactionService {
 	}
 
 	@Transactional
-	public Boolean firshChongzhiZengSong(String ttransactionid, String userno, BigDecimal amt) {
+	public Boolean firshChongzhiZengSong(String ttransactionid, Tuserinfo tuserinfo, BigDecimal amt) {
 		logger.info("第一次充值开始");
 		Boolean flag = false;
-		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
 		if (tuserinfo.getSubChannel().equals("984") || tuserinfo.getSubChannel().equals("985")) {
-			logger.info("U付如意彩用户不参与活动,user:" + userno);
+			logger.info("U付如意彩用户不参与活动,user:" + tuserinfo.getUserno());
 			return flag;
 		}
 		if (tuserinfo != null) {
@@ -210,14 +224,14 @@ public class TactionService {
 				Integer step = (Integer) activity.get("step");
 				Integer prizeamt = (Integer) activity.get("prizeamt");
 				if (amt.compareTo(new BigDecimal(step)) >= 0 && regtimeStr.equals(todayStr)) {
-					Integer count = lotteryService.findTtransaction(userno);
+					Integer count = lotteryService.findTtransaction(tuserinfo.getUserno());
 					if (count == 1) {
 						if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {
 							Chong20Mobile chong20Mobile = Chong20Mobile.findChong20Mobile(tuserinfo.getMobileid());
 							if (chong20Mobile == null) {
-								logger.info("苏宁渠道第一次充值赠送,userno:{},amt:{},prizeamt:{}", new String[] { userno,
-										amt + "", prizeamt + "" });
-								Chong20Mobile.createChong20Mobile(tuserinfo.getMobileid(), userno);
+								logger.info("苏宁渠道第一次充值赠送,userno:{},amt:{},prizeamt:{}",
+										new String[] { tuserinfo.getUserno(), amt + "", prizeamt + "" });
+								Chong20Mobile.createChong20Mobile(tuserinfo.getMobileid(), tuserinfo.getUserno());
 								sendPrize2UserJMS(tuserinfo.getUserno(), new BigDecimal(prizeamt),
 										ActionJmsType.SUNING_ZENGSONG, ttransactionid, ttransactionid,
 										suningtactivity.getMemo());
@@ -230,22 +244,23 @@ public class TactionService {
 						} else {
 							logger.info("苏宁渠道第一次充值活动,用户信息未完善.amt:{},user:{}",
 									new String[] { amt + "", tuserinfo.toString() });
-							FirstChargeUser fcu = FirstChargeUser.findFirstChargeUser(userno);
+							FirstChargeUser fcu = FirstChargeUser.findFirstChargeUser(tuserinfo.getUserno());
 							if (fcu == null) {
-								logger.info("创建FirstChargeUser等待用户完善信息userno:" + userno + ",ttransactionid:"
-										+ ttransactionid);
-								FirstChargeUser.createFirstChargeUser(userno, 0, ttransactionid);
+								logger.info("创建FirstChargeUser等待用户完善信息userno:" + tuserinfo.getUserno()
+										+ ",ttransactionid:" + ttransactionid);
+								FirstChargeUser.createFirstChargeUser(tuserinfo.getUserno(), 0, ttransactionid);
 							} else {
-								logger.info("等待用户完善信息已创建userno:" + userno + ",ttransactionid:" + ttransactionid);
+								logger.info("等待用户完善信息已创建userno:" + tuserinfo.getUserno() + ",ttransactionid:"
+										+ ttransactionid);
 							}
 						}
 					} else {
-						logger.info("苏宁渠道不是第一次充值，不参加活动.userno:{},amt:{},count:{}", new String[] { userno, amt + "",
-								count + "" });
+						logger.info("苏宁渠道不是第一次充值，不参加活动.userno:{},amt:{},count:{}", new String[] {
+								tuserinfo.getUserno(), amt + "", count + "" });
 					}
 				} else {
-					logger.info("苏宁渠道第一次充值，不满足条件.userno:{},amt:{},sep:{},regtime,{}", new String[] { userno, amt + "",
-							step + "", regtimeStr });
+					logger.info("苏宁渠道第一次充值，不满足条件.userno:{},amt:{},sep:{},regtime,{}",
+							new String[] { tuserinfo.getUserno(), amt + "", step + "", regtimeStr });
 				}
 			} else {
 				logger.info("苏宁渠道首次充值赠送活动未开启");
@@ -262,14 +277,14 @@ public class TactionService {
 					Integer step = (Integer) activity.get("step");
 					Integer prizeamt = (Integer) activity.get("prizeamt");
 					if (amt.compareTo(new BigDecimal(step)) >= 0 && regtimeStr.equals(todayStr)) {
-						Integer count = lotteryService.findTtransaction(userno);
+						Integer count = lotteryService.findTtransaction(tuserinfo.getUserno());
 						if (count != null && count == 1) {
 							if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {
 								Chong20Mobile chong20Mobile = Chong20Mobile.findChong20Mobile(tuserinfo.getMobileid());
 								if (chong20Mobile == null) {
-									logger.info("第一次充值赠送,userno:{},amt:{},prizeamt:{}", new String[] { userno,
-											amt + "", prizeamt + "" });
-									Chong20Mobile.createChong20Mobile(tuserinfo.getMobileid(), userno);
+									logger.info("第一次充值赠送,userno:{},amt:{},prizeamt:{}",
+											new String[] { tuserinfo.getUserno(), amt + "", prizeamt + "" });
+									Chong20Mobile.createChong20Mobile(tuserinfo.getMobileid(), tuserinfo.getUserno());
 									sendPrize2UserJMS(tuserinfo.getUserno(), new BigDecimal(prizeamt),
 											ActionJmsType.FIRST_CHONGZHI_ZENGSONG, ttransactionid, ttransactionid,
 											tactivity.getMemo());
@@ -281,22 +296,23 @@ public class TactionService {
 							} else {
 								logger.info("第一次充值活动,用户信息未完善.amt:{},user:{}",
 										new String[] { amt + "", tuserinfo.toString() });
-								FirstChargeUser fcu = FirstChargeUser.findFirstChargeUser(userno);
+								FirstChargeUser fcu = FirstChargeUser.findFirstChargeUser(tuserinfo.getUserno());
 								if (fcu == null) {
-									logger.info("创建FirstChargeUser等待用户完善信息userno:" + userno + ",ttransactionid:"
-											+ ttransactionid);
-									FirstChargeUser.createFirstChargeUser(userno, 0, ttransactionid);
+									logger.info("创建FirstChargeUser等待用户完善信息userno:" + tuserinfo.getUserno()
+											+ ",ttransactionid:" + ttransactionid);
+									FirstChargeUser.createFirstChargeUser(tuserinfo.getUserno(), 0, ttransactionid);
 								} else {
-									logger.info("等待用户完善信息已创建userno:" + userno + ",ttransactionid:" + ttransactionid);
+									logger.info("等待用户完善信息已创建userno:" + tuserinfo.getUserno() + ",ttransactionid:"
+											+ ttransactionid);
 								}
 							}
 						} else {
-							logger.info("不是第一次充值，不参加活动.userno:{},amt:{},count:{}", new String[] { userno, amt + "",
-									count + "" });
+							logger.info("不是第一次充值，不参加活动.userno:{},amt:{},count:{}", new String[] {
+									tuserinfo.getUserno(), amt + "", count + "" });
 						}
 					} else {
-						logger.info("第一次充值，不满足条件.userno:{},amt:{},sep:{},regtime,{}", new String[] { userno, amt + "",
-								step + "", regtimeStr });
+						logger.info("第一次充值，不满足条件.userno:{},amt:{},sep:{},regtime,{}",
+								new String[] { tuserinfo.getUserno(), amt + "", step + "", regtimeStr });
 					}
 				} else {
 					logger.info("首次充值赠送活动未开启");
@@ -345,24 +361,23 @@ public class TactionService {
 	}
 
 	@Transactional
-	public Boolean vipCase(String userno, BigDecimal amt, String businessId, Integer businessType) {
+	public Boolean vipCase(Tuserinfo tuserinfo, BigDecimal amt, String businessId, Integer businessType) {
 		Boolean flag = false;
 		logger.info("VIP购彩活动开始");
-		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
 		if (!tuserinfo.getSubChannel().equals("00092493")) {
 			return flag;
 		}
 		String currentMonth = DateUtil.format("yyyy-MM", new Date());
 		if (tuserinfo != null) {
-			VipUser vipUser = vipUserDao.findVipUser(userno, currentMonth, true);
+			VipUser vipUser = vipUserDao.findVipUser(tuserinfo.getUserno(), currentMonth, true);
 			if (vipUser == null) {
-				vipUser = vipUserDao.createVipUser(userno, currentMonth);
+				vipUser = vipUserDao.createVipUser(tuserinfo.getUserno(), currentMonth);
 			}
 			if (vipUser != null) {
 				vipUser.setBuyamt(vipUser.getBuyamt() == null ? amt : vipUser.getBuyamt().add(amt));
 				vipUser.setModifyTime(new Date());
 				vipUserDao.merge(vipUser);
-				logger.info("大客户userno:{},增加购买金额{}", new String[] { userno, amt + "" });
+				logger.info("大客户userno:{},增加购买金额{}", new String[] { tuserinfo.getUserno(), amt + "" });
 			}
 		}
 		if (tuserinfo != null) {
@@ -377,7 +392,7 @@ public class TactionService {
 
 				calendar.add(Calendar.MONTH, -1);
 				String lastMonth = DateUtil.format("yyyy-MM", calendar.getTime());
-				VipUser lastMonthVipUser = vipUserDao.findVipUser(userno, lastMonth, false);
+				VipUser lastMonthVipUser = vipUserDao.findVipUser(tuserinfo.getUserno(), lastMonth, false);
 				if (lastMonthVipUser != null && lastMonthVipUser.getBuyamt().compareTo(new BigDecimal(step)) >= 0) {
 					if (amt.compareTo(BigDecimal.ZERO) >= 0) {
 						flag = true;
@@ -386,8 +401,8 @@ public class TactionService {
 						logger.info("大客户userno:{},时间:{},总购彩金额:{},本次购彩:{},赠送金额:{}", new String[] {
 								lastMonthVipUser.getId().getUserno(), lastMonthVipUser.getId().getYearAndMonth(),
 								lastMonthVipUser.getBuyamt() + "", amt + "", prizeamt + "" });
-						sendPrize2UserJMS(userno, prizeamt, ActionJmsType.VIP_USER_GOUCAI_ZENGSONG, null, businessId,
-								tactivity.getMemo());
+						sendPrize2UserJMS(tuserinfo.getUserno(), prizeamt, ActionJmsType.VIP_USER_GOUCAI_ZENGSONG,
+								null, businessId, tactivity.getMemo());
 					}
 				} else {
 					logger.info("不满大户购彩赠送条件userno:" + tuserinfo.getUserno() + ",vipUser:"
