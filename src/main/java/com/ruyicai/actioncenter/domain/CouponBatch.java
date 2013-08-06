@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.LockModeType;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.roo.addon.entity.RooEntity;
@@ -67,6 +68,11 @@ public class CouponBatch {
 	@Column(name = "CREATETIME")
 	private Date createTime;
 	
+	public static CouponBatch find(String couponbatchid, boolean lock) {
+		CouponBatch couponBatch = entityManager().find(CouponBatch.class, couponbatchid, lock ? LockModeType.PESSIMISTIC_WRITE : LockModeType.NONE);
+		return couponBatch;
+	}
+	
 	/**
 	 * 创建兑换券批次
 	 * @param couponBatchName	批次名称
@@ -98,7 +104,7 @@ public class CouponBatch {
 	}
 	
 	public static CouponBatch useACoupon(String couponbatchid) {
-		CouponBatch couponBatch = CouponBatch.findCouponBatch(couponbatchid);
+		CouponBatch couponBatch = CouponBatch.find(couponbatchid, true);
 		couponBatch.setCouponbatchusage(couponBatch.getCouponbatchusage() + 1);
 		couponBatch.merge();
 		return couponBatch;

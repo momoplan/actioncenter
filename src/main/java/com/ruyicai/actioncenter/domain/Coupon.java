@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.EntityManager;
 import javax.persistence.Id;
+import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 
 import org.springframework.roo.addon.entity.RooEntity;
@@ -78,6 +79,11 @@ public class Coupon {
 	@Column(name = "USETIME")
 	private Date usetime;
 	
+	public static Coupon findCoupon(String couponcode, boolean lock) {
+		Coupon coupon = entityManager().find(Coupon.class, couponcode, lock ? LockModeType.PESSIMISTIC_WRITE : LockModeType.NONE);
+		return coupon;
+	}
+	
 	public static Coupon create(String couponCode, Boolean reusable, String couponBatchId, BigDecimal couponAmount, Date validity) {
 		Coupon coupon = new Coupon();
 		coupon.setCouponcode(couponCode);
@@ -90,24 +96,10 @@ public class Coupon {
 		return coupon;
 	}
 	
-	/**
-	 * 使用兑换券
-	 * @param couponCode	兑换券号码
-	 * @param userno			使用者
-	 * @return
-	 */
-	public static Coupon useCoupon(String couponCode, String userno) {
-		Coupon coupon = Coupon.findCoupon(couponCode);
-		coupon.setUserno(userno);
-		coupon.setState(0);
-		coupon.setUsetime(new Date());
-		coupon.merge();
-		return coupon;
-	}
 	
 	public static void findCouponsByPage(Map<String, Object> conditionMap,
 			Page<Coupon> page) {
-		EntityManager em = SendMoneyDetails.entityManager();
+		EntityManager em = Coupon.entityManager();
 		String sql = "SELECT o FROM Coupon o ";
 		String countSql = "SELECT count(*) FROM Coupon o ";
 		StringBuilder whereSql = new StringBuilder(" WHERE 1=1 ");

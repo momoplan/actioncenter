@@ -70,14 +70,17 @@ public class CouponService {
 	public int exchangeCoupon(String userno, String couponCode) {
 		int result = -1;
 		try {
-			Coupon coupon = Coupon.findCoupon(couponCode);
+			Coupon coupon = Coupon.findCoupon(couponCode, true);
 			if(coupon == null) {	//兑换券不存在
 				result = 0;
 			} else {	//兑换券存在
 				if(new Date().before(coupon.getValidity())) {	//兑换券未过期
 					if(coupon.getState() == 1) {	//兑换券未使用
 						if(coupon.getReusable() == true) {	//批次可以重复使用
-							Coupon.useCoupon(couponCode, userno);
+							coupon.setUserno(userno);
+							coupon.setState(0);
+							coupon.setUsetime(new Date());
+							coupon.merge();
 							CouponBatch.useACoupon(coupon.getCouponbatchid());
 							//发送彩金
 							tactionService.sendPrize2UserJMS(userno, coupon.getAmount(), ActionJmsType.Coupon, coupon.getCouponcode(), coupon.getCouponcode(), "");
@@ -86,7 +89,10 @@ public class CouponService {
 							String couponBatchId = coupon.getCouponbatchid();
 							CouponBatchUsageDetail couponBatchUsageDetail = CouponBatchUsageDetail.findCouponBatchUsageDetail(new CouponBatchUsageDetailPK(userno, couponBatchId));
 							if(couponBatchUsageDetail == null) {	//未兑换过该批次
-								Coupon.useCoupon(couponCode, userno);
+								coupon.setUserno(userno);
+								coupon.setState(0);
+								coupon.setUsetime(new Date());
+								coupon.merge();
 								couponBatchUsageDetail =CouponBatchUsageDetail.create(userno, couponBatchId);
 								CouponBatch.useACoupon(coupon.getCouponbatchid());
 								//发送彩金
