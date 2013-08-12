@@ -12,10 +12,10 @@ public class CouponBatchUsageDetailPK {
 	private static final long serialVersionUID = 1L;
 	
 	/** 
-	 * 用户编号 
+	 * 用户手机号
 	 **/
-	@Column(name = "USERNO", length = 50)
-	private String userno;
+	@Column(name = "MOBILE", length = 50)
+	private String mobile;
 	
 	/**
 	 * 批次ID

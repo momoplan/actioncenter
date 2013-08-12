@@ -38,6 +38,12 @@ public class Coupon {
 	private String couponcode;
 	
 	/**
+	 * 兑换券批次渠道
+	 */
+	@Column(name = "COUPONBATCHCHANNELID")
+	private long couponbatchchannelid;
+	
+	/**
 	 * 兑换券批次
 	 */
     @Column(name = "COUPONBATCHID", length = 50)
@@ -46,7 +52,7 @@ public class Coupon {
 	/**
 	 * 是否可以重复使用
 	 */
-	@Column(name = "REUABLE")
+	@Column(name = "REUABLE", updatable=false)
 	private Boolean reusable;
 	
 	/**
@@ -62,7 +68,7 @@ public class Coupon {
 	private Date validity;
 	
 	/**
-	 * 使用状态0使用，1未使用
+	 * 使用状态0未使用，1使用
 	 */
 	@Column(name = "STATE")
 	private int state;
@@ -74,29 +80,48 @@ public class Coupon {
 	private String userno;
 	
 	/**
+	 * 使用者手机号
+	 */
+	@Column(name = "MOBILE", length = 20)
+	private String mobile;
+	
+	/**
 	 * 使用时间
 	 */
 	@Column(name = "USETIME")
 	private Date usetime;
+	
+	/**
+	 * 创建时间
+	 */
+	@Column(name = "CREATETIME")
+	private Date createtime;
 	
 	public static Coupon findCoupon(String couponcode, boolean lock) {
 		Coupon coupon = entityManager().find(Coupon.class, couponcode, lock ? LockModeType.PESSIMISTIC_WRITE : LockModeType.NONE);
 		return coupon;
 	}
 	
-	public static Coupon create(String couponCode, Boolean reusable, String couponBatchId, BigDecimal couponAmount, Date validity) {
+	public static Coupon create(String couponCode, Boolean reusable, long couponBatchChannelId, String couponBatchId, BigDecimal couponAmount, Date validity, Date createTime) {
 		Coupon coupon = new Coupon();
 		coupon.setCouponcode(couponCode);
+		coupon.setCouponbatchchannelid(couponBatchChannelId);
 		coupon.setCouponbatchid(couponBatchId);
 		coupon.setAmount(couponAmount);
 		coupon.setReusable(reusable);
-		coupon.setState(1);
+		coupon.setState(0);
 		coupon.setValidity(validity);
+		coupon.setCreatetime(createTime);
 		coupon.persist();
 		return coupon;
 	}
 	
 	
+	/**
+	 * 根据条件查询到page中
+	 * @param conditionMap
+	 * @param page
+	 */
 	public static void findCouponsByPage(Map<String, Object> conditionMap,
 			Page<Coupon> page) {
 		EntityManager em = Coupon.entityManager();
@@ -118,7 +143,7 @@ public class Coupon {
 			PropertyFilter.setMatchValue2Query(q, pfList);
 			PropertyFilter.setMatchValue2Query(total, pfList);
 		}
-		q.setFirstResult(page.getPageIndex()).setMaxResults(page.getMaxResult());
+		q.setFirstResult(page.getPageIndex() * page.getMaxResult()).setMaxResults(page.getMaxResult());
 		List<Coupon> resultList = q.getResultList();
 		int count = total.getSingleResult().intValue();
 		page.setList(resultList);

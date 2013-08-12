@@ -18,6 +18,14 @@ privileged aspect Coupon_Roo_JavaBean {
         this.couponcode = couponcode;
     }
     
+    public long Coupon.getCouponbatchchannelid() {
+        return this.couponbatchchannelid;
+    }
+    
+    public void Coupon.setCouponbatchchannelid(long couponbatchchannelid) {
+        this.couponbatchchannelid = couponbatchchannelid;
+    }
+    
     public String Coupon.getCouponbatchid() {
         return this.couponbatchid;
     }
@@ -66,12 +74,28 @@ privileged aspect Coupon_Roo_JavaBean {
         this.userno = userno;
     }
     
+    public String Coupon.getMobile() {
+        return this.mobile;
+    }
+    
+    public void Coupon.setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+    
     public Date Coupon.getUsetime() {
         return this.usetime;
     }
     
     public void Coupon.setUsetime(Date usetime) {
         this.usetime = usetime;
+    }
+    
+    public Date Coupon.getCreatetime() {
+        return this.createtime;
+    }
+    
+    public void Coupon.setCreatetime(Date createtime) {
+        this.createtime = createtime;
     }
     
 }

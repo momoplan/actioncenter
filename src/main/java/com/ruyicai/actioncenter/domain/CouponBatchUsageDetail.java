@@ -27,9 +27,9 @@ public class CouponBatchUsageDetail {
 	@Column(name = "USETIME")
 	private Date usetime;
 	
-	public static CouponBatchUsageDetail create(String userno, String couponBatchId) {
+	public static CouponBatchUsageDetail create(String mobile, String couponBatchId) {
 		CouponBatchUsageDetail couponBatchUsageDetail = new CouponBatchUsageDetail();
-		couponBatchUsageDetail.setId(new CouponBatchUsageDetailPK(userno, couponBatchId));
+		couponBatchUsageDetail.setId(new CouponBatchUsageDetailPK(mobile, couponBatchId));
 		couponBatchUsageDetail.setUsetime(new Date());
 		couponBatchUsageDetail.persist();
 		return couponBatchUsageDetail;

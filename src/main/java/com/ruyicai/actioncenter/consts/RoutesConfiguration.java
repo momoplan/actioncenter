@@ -48,6 +48,8 @@ public class RoutesConfiguration {
 						"bean:suningRegisterListener?method=userModifyCustomer").routeId("actioncenter用户修改活动监听");
 				from("jms:queue:VirtualTopicConsumers.actioncenter.sendFund2Draw?concurrentConsumers=10").to(
 						"bean:fund2DrawService?method=fund2Draw").routeId("增加用户可提现");
+				from("jms:queue:VirtualTopicConsumers.actioncenter.updateCouponBatchAndChannel?concurrentConsumers=10").to(
+						"bean:useCouponListener?method=updateCouponBatchAndChannel").routeId("使用兑换券后更新批次和渠道");
 			}
 		});
 	}

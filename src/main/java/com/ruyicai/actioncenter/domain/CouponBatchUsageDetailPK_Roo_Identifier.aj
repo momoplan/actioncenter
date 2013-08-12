@@ -11,9 +11,9 @@ privileged aspect CouponBatchUsageDetailPK_Roo_Identifier {
     
     declare @type: CouponBatchUsageDetailPK: @Embeddable;
     
-    public CouponBatchUsageDetailPK.new(String userno, String couponbatchid) {
+    public CouponBatchUsageDetailPK.new(String mobile, String couponbatchid) {
         super();
-        this.userno = userno;
+        this.mobile = mobile;
         this.couponbatchid = couponbatchid;
     }
 
@@ -21,8 +21,8 @@ privileged aspect CouponBatchUsageDetailPK_Roo_Identifier {
         super();
     }
 
-    public String CouponBatchUsageDetailPK.getUserno() {
-        return this.userno;
+    public String CouponBatchUsageDetailPK.getMobile() {
+        return this.mobile;
     }
     
     public String CouponBatchUsageDetailPK.getCouponbatchid() {
@@ -34,9 +34,9 @@ privileged aspect CouponBatchUsageDetailPK_Roo_Identifier {
         if (obj == null) return false;
         if (!(obj instanceof CouponBatchUsageDetailPK)) return false;
         CouponBatchUsageDetailPK other = (CouponBatchUsageDetailPK) obj;
-        if (userno == null) {
-            if (other.userno != null) return false;
-        } else if (!userno.equals(other.userno)) return false;
+        if (mobile == null) {
+            if (other.mobile != null) return false;
+        } else if (!mobile.equals(other.mobile)) return false;
         if (couponbatchid == null) {
             if (other.couponbatchid != null) return false;
         } else if (!couponbatchid.equals(other.couponbatchid)) return false;
@@ -46,7 +46,7 @@ privileged aspect CouponBatchUsageDetailPK_Roo_Identifier {
     public int CouponBatchUsageDetailPK.hashCode() {
         final int prime = 31;
         int result = 17;
-        result = prime * result + (userno == null ? 0 : userno.hashCode());
+        result = prime * result + (mobile == null ? 0 : mobile.hashCode());
         result = prime * result + (couponbatchid == null ? 0 : couponbatchid.hashCode());
         return result;
     }

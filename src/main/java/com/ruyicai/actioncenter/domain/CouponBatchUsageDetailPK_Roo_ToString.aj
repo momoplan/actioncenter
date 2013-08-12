@@ -10,7 +10,7 @@ privileged aspect CouponBatchUsageDetailPK_Roo_ToString {
     public String CouponBatchUsageDetailPK.toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Couponbatchid: ").append(getCouponbatchid()).append(", ");
-        sb.append("Userno: ").append(getUserno());
+        sb.append("Mobile: ").append(getMobile());
         return sb.toString();
     }
     

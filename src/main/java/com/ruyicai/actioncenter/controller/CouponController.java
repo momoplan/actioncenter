@@ -1,7 +1,6 @@
 package com.ruyicai.actioncenter.controller;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ruyicai.actioncenter.domain.Coupon;
 import com.ruyicai.actioncenter.domain.CouponBatch;
+import com.ruyicai.actioncenter.domain.CouponBatchChannel;
 import com.ruyicai.actioncenter.service.CouponService;
 import com.ruyicai.actioncenter.util.ErrorCode;
 import com.ruyicai.actioncenter.util.JsonUtil;
@@ -29,27 +29,70 @@ public class CouponController {
 	private CouponService couponService;
 	
 	/**
-	 * 生成兑换券
+	 * 生成兑换券批次
 	 * @param couponBatchName	批次名称
-	 * @param couponAmount			每个兑换券的金额（单位是分）
-	 * @param couponQuantity		生产数量
 	 * @param reusable						是否可以重复使用
-	 * @param validity						有效期
 	 * @return
 	 */
+	@RequestMapping(value = "/createCouponBatch")
+	public @ResponseBody ResponseData createCouponBatch(@RequestParam(value = "couponBatchName", required = true) String couponBatchName,
+			@RequestParam(value = "reusable", required = true) Boolean reusable) {
+		logger.info("/coupon/createCouponBatch");
+		ResponseData rd = new ResponseData();
+		ErrorCode result = ErrorCode.OK;
+		try {
+			CouponBatch couponBatch = couponService.createCouponBatch(couponBatchName, reusable);
+			rd.setValue(couponBatch);
+		} catch (Exception e) {
+			logger.error("createCouponBatch error", new String[] { e.getMessage() }, e);
+			result = ErrorCode.ERROR;
+			rd.setValue(e.getMessage());
+		}
+		rd.setErrorCode(result.value);
+		logger.info("/coupon/createCouponBatch end");
+		return rd;
+	}
+	
+	/**
+	 * 创建兑换券批次渠道
+	 * @param couponBatchId	批次id
+	 * @param channelName	渠道名称
+	 * @param memo				渠道说明
+	 * @return
+	 */
+	@RequestMapping(value = "/createCouponBatchChannel")
+	public @ResponseBody ResponseData createCouponBatchChannel(@RequestParam(value = "couponBatchId", required = true) String couponBatchId,
+			@RequestParam(value = "channelName", required = true) String channelName,
+			@RequestParam(value = "memo", required = true) String memo) {
+		logger.info("/coupon/createCouponBatchChannel");
+		ResponseData rd = new ResponseData();
+		ErrorCode result = ErrorCode.OK;
+		try {
+			CouponBatchChannel channel = couponService.createCouponBatchChannel(couponBatchId, channelName, memo);
+			rd.setValue(channel);
+		} catch (Exception e) {
+			logger.error("createCouponBatchChannel error", new String[] { e.getMessage() }, e);
+			result = ErrorCode.ERROR;
+			rd.setValue(e.getMessage());
+		}
+		rd.setErrorCode(result.value);
+		logger.info("/coupon/createCouponBatchChannel end");
+		return rd;
+	}
+	
 	@RequestMapping(value = "/createCoupon")
-	public @ResponseBody ResponseData createCoupon(@RequestParam(value = "couponBatchName", required = true) String couponBatchName,
-			@RequestParam(value = "couponAmount", required = true) BigDecimal couponAmount, 
+	public @ResponseBody ResponseData createCoupon(@RequestParam(value = "couponBatchId", required = true) String couponBatchId,
+			@RequestParam(value = "couponBatchChannelId", required = true) Long couponBatchChannelId,
 			@RequestParam(value = "couponQuantity", required = true) Integer couponQuantity,
-			@RequestParam(value = "reusable", required = true) Boolean reusable,
-			@RequestParam(value = "validity", required = true) String validity) {
+			@RequestParam(value = "validity", required = true) String validity,
+			@RequestParam(value = "couponAmount", required = true) BigDecimal couponAmount) {
 		logger.info("/coupon/createCoupon");
 		ResponseData rd = new ResponseData();
 		ErrorCode result = ErrorCode.OK;
 		try {
-			couponService.createCoupon(couponBatchName, couponQuantity, reusable, validity, couponAmount);
+			couponService.createCoupons(couponBatchId, couponBatchChannelId, couponQuantity, validity, couponAmount);
 		} catch (Exception e) {
-			logger.error("创建兑换券出错,{}", new String[] { e.getMessage() }, e);
+			logger.error("createCoupon error", new String[] { e.getMessage() }, e);
 			result = ErrorCode.ERROR;
 			rd.setValue(e.getMessage());
 		}
@@ -96,113 +139,81 @@ public class CouponController {
 	}
 	
 	/**
-	 * 根据兑换券号，返回兑换券信息
-	 * @param couponCode	兑换券号
+	 * 根据condition搜索兑换券批次
+	 * @param condition
+	 * @param pageIndex
+	 * @param maxResult
 	 * @return
 	 */
-	@RequestMapping(value = "/listCoupon")
-	public @ResponseBody ResponseData listCoupon(@RequestParam("couponCode") String couponCode) {
-		logger.info("/coupon/listCoupon");		
+	@RequestMapping(value = "/listCouponBatchesByPage")
+	public @ResponseBody ResponseData listCouponBatchesByPage(@RequestParam(value = "condition", required = false) String condition,
+			@RequestParam(value = "pageIndex", required = false, defaultValue = "0") int pageIndex,
+			@RequestParam(value = "maxResult", required = false, defaultValue = "30") int maxResult) {
+		logger.info("/listCouponsByPage" + condition);
 		ResponseData rd = new ResponseData();
-		ErrorCode result = ErrorCode.OK;		
-		if(StringUtils.isBlank(couponCode)) {
-			rd.setValue("couponCode不能为空");
-			rd.setErrorCode(ErrorCode.PARAMTER_ERROR.value);
-			return rd;
-		}
-		try {		
-			Coupon coupon = Coupon.findCoupon(couponCode);
-			rd.setValue(coupon);
-			if(coupon == null) {
-				result = ErrorCode.PARAMTER_ERROR;
-			}
+		Page<CouponBatch> page = new Page<CouponBatch>(pageIndex, maxResult);
+		try {
+			Map<String, Object> conditionMap = JsonUtil.transferJson2Map(condition);
+			CouponBatch.findCouponBatchesByPage(conditionMap, page);
+			rd.setValue(page);
+			rd.setErrorCode(ErrorCode.OK.value);
 		} catch (Exception e) {
-			logger.error("根据兑换券号查找兑换券信息出错,{}", new String[] { e.getMessage() }, e);
-			result = ErrorCode.ERROR;
+			logger.error("兑换券批次分页查询出错", new String[] { e.getMessage() }, e);
+			rd.setErrorCode(ErrorCode.ERROR.value);
 			rd.setValue(e.getMessage());
 		}
-		rd.setErrorCode(result.value);
 		return rd;
 	}
 	
 	/**
-	 * 根据兑换券批次名称，返回兑换券批次信息
-	 * @param couponBatchName	兑换券批次名称
+	 * 根据condition搜索兑换券批次渠道
+	 * @param condition
+	 * @param pageIndex
+	 * @param maxResult
 	 * @return
 	 */
-	@RequestMapping(value = "/listCouponBatch")
-	public @ResponseBody ResponseData listCouponBatch(@RequestParam("couponBatchName") String couponBatchName) {
-		logger.info("/coupon/listCouponBatch");		
+	@RequestMapping(value = "/listCouponBatchChannelsByPage")
+	public @ResponseBody ResponseData listCouponBatchChannelsByPage(@RequestParam(value = "condition", required = false) String condition,
+			@RequestParam(value = "pageIndex", required = false, defaultValue = "0") int pageIndex,
+			@RequestParam(value = "maxResult", required = false, defaultValue = "30") int maxResult) {
+		logger.info("/listCouponBatchChannelsByPage" + condition);
 		ResponseData rd = new ResponseData();
-		ErrorCode result = ErrorCode.OK;		
-		if(StringUtils.isBlank(couponBatchName)) {
-			rd.setValue("couponBatchName不能为空");
-			rd.setErrorCode(ErrorCode.PARAMTER_ERROR.value);
-			return rd;
-		}
-		try {		
-			List<CouponBatch> couponBatchList = CouponBatch.findByName(couponBatchName);
-			rd.setValue(couponBatchList);
-			if(couponBatchList.size() == 0) {
-				result = ErrorCode.PARAMTER_ERROR;
-			}
+		Page<CouponBatchChannel> page = new Page<CouponBatchChannel>(pageIndex, maxResult);
+		try {
+			Map<String, Object> conditionMap = JsonUtil.transferJson2Map(condition);
+			CouponBatchChannel.findCouponBatchChannelsByPage(conditionMap, page);
+			rd.setValue(page);
+			rd.setErrorCode(ErrorCode.OK.value);
 		} catch (Exception e) {
-			logger.error("根据批次名称查找兑换券批次失败,{}", new String[] { e.getMessage() }, e);
-			result = ErrorCode.ERROR;
+			logger.error("兑换券批次渠道分页查询出错", new String[] { e.getMessage() }, e);
+			rd.setErrorCode(ErrorCode.ERROR.value);
 			rd.setValue(e.getMessage());
 		}
-		rd.setErrorCode(result.value);
-		return rd;
-	}
-	
-	@RequestMapping(value = "/listCouponBatchById")
-	public @ResponseBody ResponseData listCouponBatchById(@RequestParam("couponBatchId") String couponBatchId) {
-		logger.info("/coupon/listCouponBatchById");		
-		ResponseData rd = new ResponseData();
-		ErrorCode result = ErrorCode.OK;		
-		if(StringUtils.isBlank(couponBatchId)) {
-			rd.setValue("couponBatchId不能为空");
-			rd.setErrorCode(ErrorCode.PARAMTER_ERROR.value);
-			return rd;
-		}
-		try {		
-			CouponBatch couponBatch = CouponBatch.findCouponBatch(couponBatchId);
-			rd.setValue(couponBatch);
-			if(couponBatch == null) {
-				result = ErrorCode.PARAMTER_ERROR;
-			}
-		} catch (Exception e) {
-			logger.error("根据批次查找兑换券批次信息失败,{}", new String[] { e.getMessage() }, e);
-			result = ErrorCode.ERROR;
-			rd.setValue(e.getMessage());
-		}
-		rd.setErrorCode(result.value);
 		return rd;
 	}
 	
 	/**
 	 * 根据条件查询兑换券
 	 * @param condition	条件
-	 * @param startLine	开始行
-	 * @param endLine		结束行
+	 * @param pageIndex	当前页号
+	 * @param maxResult	返回结果数
 	 * @return
 	 */
 	@RequestMapping(value = "/listCouponsByPage")
 	public @ResponseBody
-	ResponseData selectReciverSendMoneyDetails(@RequestParam(value = "condition", required = false) String condition,
-			@RequestParam(value = "startLine", required = false, defaultValue = "0") int startLine,
-			@RequestParam(value = "endLine", required = false, defaultValue = "30") int endLine) {
+	ResponseData listCouponsByPage(@RequestParam(value = "condition", required = false) String condition,
+			@RequestParam(value = "pageIndex", required = false, defaultValue = "0") int pageIndex,
+			@RequestParam(value = "maxResult", required = false, defaultValue = "30") int maxResult) {
 		logger.info("/listCouponsByPage" + condition);
 		ResponseData rd = new ResponseData();
-		Page<Coupon> page = new Page<Coupon>(startLine, endLine);
+		Page<Coupon> page = new Page<Coupon>(pageIndex, maxResult);
 		try {
 			Map<String, Object> conditionMap = JsonUtil.transferJson2Map(condition);
 			Coupon.findCouponsByPage(conditionMap, page);
 			rd.setValue(page);
 			rd.setErrorCode(ErrorCode.OK.value);
 		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error("兑换券分页查询出错", e);
+			logger.error("兑换券分页查询出错", new String[] { e.getMessage() }, e);
 			rd.setErrorCode(ErrorCode.ERROR.value);
 		}
 		return rd;
