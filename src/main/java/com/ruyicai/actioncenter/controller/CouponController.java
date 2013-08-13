@@ -3,7 +3,6 @@ package com.ruyicai.actioncenter.controller;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.ruyicai.actioncenter.domain.Coupon;
 import com.ruyicai.actioncenter.domain.CouponBatch;
 import com.ruyicai.actioncenter.domain.CouponBatchChannel;
+import com.ruyicai.actioncenter.exception.RuyicaiException;
 import com.ruyicai.actioncenter.service.CouponService;
 import com.ruyicai.actioncenter.util.ErrorCode;
 import com.ruyicai.actioncenter.util.JsonUtil;
@@ -80,6 +80,15 @@ public class CouponController {
 		return rd;
 	}
 	
+	/**
+	 * 创建兑换券
+	 * @param couponBatchId					兑换券批次Id
+	 * @param couponBatchChannelId		兑换券批次渠道Id
+	 * @param couponQuantity				创建的兑换券数量
+	 * @param validity								兑换券有效期
+	 * @param couponAmount					兑换券金额（分）
+	 * @return
+	 */
 	@RequestMapping(value = "/createCoupon")
 	public @ResponseBody ResponseData createCoupon(@RequestParam(value = "couponBatchId", required = true) String couponBatchId,
 			@RequestParam(value = "couponBatchChannelId", required = true) Long couponBatchChannelId,
@@ -91,6 +100,10 @@ public class CouponController {
 		ErrorCode result = ErrorCode.OK;
 		try {
 			couponService.createCoupons(couponBatchId, couponBatchChannelId, couponQuantity, validity, couponAmount);
+		} catch(IllegalArgumentException e) {
+			logger.error("createCoupon error", new String[] { e.getMessage() }, e);
+			result = ErrorCode.ERROR;
+			rd.setValue(e.getMessage());
 		} catch (Exception e) {
 			logger.error("createCoupon error", new String[] { e.getMessage() }, e);
 			result = ErrorCode.ERROR;
@@ -105,7 +118,7 @@ public class CouponController {
 	 * 使用兑换券
 	 * @param couponCode	兑换券号
 	 * @param userno			用户ID
-	 * @return
+	 * @return Coupon
 	 */
 	@RequestMapping(value = "/useCoupon")
 	public @ResponseBody ResponseData useCoupon(@RequestParam("couponCode") String couponCode,
@@ -113,22 +126,13 @@ public class CouponController {
 		logger.info("/coupon/useCoupon");
 		ResponseData rd = new ResponseData();
 		ErrorCode result = ErrorCode.OK;
-		if(StringUtils.isBlank(couponCode)) {
-			rd.setValue("couponCode不能为空");
-			rd.setErrorCode(ErrorCode.PARAMTER_ERROR.value);
-			return rd;
-		}
-		if(StringUtils.isBlank(userno)) {
-			rd.setValue("userno不能为空");
-			rd.setErrorCode(ErrorCode.PARAMTER_ERROR.value);
-			return rd;
-		}
 		try {
-			int intresult = couponService.exchangeCoupon(userno, couponCode);
-			if(intresult != 1) {
-				result = ErrorCode.PARAMTER_ERROR;
-				rd.setValue(intresult);
-			}
+			Coupon coupon = couponService.exchangeCoupon(userno, couponCode);
+			rd.setValue(coupon);
+		} catch(RuyicaiException e) {
+			logger.error("使用兑换券出错,{}", new String[] { e.getMessage() }, e);
+			result = ErrorCode.ERROR;
+			rd.setValue(e.getMessage());
 		} catch (Exception e) {
 			logger.error("使用兑换券出错,{}", new String[] { e.getMessage() }, e);
 			result = ErrorCode.ERROR;
@@ -143,7 +147,7 @@ public class CouponController {
 	 * @param condition
 	 * @param pageIndex
 	 * @param maxResult
-	 * @return
+	 * @return List<CouponBatch>
 	 */
 	@RequestMapping(value = "/listCouponBatchesByPage")
 	public @ResponseBody ResponseData listCouponBatchesByPage(@RequestParam(value = "condition", required = false) String condition,
@@ -170,7 +174,7 @@ public class CouponController {
 	 * @param condition
 	 * @param pageIndex
 	 * @param maxResult
-	 * @return
+	 * @return	List<CouponBatchChannel>
 	 */
 	@RequestMapping(value = "/listCouponBatchChannelsByPage")
 	public @ResponseBody ResponseData listCouponBatchChannelsByPage(@RequestParam(value = "condition", required = false) String condition,
@@ -197,7 +201,7 @@ public class CouponController {
 	 * @param condition	条件
 	 * @param pageIndex	当前页号
 	 * @param maxResult	返回结果数
-	 * @return
+	 * @return List<Coupon>
 	 */
 	@RequestMapping(value = "/listCouponsByPage")
 	public @ResponseBody

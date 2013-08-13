@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Random;
 
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -47,14 +47,14 @@ public class CouponService {
 	 */
 	@Transactional
 	public CouponBatch createCouponBatch(String couponBatchName, Boolean reusable) {
-		logger.info("createCouponBatch couponBachName:" + couponBatchName + "  reusable:" + reusable);
-		CouponBatch couponBatch = null;
-		try {
-			couponBatch = CouponBatch.createCouponBatch(couponBatchName, reusable);
-		} catch (Exception e) {
-			logger.error("createCouponBatch error", e);
-			throw new RuyicaiException(ErrorCode.ERROR);
+		if(StringUtils.isBlank(couponBatchName)) {
+			throw new IllegalArgumentException("the argument couponBatchName is required");
 		}
+		if(reusable ==  null) {
+			throw new IllegalArgumentException("the argument reusable is required");
+		}
+		logger.info("createCouponBatch couponBachName:" + couponBatchName + "  reusable:" + reusable);
+		CouponBatch couponBatch = CouponBatch.createCouponBatch(couponBatchName, reusable);
 		return couponBatch;
 	}
 	
@@ -63,18 +63,21 @@ public class CouponService {
 	 * @param couponBatchId	批次id
 	 * @param channelName	渠道名称
 	 * @param memo				渠道说明
-	 * @return
+	 * @return CouponBatchChannel
 	 */
 	@Transactional
 	public CouponBatchChannel createCouponBatchChannel(String couponBatchId, String channelName, String memo) {
-		logger.info("createCouponBatchChannel couponBatchId:" + couponBatchId + " channelName:" + channelName + " memo:" + memo);
-		CouponBatchChannel channel = null;
-		try {
-			channel = CouponBatchChannel.create(couponBatchId, channelName, memo);
-		} catch (Exception e) {
-			logger.error("createCouponBatchChannel error", e);
-			throw new RuyicaiException(ErrorCode.ERROR);
+		if(StringUtils.isBlank(couponBatchId)) {
+			throw new IllegalArgumentException("the argument couponBatchId is required");
 		}
+		if(StringUtils.isBlank(channelName)) {
+			throw new IllegalArgumentException("the argument channelName is required");
+		}
+		if(StringUtils.isBlank(memo)) {
+			throw new IllegalArgumentException("the argument memo is required");
+		}
+		logger.info("createCouponBatchChannel couponBatchId:" + couponBatchId + " channelName:" + channelName + " memo:" + memo);
+		CouponBatchChannel channel = CouponBatchChannel.create(couponBatchId, channelName, memo);
 		return channel;
 	}
 	
@@ -88,25 +91,35 @@ public class CouponService {
 	 * @param couponAmount					兑换券金额
 	 */
 	@Transactional
-	public void createCoupons(String couponBatchId, long couponBatchChannelId, int couponQuantity, String validity, BigDecimal couponAmount) {
-		logger.info("createCoupons couponBatchId:" + couponBatchId + " couponBatchChannelId:" + couponBatchChannelId + " couponQuantity:" + couponQuantity + " validity:" + validity + " couponAmount:" + couponAmount);
-		try {
-			//更新批次数量、总金额
-			CouponBatch couponBatch = CouponBatch.findCouponBatch(couponBatchId);
-			couponBatch.setCouponbatchquantity(couponBatch.getCouponbatchquantity() + couponQuantity);
-			couponBatch.setTotalamount(couponBatch.getTotalamount().add(couponAmount.multiply(new BigDecimal(couponQuantity))));
-			couponBatch.merge();
-			//更新渠道数量、总金额
-			CouponBatchChannel channel = CouponBatchChannel.findCouponBatchChannel(couponBatchChannelId);
-			channel.setCouponquantity(couponQuantity);
-			channel.setTotalamount(couponAmount.multiply(new BigDecimal(couponQuantity)));
-			channel.merge();
-			//创建兑换券
-			doCreateCoupons(couponBatchId, couponBatchChannelId, couponQuantity, couponBatch.getReusable(), validity, couponAmount);
-		} catch (Exception e) {
-			logger.error("createCoupons error", e);
-			throw new RuyicaiException(ErrorCode.ERROR);
+	public void createCoupons(String couponBatchId, Long couponBatchChannelId, Integer couponQuantity, String validity, BigDecimal couponAmount) {
+		if(StringUtils.isBlank(couponBatchId)) {
+			throw new IllegalArgumentException("the argument couponBatchId is required");
 		}
+		if(couponBatchChannelId == null) {
+			throw new IllegalArgumentException("the argument couponBatchChannelId is required");
+		}
+		if(couponQuantity == null) {
+			throw new IllegalArgumentException("the argument couponQuantity is required");
+		}
+		if(StringUtils.isBlank(validity)) {
+			throw new IllegalArgumentException("the argument validity is required");
+		}
+		if(couponAmount == null) {
+			throw new IllegalArgumentException("the argument couponAmount is required");
+		}
+		logger.info("createCoupons couponBatchId:" + couponBatchId + " couponBatchChannelId:" + couponBatchChannelId + " couponQuantity:" + couponQuantity + " validity:" + validity + " couponAmount:" + couponAmount);
+		//更新批次数量、总金额
+		CouponBatch couponBatch = CouponBatch.findCouponBatch(couponBatchId);
+		couponBatch.setCouponbatchquantity(couponBatch.getCouponbatchquantity() + couponQuantity);
+		couponBatch.setTotalamount(couponBatch.getTotalamount().add(couponAmount.multiply(new BigDecimal(couponQuantity))));
+		couponBatch.merge();
+		//更新渠道数量、总金额
+		CouponBatchChannel channel = CouponBatchChannel.findCouponBatchChannel(couponBatchChannelId);
+		channel.setCouponquantity(couponQuantity);
+		channel.setTotalamount(couponAmount.multiply(new BigDecimal(couponQuantity)));
+		channel.merge();
+		//创建兑换券
+		doCreateCoupons(couponBatchId, couponBatchChannelId, couponQuantity, couponBatch.getReusable(), validity, couponAmount);
 	}
 	
 	/**
@@ -121,65 +134,82 @@ public class CouponService {
 	@Transactional
 	public void doCreateCoupons(String couponBatchId, long couponBatchChannelId, int couponQuantity, Boolean reusable, String validity, BigDecimal couponAmount) {
 		logger.info("doCreateCoupons couponBatchId:" + couponBatchId + " couponBatchChannelId:" + couponBatchChannelId + " couponQuantity:" + couponQuantity + " reusable:" + reusable + " validity:" + validity + " couponAmount:" + couponAmount);
-		try {
-			Date date = new Date();
-			for(int i = 0; i < couponQuantity; i++) {	
-				Coupon.create(UUID.randomUUID().toString().replaceAll("-", ""), reusable, couponBatchChannelId, couponBatchId, couponAmount, DateUtil.parse(validity), date);
-			}	
-		} catch (Exception e) {
-			logger.error("doCreateCoupons error", e);
-			throw new RuyicaiException(ErrorCode.ERROR);
-		}
+		Date date = new Date();
+		for(int i = 0; i < couponQuantity; i++) {	
+			try {
+				Coupon.create(getRandomString(12), reusable, couponBatchChannelId, couponBatchId, couponAmount, DateUtil.parse(validity), date);
+			} catch (Exception e) {
+				logger.error("doCreateCoupons error", e.getMessage(), e);
+			}
+		}	
+	}
+	
+	/**
+	 * 生成随机码
+	 * @param length	生成的长度
+	 * @return
+	 */
+	private String getRandomString(int length) {
+		String base = "ABCDEFGHIJKLMNPQRSTUVWXYZ0123456789";   
+		Random random = new Random();   
+		StringBuffer sb = new StringBuffer();   
+		for (int i = 0; i < length; i++) {   
+		    int number = random.nextInt(base.length());   
+		    sb.append(base.charAt(number));   
+		}   
+		return sb.toString();  
 	}
 	
 	/**
 	 * 兑换兑换券
 	 * @param userno				要兑换的用户
 	 * @param couponCode		兑换券号
-	 * @return -1 错误 <br/> 0 兑换券不存在 <br/> 1 兑换成功 <br/>  2 该批次已经兑换 <br/>  3 兑换券已经使用 <br/> 4 兑换券已过期 <br/> 5 用户没有绑定手机号
+	 * @return Coupon
 	 */
 	@Transactional
-	public int exchangeCoupon(String userno, String couponCode) {
-		logger.info("exchangeCoupon userno:" + userno + " couponCode:" + couponCode);
-		int result = -1;
-		try {
-			Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
-			String mobile = tuserinfo.getMobileid();
-			if(StringUtils.isBlank(mobile)) {
-				return 5;
-			}
-			Coupon coupon = Coupon.findCoupon(couponCode, true);
-			if(coupon == null) {	//兑换券不存在
-				result = 0;
-			} else {	//兑换券存在
-				if(new Date().before(coupon.getValidity())) {	//兑换券未过期
-					if(coupon.getState() == 0) {	//兑换券未使用
-						if(coupon.getReusable() == true) {	//批次可以重复使用
-							doExchangeCoupon(coupon, mobile, userno);
-							result = 1;
-						} else {	//批次不可以重复使用
-							String couponBatchId = coupon.getCouponbatchid();
-							CouponBatchUsageDetail couponBatchUsageDetail = CouponBatchUsageDetail.findCouponBatchUsageDetail(new CouponBatchUsageDetailPK(mobile, couponBatchId));
-							if(couponBatchUsageDetail == null) {	//未兑换过该批次
-								doExchangeCoupon(coupon, mobile, userno);
-								couponBatchUsageDetail =CouponBatchUsageDetail.create(mobile, couponBatchId);
-								result = 1;
-							} else {	//已经兑换过该批次，不可重复兑换
-								result = 2;
-							}
-						}
-					} else {	//兑换券已使用
-						result = 3;
-					}		
-				} else {
-					result = 4;
-				}					
-			}		
-		} catch (Exception e) {
-			logger.error("exchangeCoupon error", e);
-			throw new RuyicaiException(ErrorCode.ERROR);
+	public Coupon exchangeCoupon(String userno, String couponCode) {
+		if(StringUtils.isBlank(couponCode)) {
+			throw new IllegalArgumentException("the argument couponCode is required");
 		}
-		return result;
+		if(StringUtils.isBlank(userno)) {
+			throw new IllegalArgumentException("the argument userno is required");
+		}
+		logger.info("exchangeCoupon userno:" + userno + " couponCode:" + couponCode);
+		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
+		if(tuserinfo == null) {
+			throw new RuyicaiException(ErrorCode.UserMod_UserNotExists);
+		}
+		String mobile = tuserinfo.getMobileid();
+		if(StringUtils.isBlank(mobile)) {
+			throw new RuyicaiException(ErrorCode.UserMod_MobileidNotBind);
+		}
+		Coupon coupon = Coupon.findCoupon(couponCode, true);
+		if(coupon == null) {	//兑换券不存在
+			throw new RuyicaiException(ErrorCode.CouponNotExist);
+		} else {	//兑换券存在
+			if(new Date().before(coupon.getValidity())) {	//兑换券未过期
+				if(coupon.getState() == 0) {	//兑换券未使用
+					if(coupon.getReusable() == true) {	//批次可以重复使用
+						doExchangeCoupon(coupon, mobile, userno);
+						return coupon;
+					} else {	//批次不可以重复使用
+						String couponBatchId = coupon.getCouponbatchid();
+						CouponBatchUsageDetail couponBatchUsageDetail = CouponBatchUsageDetail.findCouponBatchUsageDetail(new CouponBatchUsageDetailPK(mobile, couponBatchId));
+						if(couponBatchUsageDetail == null) {	//未兑换过该批次
+							doExchangeCoupon(coupon, mobile, userno);
+							couponBatchUsageDetail =CouponBatchUsageDetail.create(mobile, couponBatchId);
+							return coupon;
+						} else {	//已经兑换过该批次，不可重复兑换
+							throw new RuyicaiException(ErrorCode.CouponBatchAlreadyUsed);
+						}
+					}
+				} else {	//兑换券已使用
+					throw new RuyicaiException(ErrorCode.CouponAlreadyUsed);
+				}		
+			} else {
+				throw new RuyicaiException(ErrorCode.CouponOutOfDate);
+			}					
+		}		
 	}
 	
 	/**

@@ -18,6 +18,7 @@ public enum ErrorCode {
 	UserMod_MobileidBind("100003", "用户手机号已绑定"),
 	UserMod_EmailBind("100004", "用户邮箱已绑定"),
 	UserMod_ZfbuserifBind("100006", "用户支付宝user_id已绑定"),
+	UserMod_MobileidNotBind("100007","用户手机号未绑定"),
 	UserMod_NicknameNotExists("100205", "昵称不存在"),
 	UserMod_StateNotNormal("100206", "用户状态不正常"),
 	UserMod_InformationNotEnough("100207", "用户信息不完善"),
@@ -109,7 +110,13 @@ public enum ErrorCode {
 	Statistic_ParaWrong("700001","统计中奖参数错误"),
 	
 	ActionCenter_HadJoin("8020001","活动已参加，只能参加一次"),
-	HavereciveMoney("8020002","已经领过红包");
+	HavereciveMoney("8020002","已经领过红包"),
+	
+	CouponNotExist("900001","兑换券不存在"),
+	CouponAlreadyUsed("900002"," 兑换券已经使用"),
+	CouponBatchAlreadyUsed("900003","该批次已经兑换"),
+	CouponOutOfDate("900004","兑换券已过期");
+	
 	public String value;
 	
 	public String memo;
