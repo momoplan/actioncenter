@@ -59,7 +59,7 @@ public class CouponBatch {
 	/**
 	 * 总金额
 	 */
-	@Column(name = "TOTALAMOUNT")
+	@Column(name = "TOTALAMOUNT", precision = 10, scale = 0, columnDefinition = "decimal")
 	private BigDecimal totalamount;
 	
 	/**

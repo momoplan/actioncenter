@@ -58,7 +58,7 @@ public class Coupon {
 	/**
 	 * 金额
 	 */
-	@Column(name = "AMOUNT")
+	@Column(name = "AMOUNT", precision = 10, scale = 0, columnDefinition = "decimal")
 	private BigDecimal amount;
 	
 	/**
@@ -134,7 +134,7 @@ public class Coupon {
 			String buildSql = PropertyFilter.transfer2Sql(pfList, "o");
 			whereSql.append(buildSql);
 		}
-		StringBuilder orderSql = new StringBuilder(" ORDER BY o.validity DESC");
+		StringBuilder orderSql = new StringBuilder(" ORDER BY o.usetime DESC, o.couponcode ASC ");
 		String tsql = sql + whereSql.toString() + orderSql.toString();
 		String tCountSql = countSql + whereSql.toString();
 		TypedQuery<Coupon> q = em.createQuery(tsql, Coupon.class);

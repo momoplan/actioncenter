@@ -131,7 +131,7 @@ public class CouponController {
 			rd.setValue(coupon);
 		} catch(RuyicaiException e) {
 			logger.error("使用兑换券出错,{}", new String[] { e.getMessage() }, e);
-			result = ErrorCode.ERROR;
+			result = e.getErrorCode();
 			rd.setValue(e.getMessage());
 		} catch (Exception e) {
 			logger.error("使用兑换券出错,{}", new String[] { e.getMessage() }, e);

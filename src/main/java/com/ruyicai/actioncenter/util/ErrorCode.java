@@ -112,10 +112,10 @@ public enum ErrorCode {
 	ActionCenter_HadJoin("8020001","活动已参加，只能参加一次"),
 	HavereciveMoney("8020002","已经领过红包"),
 	
-	CouponNotExist("900001","兑换券不存在"),
-	CouponAlreadyUsed("900002"," 兑换券已经使用"),
-	CouponBatchAlreadyUsed("900003","该批次已经兑换"),
-	CouponOutOfDate("900004","兑换券已过期");
+	CouponNotExist("901001","兑换券不存在"),
+	CouponAlreadyUsed("901002"," 兑换券已经使用"),
+	CouponBatchAlreadyUsed("901003","该批次已经兑换"),
+	CouponOutOfDate("901004","兑换券已过期");
 	
 	public String value;
 	
