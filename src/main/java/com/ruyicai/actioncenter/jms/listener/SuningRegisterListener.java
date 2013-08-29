@@ -91,6 +91,7 @@ public class SuningRegisterListener {
 				String createTimeStr = DateUtil.format("yyyyMMdd", fcu.getCreateTime());
 				if (!todayStr.equals(createTimeStr)) {
 					logger.info("首次充值用户不是在同一天完善的信息today:" + todayStr + ",createTime:" + createTimeStr);
+					return;
 				}
 				logger.info("首次充值后完善信息,userno:" + userno);
 				String express = tactivity.getExpress();
