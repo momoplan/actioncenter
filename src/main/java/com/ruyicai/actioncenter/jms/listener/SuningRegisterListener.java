@@ -131,6 +131,12 @@ public class SuningRegisterListener {
 				String regtimeStr = DateUtil.format("yyyyMMdd", regtime);
 				String todayStr = DateUtil.format("yyyyMMdd", new Date());
 				if (regtimeStr.equals(todayStr)) {
+					SuningRegister byUserno = SuningRegister.findSuningRegisterByUserno(userno);
+					if (byUserno != null) {
+						logger.info("苏宁渠道完善信息赠送3元,用户编号已赠送过.mobileid:{},userno:{}",
+								new String[] { tuserinfo.getMobileid(), userno });
+						return;
+					}
 					SuningRegister register = SuningRegister.findSuningRegister(tuserinfo.getMobileid());
 					if (register == null) {
 						String express = suningtactivity.getExpress();
