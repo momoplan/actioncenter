@@ -115,7 +115,11 @@ public enum ErrorCode {
 	CouponNotExist("901001","兑换券不存在"),
 	CouponAlreadyUsed("901002"," 兑换券已经使用"),
 	CouponBatchAlreadyUsed("901003","该批次已经兑换"),
-	CouponOutOfDate("901004","兑换券已过期");
+	CouponOutOfDate("901004","兑换券已过期"),
+	
+	UserExperience_UsernoAlreadyRecruit("902001","该用户已经招募"),
+	UserExperience_UsernoNotRecruit("902002","该用户还未招募"),
+	UserExperience_UsernoNotAvailableVote("902003","该用户的可投票次数为0");
 	
 	public String value;
 	
