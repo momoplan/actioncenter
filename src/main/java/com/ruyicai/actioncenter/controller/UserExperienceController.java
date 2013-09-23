@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ruyicai.actioncenter.domain.UserExperience;
+import com.ruyicai.actioncenter.domain.UserExperienceAvailableVoteTimes;
 import com.ruyicai.actioncenter.domain.UserExperienceVoteLog;
 import com.ruyicai.actioncenter.exception.RuyicaiException;
 import com.ruyicai.actioncenter.service.UserExperienceService;
@@ -144,6 +145,33 @@ public class UserExperienceController {
 			rd.setValue(page);
 		} catch (Exception e) {
 			logger.error("listVotersByPage error", e);
+			rd.setValue(e.getMessage());
+			result = ErrorCode.ERROR;
+		}
+		rd.setErrorCode(result.value);
+		return rd;
+	}
+	
+	/**
+	 * 增加用户可投票次数
+	 * @param userno	用户id
+	 * @param times		次数
+	 * @return
+	 */
+	@RequestMapping("/addAvailableVoteTimes")
+	public @ResponseBody ResponseData addAvailableVoteTimes(@RequestParam(value = "userno", required = false) String userno,
+			@RequestParam(value = "times", required = false) Integer times) {
+		logger.info("/userexperience/addAvailableVoteTimes userno:{} times:{}", new String[] {userno, times + ""});
+		ResponseData rd = new ResponseData();
+		ErrorCode result = ErrorCode.OK;
+		try {
+			UserExperienceAvailableVoteTimes ueavt = userExperieneService.addAvailableVoteTimes(userno, times);
+			rd.setValue(ueavt);
+		} catch(IllegalArgumentException e) {
+			rd.setValue(e.getMessage());
+			result = ErrorCode.PARAMTER_ERROR;
+		} catch (Exception e) {
+			logger.error("addAvailableVoteTimes error", e);
 			rd.setValue(e.getMessage());
 			result = ErrorCode.ERROR;
 		}

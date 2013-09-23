@@ -44,7 +44,6 @@ public class UserExperienceService {
 		} else if(StringUtils.isBlank(userExperience.getQuestion5())) {
 			throw new IllegalArgumentException("the argument question5 is required");
 		} 
-		logger.info("UserExperienceService#recruit " + userExperience.toString());
 		
 		UserExperience result = UserExperience.findUserExperience(userExperience.getUserno());
 		if(result != null) {
@@ -80,7 +79,6 @@ public class UserExperienceService {
 		} else if(StringUtils.isBlank(userno)) {
 			throw new IllegalArgumentException("the argument userno is required");
 		}
-		logger.info("UserExperienceService#vote voteruserno:{} userno:{}", new String[] {voteruserno, userno});
 		
 		UserExperienceAvailableVoteTimes ueavt = UserExperienceAvailableVoteTimes.findUserExperienceAvailableVoteTimes(voteruserno, true);
 		if(ueavt == null) {
@@ -132,6 +130,31 @@ public class UserExperienceService {
 		uevat.setRemainingtimes(1);
 		uevat.persist();
 		return uevat;
+	}
+	
+	/**
+	 * 增加用户可投票次数
+	 * @param userno	用户id
+	 * @param times		次数
+	 * @return UserExperienceAvailableVoteTimes
+	 */
+	@Transactional
+	public UserExperienceAvailableVoteTimes addAvailableVoteTimes(String userno, Integer times) {
+		if(StringUtils.isEmpty(userno)) {
+			throw new IllegalArgumentException("the argument userno is required");
+		} else if(times == null) {
+			throw new IllegalArgumentException("the argument times is required");
+		}
+		
+		UserExperienceAvailableVoteTimes ueavt = UserExperienceAvailableVoteTimes.findUserExperienceAvailableVoteTimes(userno, true);
+		if(ueavt == null) {
+			ueavt =initUserAvailableVoteTimes(userno);
+		}
+		
+		ueavt.setRemainingtimes(ueavt.getRemainingtimes() + 1);
+		ueavt.merge();
+		
+		return ueavt;
 	}
 	
 	
