@@ -2,6 +2,7 @@ package com.ruyicai.actioncenter.jms.listener;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
 import com.ruyicai.actioncenter.service.LotteryService;
+import com.ruyicai.actioncenter.util.DateUtil;
 import com.ruyicai.actioncenter.util.JsonUtil;
 import com.ruyicai.lottery.domain.Torder;
 import com.ruyicai.lottery.domain.Tuserinfo;
@@ -79,6 +81,17 @@ public class OrderAfterBetListener {
 		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.First_Order.value);
 		if (tactivity != null) {
+			Date regtime = tuserinfo.getRegtime();
+			String regtimeStr = DateUtil.format("yyyyMMdd", regtime);
+			String todayStr = DateUtil.format("yyyyMMdd", new Date());
+			if (!regtimeStr.equals(todayStr)) {
+				logger.info("非当天注册用户userno:" + tuserinfo.getUserno());
+				return;
+			}
+			if (StringUtils.isBlank(tuserinfo.getMobileid())) {
+				logger.info("未完善手机信息用户userno:" + tuserinfo.getUserno());
+				return;
+			}
 			String express = tactivity.getExpress();
 			Map<String, Object> activity = JsonUtil.transferJson2Map(express);
 			Integer amt = (Integer) activity.get("amt");
