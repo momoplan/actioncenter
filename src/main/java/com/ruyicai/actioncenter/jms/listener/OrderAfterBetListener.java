@@ -110,6 +110,7 @@ public class OrderAfterBetListener {
 					FirstOrder fo = new FirstOrder();
 					fo.setUserno(tuserinfo.getUserno());
 					fo.setOrderid(order.getId());
+					fo.setCreateTime(new Date());
 					fo.persist();
 					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.First_Order)) {
 						logger.info(ActionJmsType.First_Order.memo + "prize:" + prize.longValue());

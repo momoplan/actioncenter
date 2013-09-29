@@ -22,5 +22,8 @@ public class FirstOrder {
 
 	@Column(name = "ORDERID")
 	private String orderid;
+	
+	@Column(name = "CREATETIME")
+	private Date createTime;
 
 }

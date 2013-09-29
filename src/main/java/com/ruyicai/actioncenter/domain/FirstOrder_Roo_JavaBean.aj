@@ -4,6 +4,7 @@
 package com.ruyicai.actioncenter.domain;
 
 import java.lang.String;
+import java.util.Date;
 
 privileged aspect FirstOrder_Roo_JavaBean {
     
@@ -21,6 +22,14 @@ privileged aspect FirstOrder_Roo_JavaBean {
     
     public void FirstOrder.setOrderid(String orderid) {
         this.orderid = orderid;
+    }
+    
+    public Date FirstOrder.getCreateTime() {
+        return this.createTime;
+    }
+    
+    public void FirstOrder.setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
     
 }

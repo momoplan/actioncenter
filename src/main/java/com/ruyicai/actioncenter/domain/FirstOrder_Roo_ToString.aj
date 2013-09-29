@@ -9,6 +9,7 @@ privileged aspect FirstOrder_Roo_ToString {
     
     public String FirstOrder.toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("CreateTime: ").append(getCreateTime()).append(", ");
         sb.append("Orderid: ").append(getOrderid()).append(", ");
         sb.append("Userno: ").append(getUserno());
         return sb.toString();
