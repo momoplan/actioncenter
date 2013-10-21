@@ -93,6 +93,9 @@ public class UserExperienceService {
 		if(userExperience == null) {
 			throw new RuyicaiException(ErrorCode.UserExperience_UsernoNotRecruit);
 		}
+		if(userExperience.getSelected() != 1) {
+			throw new RuyicaiException(ErrorCode.UserExperience_UsernoNoSelected);
+		}
 		
 		UserExperience userExperienceVoted = doVote(voteruserno, userno, ueavt);
 		
@@ -128,6 +131,8 @@ public class UserExperienceService {
 		UserExperienceAvailableVoteTimes uevat = new UserExperienceAvailableVoteTimes();
 		uevat.setUserno(userno);
 		uevat.setRemainingtimes(1);
+		uevat.setDownloadapp(0);
+		uevat.setWeibo(0);
 		uevat.persist();
 		return uevat;
 	}
@@ -135,23 +140,43 @@ public class UserExperienceService {
 	/**
 	 * 增加用户可投票次数
 	 * @param userno	用户id
-	 * @param times		次数
+	 * @param type		类型 0普通，1下载客户端，2微博分享
 	 * @return UserExperienceAvailableVoteTimes
 	 */
 	@Transactional
-	public UserExperienceAvailableVoteTimes addAvailableVoteTimes(String userno, Integer times) {
+	public UserExperienceAvailableVoteTimes addAvailableVoteTimes(String userno, Integer type) {
 		if(StringUtils.isEmpty(userno)) {
 			throw new IllegalArgumentException("the argument userno is required");
-		} else if(times == null) {
-			throw new IllegalArgumentException("the argument times is required");
+		} else if(type == null) {
+			throw new IllegalArgumentException("the arguemtn type is required.");
 		}
 		
 		UserExperienceAvailableVoteTimes ueavt = UserExperienceAvailableVoteTimes.findUserExperienceAvailableVoteTimes(userno, true);
 		if(ueavt == null) {
 			ueavt =initUserAvailableVoteTimes(userno);
+			if(type.equals(1)) {
+				ueavt.setDownloadapp(1);
+			} else if(type.equals(2)) {
+				ueavt.setWeibo(1);
+			}
+			ueavt.setRemainingtimes(ueavt.getRemainingtimes() + 1);
+		} else {
+			if(type.equals(1)) {
+				if(ueavt.getDownloadapp().equals(1)) {
+					throw new RuyicaiException(ErrorCode.UserExperience_AlreadyDownloadApp);
+				} else {
+					ueavt.setDownloadapp(1);
+				}
+			} else if(type.equals(2)) {
+				if(ueavt.getWeibo().equals(1)) {
+					throw new RuyicaiException(ErrorCode.UserExperience_ArreadyWeibo);
+				} else {
+					ueavt.setWeibo(1);
+				}
+			}
+			ueavt.setRemainingtimes(ueavt.getRemainingtimes() + 1);
 		}
 		
-		ueavt.setRemainingtimes(ueavt.getRemainingtimes() + 1);
 		ueavt.merge();
 		
 		return ueavt;

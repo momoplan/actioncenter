@@ -160,13 +160,16 @@ public class UserExperienceController {
 	 */
 	@RequestMapping("/addAvailableVoteTimes")
 	public @ResponseBody ResponseData addAvailableVoteTimes(@RequestParam(value = "userno", required = false) String userno,
-			@RequestParam(value = "times", required = false) Integer times) {
-		logger.info("/userexperience/addAvailableVoteTimes userno:{} times:{}", new String[] {userno, times + ""});
+			@RequestParam(value = "type", required =false) Integer type) {
+		logger.info("/userexperience/addAvailableVoteTimes userno:{} type:{}", new String[] {userno, type + ""});
 		ResponseData rd = new ResponseData();
 		ErrorCode result = ErrorCode.OK;
 		try {
-			UserExperienceAvailableVoteTimes ueavt = userExperieneService.addAvailableVoteTimes(userno, times);
+			UserExperienceAvailableVoteTimes ueavt = userExperieneService.addAvailableVoteTimes(userno, type);
 			rd.setValue(ueavt);
+		} catch(RuyicaiException e) {
+			rd.setValue(e.getMessage());
+			result = e.getErrorCode();
 		} catch(IllegalArgumentException e) {
 			rd.setValue(e.getMessage());
 			result = ErrorCode.PARAMTER_ERROR;

@@ -32,8 +32,25 @@ public class UserExperienceAvailableVoteTimes {
 	@Column(name = "USERNO", length = 20)
 	private String userno;
 	
+	/**
+	 * 可投票次数
+	 */
 	@Column(name = "REMAININGTIMES")
 	private Integer remainingtimes;
+	
+	/**
+	 * 是否下载过客户端
+	 * 0否1是
+	 */
+	@Column(name = "DOWNLOADAPP")
+	private Integer downloadapp;
+	
+	/**
+	 * 是否分享过微博
+	 * 0否1是
+	 */
+	@Column(name = "WEIBO")
+	private Integer weibo;
 	
 	/**
 	 * 查找用户可投票次数

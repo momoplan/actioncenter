@@ -57,6 +57,14 @@ privileged aspect UserExperience_Roo_JavaBean {
         this.votes = votes;
     }
     
+    public Integer UserExperience.getSelected() {
+        return this.selected;
+    }
+    
+    public void UserExperience.setSelected(Integer selected) {
+        this.selected = selected;
+    }
+    
     public Integer UserExperience.getQuestion1() {
         return this.question1;
     }

@@ -68,6 +68,13 @@ public class UserExperience {
 	private Integer votes;
 	
 	/**
+	 * 是否呗选中
+	 * 0否1是
+	 */
+	@Column(name = "SELECTED")
+	private Integer selected;
+	
+	/**
 	 * 问题1	0-false 1-true
 	 */
 	@Column(name = "QUESTION1")

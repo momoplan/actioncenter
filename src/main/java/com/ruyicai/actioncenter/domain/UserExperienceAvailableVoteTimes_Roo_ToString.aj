@@ -9,8 +9,10 @@ privileged aspect UserExperienceAvailableVoteTimes_Roo_ToString {
     
     public String UserExperienceAvailableVoteTimes.toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("Downloadapp: ").append(getDownloadapp()).append(", ");
         sb.append("Remainingtimes: ").append(getRemainingtimes()).append(", ");
-        sb.append("Userno: ").append(getUserno());
+        sb.append("Userno: ").append(getUserno()).append(", ");
+        sb.append("Weibo: ").append(getWeibo());
         return sb.toString();
     }
     

@@ -24,4 +24,20 @@ privileged aspect UserExperienceAvailableVoteTimes_Roo_JavaBean {
         this.remainingtimes = remainingtimes;
     }
     
+    public Integer UserExperienceAvailableVoteTimes.getDownloadapp() {
+        return this.downloadapp;
+    }
+    
+    public void UserExperienceAvailableVoteTimes.setDownloadapp(Integer downloadapp) {
+        this.downloadapp = downloadapp;
+    }
+    
+    public Integer UserExperienceAvailableVoteTimes.getWeibo() {
+        return this.weibo;
+    }
+    
+    public void UserExperienceAvailableVoteTimes.setWeibo(Integer weibo) {
+        this.weibo = weibo;
+    }
+    
 }

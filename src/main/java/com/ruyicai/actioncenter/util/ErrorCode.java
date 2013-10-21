@@ -119,7 +119,10 @@ public enum ErrorCode {
 	
 	UserExperience_UsernoAlreadyRecruit("902001","该用户已经招募"),
 	UserExperience_UsernoNotRecruit("902002","该用户还未招募"),
-	UserExperience_UsernoNotAvailableVote("902003","该用户的可投票次数为0");
+	UserExperience_UsernoNotAvailableVote("902003","该用户的可投票次数为0"),
+	UserExperience_UsernoNoSelected("902004", "用户没有被选为候选人"),
+	UserExperience_AlreadyDownloadApp("902005", "已经通过下载客户端增加投票次数"),
+	UserExperience_ArreadyWeibo("902006", "已经通过分享微博增加投票次数");
 	
 	public String value;
 	

@@ -18,6 +18,7 @@ privileged aspect UserExperience_Roo_ToString {
         sb.append("Question3: ").append(getQuestion3()).append(", ");
         sb.append("Question4: ").append(getQuestion4()).append(", ");
         sb.append("Question5: ").append(getQuestion5()).append(", ");
+        sb.append("Selected: ").append(getSelected()).append(", ");
         sb.append("Userno: ").append(getUserno()).append(", ");
         sb.append("Votes: ").append(getVotes());
         return sb.toString();
