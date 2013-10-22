@@ -9,7 +9,7 @@ import com.ruyicai.actioncenter.domain.PrizeInfo;
 /**
  * 根据随机概率获取奖品信息.
  * @author hzf
- * @version 
+ * @version 1.0v 2013-10-22
  */
 public class RandomProbability {
 
@@ -28,11 +28,11 @@ public class RandomProbability {
 			proArr[i] = piList.get(i).getAriseProbability();
 			remainSum += piList.get(i).getRemainNum();
 		}
-		int maxProbability = getMaxInt(proArr); // 最大概率
+		int sumProbability = getSumInt(proArr); // 概率总和
 		int resultPosition = -1;
 		while(resultPosition < 0)
 		{
-			resultPosition = getPositionByRandomProbability(proArr, maxProbability, remainSum, piList);
+			resultPosition = getPositionByRandomProbability(proArr, sumProbability, remainSum, piList);
 		}
 
 		return resultPosition;
@@ -42,17 +42,17 @@ public class RandomProbability {
 	 * 根据随机概率返回奖品在list上的位置.
 	 * 
 	 * @param proArr
-	 * @param maxProbability
+	 * @param sumProbability
 	 * @param remainSum
 	 * @param piList
 	 * @return
 	 */
-	public static int getPositionByRandomProbability(int[] proArr, int maxProbability, double remainSum, List<PrizeInfo> piList)
+	public static int getPositionByRandomProbability(int[] proArr, int sumProbability, double remainSum, List<PrizeInfo> piList)
 	{
 		int resultPosition = -1;
 		for(int i=0;i<proArr.length;i++)
 		{
-			int randomPro = getRandomPro(1,maxProbability);
+			int randomPro = getRandomPro(1, sumProbability);
 			// 奖品发生概率与其延迟率共同影响结果
 			if(randomPro < proArr[i])   // 小于其概率
 			{
@@ -66,7 +66,7 @@ public class RandomProbability {
 				}
 			}else
 			{
-				maxProbability -= proArr[i];
+				sumProbability -= proArr[i];
 			}
 		}
 
@@ -74,25 +74,18 @@ public class RandomProbability {
 	}
 
 	/**
-	 * 返回整型数组最大值.
+	 * 返回整型数组值总和.
 	 * @param arry
 	 * @return
 	 */
-	public static int getMaxInt(int[] arry)
+	public static int getSumInt(int[] arry)
 	{
-		int maxValue = 0;
-		if(arry.length >= 0 )
+		int sumValue = 0;
+		for(int i=0; i<arry.length; i++)
 		{
-			maxValue = arry[0];
-			for(int i=1;i<arry.length;i++)
-			{
-				if(maxValue < arry[i])
-				{
-					maxValue = arry[i];
-				}
-			}
+			sumValue += arry[i];
 		}
-		return maxValue;
+		return sumValue;
 	}
 
 	/**

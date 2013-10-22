@@ -74,5 +74,6 @@ public class LuckyDrawController{
 		rd.setErrorCode(result.value);
 		return rd;
 	}
+	
 
 }

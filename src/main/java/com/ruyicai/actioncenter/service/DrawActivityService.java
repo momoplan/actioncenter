@@ -15,8 +15,8 @@ import com.ruyicai.actioncenter.util.RandomProbability;
 
 /**
  * 抽奖活动.
- * @author ryc
- *
+ * @author hzf
+ * @version 1.0v 2013-10-22
  */
 @Service
 public class DrawActivityService {
@@ -24,6 +24,7 @@ public class DrawActivityService {
 	private Logger logger = Logger.getLogger(DrawActivityService.class);
 
 	private final static String TRY_DRAW_CODE = "0001";
+	private final static int UPDATE_RESULT = 0;
 
 	@Autowired
 	DrawActivityDAO drawActivityDAO;
@@ -37,20 +38,28 @@ public class DrawActivityService {
 	public PrizeInfo getPrizeInfoByRandomProbability(String activeTimes, String userno, String payObj, String gainObj)
 	{
 		List<PrizeInfo> piList = queryPrizeConfigList(activeTimes);
-		int piPosition = RandomProbability.getPrizeRandomPosition(piList);
-		PrizeInfo returnPi = piList.get(piPosition);
-		try{
-			processPrizeInfo(returnPi, userno, payObj, gainObj);
-		}catch(Exception e)
+		PrizeInfo returnPi = null;
+		if(piList.size() > 0)
 		{
-			if(TRY_DRAW_CODE.equals(e.getMessage())) // try again
+			int piPosition = RandomProbability.getPrizeRandomPosition(piList);
+			returnPi = piList.get(piPosition);
+			try{
+				processPrizeInfo(returnPi, userno, payObj, gainObj);
+			}catch(Exception e)
 			{
-				returnPi = getPrizeInfoByRandomProbability(activeTimes, userno, payObj, gainObj);
+				if(TRY_DRAW_CODE.equals(e.getMessage())) // try again
+				{
+					logger.info("用户：" + userno + "于期次: " + activeTimes + " 重新获取奖品" );
+					returnPi = getPrizeInfoByRandomProbability(activeTimes, userno, payObj, gainObj);
+				}
 			}
+			logger.info("用户:"+ userno +"-->中奖信息为：奖品id=" + returnPi.getId() 
+					+ ",奖品名称=" + returnPi.getName() + ",奖品等级=" + returnPi.getLevel()
+					+ ",奖品剩余数量=" + returnPi.getRemainNum() + ",中奖时间=" + new Date());
+		}else
+		{
+			logger.info("用户：" + userno + ", 本期:" + activeTimes + "已无奖品！");
 		}
-		logger.info("用户:"+ userno +"-->中奖信息为：奖品id=" + returnPi.getId() 
-				+ ",奖品名称=" + returnPi.getName() + ",奖品等级=" + returnPi.getLevel()
-				+ ",奖品剩余数量=" + returnPi.getRemainNum() + ",中奖时间=" + new Date());
 
 		return returnPi;
 	}
@@ -80,7 +89,7 @@ public class DrawActivityService {
 
 		// 更新奖品信息
 		int result = drawActivityDAO.updatePrizeInfo(pi.getId());
-		if(result == 0)
+		if(result == UPDATE_RESULT)
 		{
 			throw new RuyicaiException(TRY_DRAW_CODE);
 		}
