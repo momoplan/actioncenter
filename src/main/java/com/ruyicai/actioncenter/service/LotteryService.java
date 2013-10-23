@@ -2,6 +2,8 @@ package com.ruyicai.actioncenter.service;
 
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,8 @@ import com.ruyicai.actioncenter.util.Page;
 import com.ruyicai.actioncenter.util.StringUtil;
 import com.ruyicai.lottery.controller.dto.CaselotDTO;
 import com.ruyicai.lottery.domain.CaseLot;
+import com.ruyicai.lottery.domain.CaseLotBuy;
+import com.ruyicai.lottery.domain.CaseLotBuyAndUserDTO;
 import com.ruyicai.lottery.domain.Torder;
 import com.ruyicai.lottery.domain.Tuserinfo;
 
@@ -479,6 +483,45 @@ public class LotteryService {
 			throw new RuyicaiException("请求lottery失败");
 		}
 		return minAmt;
+	}
+	
+	/**
+	 * 查询合买参与人
+	 * 
+	 * @param caselotid
+	 * @return
+	 */
+	public List<CaseLotBuy> selectCaseLotBuysWithOutPage(String caselotid) {
+		if (StringUtils.isBlank(caselotid)) {
+			throw new IllegalArgumentException("the caselotid argument is required");
+		}
+		logger.info("selectCaseLotBuysWithOutPage caselotid:" + caselotid);
+		List<CaseLotBuy> resultList = new ArrayList<CaseLotBuy>();
+		String url = lotteryurl + "/select/selectCaseLotBuysWithOutPage?caselotid=" + caselotid + "&withOutUser=1";
+		try {
+			String result = HttpUtil.getResultMessage(url.toString());
+			JSONObject jsonObject = new JSONObject(result);
+			String errorCode = jsonObject.getString("errorCode");
+			if (errorCode.equals(ErrorCode.OK.value)) {
+				if (jsonObject.has("value")) {
+					String valueJson = jsonObject.getString("value");
+					JSONObject valueObject = new JSONObject(valueJson);
+					if (valueObject.has("caseLotBuyAndUser")) {
+						String resultValue = valueObject.getString("caseLotBuyAndUser");
+						Collection<CaseLotBuyAndUserDTO> collection = CaseLotBuyAndUserDTO
+								.fromJsonArrayToCaseLoes(resultValue);
+						for (CaseLotBuyAndUserDTO dto : collection) {
+							resultList.add(dto.getCaseLotBuy());
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("请求" + url + "失败" + e.getMessage(), e);
+			throw new RuyicaiException(ErrorCode.ERROR);
+		}
+		return resultList;
 	}
 
 }

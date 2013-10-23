@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.Body;
@@ -24,8 +25,10 @@ import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
 import com.ruyicai.actioncenter.service.LotteryService;
+import com.ruyicai.actioncenter.service.UserExperienceService;
 import com.ruyicai.actioncenter.util.DateUtil;
 import com.ruyicai.actioncenter.util.JsonUtil;
+import com.ruyicai.lottery.domain.CaseLotBuy;
 import com.ruyicai.lottery.domain.Torder;
 import com.ruyicai.lottery.domain.Tuserinfo;
 
@@ -45,6 +48,9 @@ public class OrderAfterBetListener {
 
 	@Value("${ruyicaiUserno}")
 	private String ruyicaiUserno;
+	
+	@Autowired
+	private UserExperienceService userExperienceService;
 
 	public void orderAfterBetCustomer(@Body String orderJson) {
 		if (StringUtils.isBlank(orderJson)) {
@@ -73,6 +79,13 @@ public class OrderAfterBetListener {
 			firstorder(order, tuserinfo);
 		} catch (Exception e) {
 			logger.error("广东快乐十分首单活动异常", e);
+		}
+		
+		try {
+			logger.info("→→→→→→→→→→→→→→→→→增加用户体验官投票次数");
+			addUserExperienceVoteTime(order.getUserno(), order.getAmt());
+		} catch (Exception e) {
+			logger.error("增加用户体验官投票次数出错", e);
 		}
 	}
 
@@ -163,5 +176,10 @@ public class OrderAfterBetListener {
 		headers.put("actionJmsType", actionJmsType.value);
 		headers.put("memo", memo);
 		sendActivityPrizeProducer.sendBodyAndHeaders(null, headers);
+	}
+	
+	@Transactional
+	public void addUserExperienceVoteTime(String userno, BigDecimal amt) {
+		userExperienceService.addAvailableVoteTimesByBuyAMT(userno, amt.divide(new BigDecimal(200)).intValue());
 	}
 }

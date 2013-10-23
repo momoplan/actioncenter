@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.LockModeType;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
 
 import org.springframework.roo.addon.entity.RooEntity;
@@ -16,8 +17,9 @@ import org.springframework.roo.addon.tostring.RooToString;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.util.Page;
-import com.ruyicai.actioncenter.util.PropertyFilter;
 import com.ruyicai.actioncenter.util.Page.Sort;
+import com.ruyicai.actioncenter.util.PropertyFilter;
+import com.ruyicai.lottery.domain.Tuserinfo;
 
 /**
  * 用户体验官
@@ -28,7 +30,7 @@ import com.ruyicai.actioncenter.util.Page.Sort;
 @RooJson
 @RooToString
 @RooEntity(versionField = "", table = "USEREXPERIENCE", identifierField = "userno")
-public class UserExperience {
+public class UserExperience implements Comparable<UserExperience> {
 
 	/**
 	 * 用户id
@@ -104,6 +106,12 @@ public class UserExperience {
 	@Column(name = "QUESTION5", columnDefinition = "TEXT")
 	private String question5;
 	
+	@Transient
+	private Tuserinfo userinfo;
+	
+	@Transient
+	private Integer rank;
+	
 	
 	/**
 	 * 创建UserExperience
@@ -168,4 +176,15 @@ public class UserExperience {
 		page.setList(resultList);
 		page.setTotalResult(count);
 	}
+
+	@Override
+	public int compareTo(UserExperience o) {
+		if(this.applytime.before(o.getApplytime())) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+
 }

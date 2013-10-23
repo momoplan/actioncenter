@@ -182,5 +182,22 @@ public class UserExperienceService {
 		return ueavt;
 	}
 	
+	@Transactional
+	public void addAvailableVoteTimesByBuyAMT(String userno, Integer times) {
+		if(StringUtils.isBlank(userno)) {
+			throw new IllegalArgumentException("The argument userno is required.");
+		}
+		if(times == null) {
+			throw new IllegalArgumentException("The argument times is required.");
+		}
+		logger.info("用户体验官增加投票次数 userno:{} times:{}", new String[] {userno, times+""});
+		UserExperienceAvailableVoteTimes ueavt = UserExperienceAvailableVoteTimes.findUserExperienceAvailableVoteTimes(userno, true);
+		if(ueavt == null) {
+			ueavt =initUserAvailableVoteTimes(userno);
+		}
+		ueavt.setRemainingtimes(ueavt.getRemainingtimes() + times);
+		ueavt.merge();
+	}
+	
 	
 }

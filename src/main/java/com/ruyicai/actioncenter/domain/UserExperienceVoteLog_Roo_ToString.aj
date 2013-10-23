@@ -11,6 +11,8 @@ privileged aspect UserExperienceVoteLog_Roo_ToString {
         StringBuilder sb = new StringBuilder();
         sb.append("Id: ").append(getId()).append(", ");
         sb.append("Userno: ").append(getUserno()).append(", ");
+        sb.append("Usernoinfo: ").append(getUsernoinfo()).append(", ");
+        sb.append("Voteruserinfo: ").append(getVoteruserinfo()).append(", ");
         sb.append("Voteruserno: ").append(getVoteruserno()).append(", ");
         sb.append("Votetime: ").append(getVotetime());
         return sb.toString();

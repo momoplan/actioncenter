@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
 
 import org.springframework.roo.addon.entity.RooEntity;
@@ -18,6 +19,7 @@ import org.springframework.roo.addon.tostring.RooToString;
 import com.ruyicai.actioncenter.util.Page;
 import com.ruyicai.actioncenter.util.Page.Sort;
 import com.ruyicai.actioncenter.util.PropertyFilter;
+import com.ruyicai.lottery.domain.Tuserinfo;
 
 @RooJavaBean
 @RooToString
@@ -36,8 +38,14 @@ public class UserExperienceVoteLog {
 	@Column(name = "VOTERUSERNO")
 	private String voteruserno;
 	
+	@Transient
+	private Tuserinfo voteruserinfo;
+	
 	@Column(name = "USERNO")
 	private String userno;
+	
+	@Transient
+	private Tuserinfo usernoinfo;
 	
 	@Column(name = "VOTETIME")
 	private Date votetime;
@@ -85,7 +93,6 @@ public class UserExperienceVoteLog {
 		}
 		String tsql = sql + whereSql.toString() + orderSql.toString();
 		String tCountSql = countSql + whereSql.toString();
-		System.out.println(tsql);
 		TypedQuery<UserExperienceVoteLog> q = entityManager().createQuery(tsql, UserExperienceVoteLog.class);
 		TypedQuery<Long> total = entityManager().createQuery(tCountSql, Long.class);
 		if (conditionMap != null && conditionMap.size() > 0) {
@@ -98,4 +105,5 @@ public class UserExperienceVoteLog {
 		page.setList(resultList);
 		page.setTotalResult(count);
 	}
+
 }

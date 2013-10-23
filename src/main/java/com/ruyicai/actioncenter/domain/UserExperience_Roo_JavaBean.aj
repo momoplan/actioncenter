@@ -3,6 +3,7 @@
 
 package com.ruyicai.actioncenter.domain;
 
+import com.ruyicai.lottery.domain.Tuserinfo;
 import java.lang.Integer;
 import java.lang.String;
 import java.util.Date;
@@ -103,6 +104,22 @@ privileged aspect UserExperience_Roo_JavaBean {
     
     public void UserExperience.setQuestion5(String question5) {
         this.question5 = question5;
+    }
+    
+    public Tuserinfo UserExperience.getUserinfo() {
+        return this.userinfo;
+    }
+    
+    public void UserExperience.setUserinfo(Tuserinfo userinfo) {
+        this.userinfo = userinfo;
+    }
+    
+    public Integer UserExperience.getRank() {
+        return this.rank;
+    }
+    
+    public void UserExperience.setRank(Integer rank) {
+        this.rank = rank;
     }
     
 }

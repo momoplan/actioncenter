@@ -1,5 +1,7 @@
 package com.ruyicai.actioncenter.controller;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -15,6 +17,7 @@ import com.ruyicai.actioncenter.domain.UserExperience;
 import com.ruyicai.actioncenter.domain.UserExperienceAvailableVoteTimes;
 import com.ruyicai.actioncenter.domain.UserExperienceVoteLog;
 import com.ruyicai.actioncenter.exception.RuyicaiException;
+import com.ruyicai.actioncenter.service.LotteryService;
 import com.ruyicai.actioncenter.service.UserExperienceService;
 import com.ruyicai.actioncenter.util.ErrorCode;
 import com.ruyicai.actioncenter.util.JsonUtil;
@@ -28,6 +31,9 @@ public class UserExperienceController {
 	
 	@Autowired
 	private UserExperienceService userExperieneService;
+	
+	@Autowired
+	private LotteryService lotteryService;
 
 	/**
 	 * 应聘体验官 <br/>
@@ -121,6 +127,39 @@ public class UserExperienceController {
 	}
 	
 	/**
+	 * 返回选定的20名候选人
+	 * @return
+	 */
+	@RequestMapping("/listSelectedUserExperience")
+	public @ResponseBody ResponseData listSelectedUserExperience() {
+		logger.info("/userexperience/listSelectedUserExperience");
+		ResponseData rd = new ResponseData();
+		ErrorCode result = ErrorCode.OK;
+		Page<UserExperience> page = new Page<UserExperience>(0, 20, "votes", "desc");
+		try {
+			Map<String, Object> conditionMap = new HashMap<String, Object>();
+			conditionMap.put("EQI_selected", 1);
+			int i = 1;
+			UserExperience.findByPage(conditionMap, page);
+			for(UserExperience user : page.getList()) {
+				user.setUserinfo(lotteryService.findTuserinfoByUserno(user.getUserno()));
+				user.setRank(i);
+				i++;
+			}
+			logger.info("排序开始");
+			Collections.sort(page.getList());
+			logger.info("排序结束");
+			rd.setValue(page);
+		} catch (Exception e) {
+			logger.error("listUserExperienceByPage error", e);
+			rd.setValue(e.getMessage());
+			result = ErrorCode.ERROR;
+		}
+		rd.setErrorCode(result.value);
+		return rd;
+	}
+	
+	/**
 	 * 查找投票
 	 * @param condition	条件
 	 * @param pageIndex	当前页码（第一页为0）
@@ -132,7 +171,7 @@ public class UserExperienceController {
 	@RequestMapping("/listVotersByPage")
 	public @ResponseBody ResponseData listVotersByPage(@RequestParam(value = "condition", required = false) String condition,
 			@RequestParam(value = "pageIndex", required = false, defaultValue = "0") int pageIndex,
-			@RequestParam(value = "maxResult", required = false, defaultValue = "30") int maxResult,
+			@RequestParam(value = "maxResult", required = false, defaultValue = "10") int maxResult,
 			@RequestParam(value = "orderBy", required = false) String orderBy,
 			@RequestParam(value = "orderDir", required = false) String orderDir) {
 		logger.info("/userexperience/listVotersByPage condition:{} pageIndex:{} maxResult:{} orderBy:{} orderDir:{}", new String[] {condition, pageIndex + "", maxResult + "", orderBy, orderDir});
@@ -142,6 +181,10 @@ public class UserExperienceController {
 		try {
 			Map<String, Object> conditionMap = JsonUtil.transferJson2Map(condition);
 			UserExperienceVoteLog.findByPage(conditionMap, page);
+			for(UserExperienceVoteLog uevl : page.getList()) {
+				uevl.setVoteruserinfo(lotteryService.findTuserinfoByUserno(uevl.getVoteruserno()));
+				uevl.setUsernoinfo(lotteryService.findTuserinfoByUserno(uevl.getUserno()));
+			}
 			rd.setValue(page);
 		} catch (Exception e) {
 			logger.error("listVotersByPage error", e);

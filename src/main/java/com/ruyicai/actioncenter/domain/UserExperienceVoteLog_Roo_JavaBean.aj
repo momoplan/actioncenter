@@ -3,6 +3,7 @@
 
 package com.ruyicai.actioncenter.domain;
 
+import com.ruyicai.lottery.domain.Tuserinfo;
 import java.lang.Integer;
 import java.lang.String;
 import java.util.Date;
@@ -25,12 +26,28 @@ privileged aspect UserExperienceVoteLog_Roo_JavaBean {
         this.voteruserno = voteruserno;
     }
     
+    public Tuserinfo UserExperienceVoteLog.getVoteruserinfo() {
+        return this.voteruserinfo;
+    }
+    
+    public void UserExperienceVoteLog.setVoteruserinfo(Tuserinfo voteruserinfo) {
+        this.voteruserinfo = voteruserinfo;
+    }
+    
     public String UserExperienceVoteLog.getUserno() {
         return this.userno;
     }
     
     public void UserExperienceVoteLog.setUserno(String userno) {
         this.userno = userno;
+    }
+    
+    public Tuserinfo UserExperienceVoteLog.getUsernoinfo() {
+        return this.usernoinfo;
+    }
+    
+    public void UserExperienceVoteLog.setUsernoinfo(Tuserinfo usernoinfo) {
+        this.usernoinfo = usernoinfo;
     }
     
     public Date UserExperienceVoteLog.getVotetime() {
