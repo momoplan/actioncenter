@@ -18,7 +18,8 @@ privileged aspect PrizeInfo_Roo_ToString {
         sb.append("Name: ").append(getName()).append(", ");
         sb.append("RemainNum: ").append(getRemainNum()).append(", ");
         sb.append("StartDate: ").append(getStartDate()).append(", ");
-        sb.append("Sum: ").append(getSum());
+        sb.append("Sum: ").append(getSum()).append(", ");
+        sb.append("Valid: ").append(getValid());
         return sb.toString();
     }
     

@@ -1,7 +1,10 @@
 package com.ruyicai.actioncenter.service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +14,10 @@ import com.ruyicai.actioncenter.dao.DrawActivityDAO;
 import com.ruyicai.actioncenter.domain.PrizeInfo;
 import com.ruyicai.actioncenter.domain.UserDrawDetails;
 import com.ruyicai.actioncenter.exception.RuyicaiException;
+import com.ruyicai.actioncenter.util.ErrorCode;
+import com.ruyicai.actioncenter.util.JsonUtil;
 import com.ruyicai.actioncenter.util.RandomProbability;
+import com.ruyicai.actioncenter.util.StringUtil;
 
 /**
  * 抽奖活动.
@@ -102,6 +108,73 @@ public class DrawActivityService {
 		// 异步处理
 		// ------------------
 
+	}
+	
+	/**
+	 * 编辑奖品信息
+	 * @param jsonString
+	 * @return
+	 */
+	@Transactional
+	public String editPrizeInfo(String jsonString)
+	{
+		logger.info("update prize_info start: 得到参数：jsonString=" + jsonString);
+		String errorCode = ErrorCode.OK.value;
+		try {
+			Map<String, Object> map = JsonUtil.transferJson2Map(jsonString);
+			String id = map.containsKey("id") ? map.get("id").toString().trim() : "";
+			String name = map.containsKey("name") ? map.get("name").toString().trim() : "";
+			String level = map.containsKey("level") ? map.get("level").toString().trim()  : "";
+			String sum = map.containsKey("sum") ? map.get("sum").toString().trim()  : "";
+			String remain_num = map.containsKey("remain_num") ? map.get("remain_num").toString().trim()  : "";
+			String arise_probability = map.containsKey("arise_probability") ? map.get("arise_probability").toString().trim()  : "";
+			String delay_probability = map.containsKey("delay_probability") ? map.get("delay_probability").toString().trim()  : "";
+			String start_date = map.containsKey("start_date") ? map.get("start_date").toString().trim()  : "";
+			String end_date = map.containsKey("end_date") ? map.get("end_date").toString().trim()  : "";
+			String active_times = map.containsKey("active_times") ? map.get("active_times").toString().trim()  : "";
+			String valid = map.containsKey("valid") ? map.get("valid").toString().trim()  : "";
+			String editType = map.containsKey("editType") ? map.get("editType").toString().trim()  : ""; // 编辑类型
+
+			if (StringUtil.isEmpty(editType) || StringUtil.isEmpty(name) || StringUtil.isEmpty(level)) {
+				errorCode = ErrorCode.PARAMTER_ERROR.value;
+			} else if(!"add".equals(editType) && StringUtil.isEmpty(id))
+			{
+				errorCode = ErrorCode.PARAMTER_ERROR.value;
+			}else {
+				PrizeInfo pi = new PrizeInfo();
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				pi.setName(name);
+				pi.setLevel(level);
+				pi.setSum(Integer.parseInt(sum));
+				pi.setRemainNum(Integer.parseInt(remain_num));
+				pi.setAriseProbability(Integer.parseInt(arise_probability));
+				pi.setDelayProbability(delay_probability);
+				if(!"".equals(start_date))
+				{
+					pi.setStartDate(sdf.parse(start_date));
+				}
+				if(!"".equals(end_date))
+				{
+					pi.setEndDate(sdf.parse(end_date));
+				}
+				pi.setActiveTimes(active_times);
+				pi.setValid(valid);
+
+				if("add".equals(editType))
+				{
+					drawActivityDAO.createPrizeInfo(pi);
+				}else if("update".equals(editType))
+				{
+					pi.setId(Integer.parseInt(id));
+					drawActivityDAO.merge(pi);
+				}
+			}
+		} catch(Exception e) {
+			errorCode = ErrorCode.ERROR.value;	
+			logger.error("update prize_info error, ", e);
+		}
+		logger.info("update prize_info end");
+		return errorCode;
 	}
 	
 	// ---------user draw details service

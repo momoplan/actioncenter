@@ -75,5 +75,14 @@ public class LuckyDrawController{
 		return rd;
 	}
 	
+	/**
+	 * 编辑奖品信息.
+	 * @param jsonString
+	 * @return
+	 */
+	@RequestMapping(value = "/edit", method = RequestMethod.GET)
+	public @ResponseBody String doEdit(@RequestParam(value = "jsonString", required = false) String jsonString){
+		return drawActivityService.editPrizeInfo(jsonString);
+	}
 
 }

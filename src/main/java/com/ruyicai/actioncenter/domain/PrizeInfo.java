@@ -41,7 +41,7 @@ public class PrizeInfo{
 	private int ariseProbability;
 	
 	@Column(name = "delay_probability")
-	private double delayProbability;
+	private String delayProbability;
 	
 	@Column(name = "start_date")
 	private Date startDate;
@@ -51,4 +51,7 @@ public class PrizeInfo{
 	
 	@Column(name = "active_times")
 	private String activeTimes;
+	
+	@Column(name = "valid")
+	private String valid;
 }

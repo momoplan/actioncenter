@@ -23,7 +23,7 @@ public class DrawActivityDAO {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<PrizeInfo> findPrizeInfoList(String activeTimes) {
-		String sql = "from PrizeInfo o where o.remainNum != '0' and o.activeTimes = ? order by o.ariseProbability asc";
+		String sql = "from PrizeInfo o where o.remainNum != '0' and o.valid = '1' and o.activeTimes = ? order by o.ariseProbability asc";
 		Query q = entityManager.createQuery(sql, PrizeInfo.class);
 		q.setParameter(1, activeTimes);
 		List<PrizeInfo> returnList = q.getResultList();
@@ -54,6 +54,7 @@ public class DrawActivityDAO {
 
 	/**
 	 * 更新奖品信息.
+	 * <p>根据更新结果来判断是否需要重新获取奖品信息</p>
 	 * @param id
 	 * @return
 	 */
@@ -65,10 +66,21 @@ public class DrawActivityDAO {
 		q.setParameter(1, id);
 		return q.executeUpdate();
 	}
+	
+	/**
+	 * 增加奖品信息
+	 * @param pi
+	 * @return
+	 */
+	@Transactional
+	public PrizeInfo createPrizeInfo(PrizeInfo pi) {
+		entityManager.persist(pi);
+		return pi;
+	}
 
 	// ----------------------------user draw details
 	/**
-	 * 记录用户抽奖信息
+	 * 增加用户抽奖信息
 	 * @param userMap
 	 * @return
 	 */

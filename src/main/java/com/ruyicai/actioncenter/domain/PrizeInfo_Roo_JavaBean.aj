@@ -56,11 +56,11 @@ privileged aspect PrizeInfo_Roo_JavaBean {
         this.ariseProbability = ariseProbability;
     }
     
-    public double PrizeInfo.getDelayProbability() {
+    public String PrizeInfo.getDelayProbability() {
         return this.delayProbability;
     }
     
-    public void PrizeInfo.setDelayProbability(double delayProbability) {
+    public void PrizeInfo.setDelayProbability(String delayProbability) {
         this.delayProbability = delayProbability;
     }
     
@@ -86,6 +86,14 @@ privileged aspect PrizeInfo_Roo_JavaBean {
     
     public void PrizeInfo.setActiveTimes(String activeTimes) {
         this.activeTimes = activeTimes;
+    }
+    
+    public String PrizeInfo.getValid() {
+        return this.valid;
+    }
+    
+    public void PrizeInfo.setValid(String valid) {
+        this.valid = valid;
     }
     
 }

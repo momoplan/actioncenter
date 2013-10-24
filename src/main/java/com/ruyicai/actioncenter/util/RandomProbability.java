@@ -58,8 +58,8 @@ public class RandomProbability {
 			{
 				double remainNum = piList.get(i).getRemainNum();
 				double currentDelayPro = div(remainNum, remainSum, 10);
-				double delayPro = piList.get(i).getDelayProbability();
-				if(Double.compare(currentDelayPro, delayPro) >= 0) // 大于或等于其延迟率
+				String delayPro = piList.get(i).getDelayProbability();
+				if(Double.compare(currentDelayPro, Double.valueOf(delayPro)) >= 0) // 大于或等于其延迟率
 				{
 					resultPosition = i;
 					break;
