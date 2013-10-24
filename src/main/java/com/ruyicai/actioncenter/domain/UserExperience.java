@@ -121,6 +121,7 @@ public class UserExperience implements Comparable<UserExperience> {
 	public static UserExperience createUserExperience(UserExperience userExperience) {
 		userExperience.setApplytime(new Date());
 		userExperience.setVotes(0);
+		userExperience.setSelected(0);
 		userExperience.persist();
 		return userExperience;
 	}

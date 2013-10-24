@@ -3,20 +3,26 @@ package com.ruyicai.actioncenter.service;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.domain.UserExperience;
 import com.ruyicai.actioncenter.domain.UserExperienceAvailableVoteTimes;
+import com.ruyicai.actioncenter.domain.UserExperienceMobile;
 import com.ruyicai.actioncenter.domain.UserExperienceVoteLog;
 import com.ruyicai.actioncenter.exception.RuyicaiException;
 import com.ruyicai.actioncenter.util.ErrorCode;
 import com.ruyicai.actioncenter.util.HtmlFilter;
+import com.ruyicai.lottery.domain.Tuserinfo;
 
 @Service
 public class UserExperienceService {
 	
 	private Logger logger = LoggerFactory.getLogger(UserExperienceService.class);
+	
+	@Autowired
+	private LotteryService lotteryService;
 	
 	/**
 	 * 用户招募方法
@@ -80,6 +86,27 @@ public class UserExperienceService {
 			throw new IllegalArgumentException("the argument userno is required");
 		}
 		
+		Tuserinfo userinfo = lotteryService.findTuserinfoByUserno(voteruserno);
+		if(userinfo == null) {
+			throw new RuyicaiException(ErrorCode.UserMod_UserNotExists);
+		}
+		
+		String mobileid = userinfo.getMobileid();
+		if(StringUtils.isBlank(mobileid)) {
+			throw new RuyicaiException(ErrorCode.UserMod_MobileidNotBind);
+		}
+		
+		UserExperienceMobile uem = UserExperienceMobile.findUserExperienceMobile(mobileid);
+		if(uem == null) {
+			logger.info("手机号：" + mobileid + " 用户编号：" + voteruserno + " 第一次投票");
+			uem = UserExperienceMobile.createUserExperienceMobile(mobileid, voteruserno);
+		} else {
+			String logUserno = uem.getUserno();
+			if(logUserno.equals(voteruserno) == false) {
+				throw new RuyicaiException(ErrorCode.UserExperience_MobileidNotMathUserno);
+			}
+		}
+		
 		UserExperienceAvailableVoteTimes ueavt = UserExperienceAvailableVoteTimes.findUserExperienceAvailableVoteTimes(voteruserno, true);
 		if(ueavt == null) {
 			ueavt = initUserAvailableVoteTimes(voteruserno);
@@ -111,7 +138,7 @@ public class UserExperienceService {
 	 */
 	private UserExperience doVote(String voteruserno, String userno, UserExperienceAvailableVoteTimes ueavt) {
 		//创建用户投票记录
-		UserExperienceVoteLog userExperienceVoteLog = UserExperienceVoteLog.create(voteruserno, userno);
+		UserExperienceVoteLog.create(voteruserno, userno);
 		//更新投票数
 		UserExperience userExperience = UserExperience.findUserExperience(userno, true);
 		userExperience.setVotes(userExperience.getVotes() + 1);

@@ -122,7 +122,8 @@ public enum ErrorCode {
 	UserExperience_UsernoNotAvailableVote("902003","该用户的可投票次数为0"),
 	UserExperience_UsernoNoSelected("902004", "用户没有被选为候选人"),
 	UserExperience_AlreadyDownloadApp("902005", "已经通过下载客户端增加投票次数"),
-	UserExperience_ArreadyWeibo("902006", "已经通过分享微博增加投票次数");
+	UserExperience_ArreadyWeibo("902006", "已经通过分享微博增加投票次数"),
+	UserExperience_MobileidNotMathUserno("902007", "手机号和用户ID不符合");
 	
 	public String value;
 	
