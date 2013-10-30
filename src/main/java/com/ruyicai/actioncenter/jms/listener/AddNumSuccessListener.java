@@ -128,7 +128,7 @@ public class AddNumSuccessListener {
 			logger.info("null return");
 			return;
 		}
-		Tactivity addNum15 = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+		Tactivity addNum15 = Tactivity.findTactivity(tsubscribe.getLotno(), null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.AddNum15.value);
 		if (addNum15 != null) {
 			String express = addNum15.getExpress();

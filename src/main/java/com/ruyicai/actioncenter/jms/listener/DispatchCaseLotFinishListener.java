@@ -91,6 +91,8 @@ public class DispatchCaseLotFinishListener {
 				Integer step5prize = (Integer) activity.get("step5prize");
 				Integer step6 = (Integer) activity.get("step6");
 				Integer step6prize = (Integer) activity.get("step6prize");
+				Integer step7 = (Integer) activity.get("step7");
+				Integer step7prize = (Integer) activity.get("step7prize");
 				if (caselotprize >= step1 && caselotprize < step2) {
 					prize = new BigDecimal(step1prize);
 				} else if (caselotprize >= step2 && caselotprize < step3) {
@@ -101,8 +103,10 @@ public class DispatchCaseLotFinishListener {
 					prize = new BigDecimal(step4prize);
 				} else if (caselotprize >= step5 && caselotprize < step6) {
 					prize = new BigDecimal(step5prize);
-				} else if (caselotprize >= step6) {
+				} else if (caselotprize >= step6 && caselotprize < step7) {
 					prize = new BigDecimal(step6prize);
+				} else if (caselotprize >= step7) {
+					prize = new BigDecimal(step7prize);
 				}
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_Jingcai_2Chan1)) {

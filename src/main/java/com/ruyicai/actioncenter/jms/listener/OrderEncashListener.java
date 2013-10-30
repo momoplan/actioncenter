@@ -187,6 +187,8 @@ public class OrderEncashListener {
 				Integer step5prize = (Integer) activity.get("step5prize");
 				Integer step6 = (Integer) activity.get("step6");
 				Integer step6prize = (Integer) activity.get("step6prize");
+				Integer step7 = (Integer) activity.get("step7");
+				Integer step7prize = (Integer) activity.get("step7prize");
 				if (orderprizeamt >= step1 && orderprizeamt < step2) {
 					prize = new BigDecimal(step1prize);
 				} else if (orderprizeamt >= step2 && orderprizeamt < step3) {
@@ -197,8 +199,10 @@ public class OrderEncashListener {
 					prize = new BigDecimal(step4prize);
 				} else if (orderprizeamt >= step5 && orderprizeamt < step6) {
 					prize = new BigDecimal(step5prize);
-				} else if (orderprizeamt >= step6) {
+				} else if (orderprizeamt >= step6 && orderprizeamt < step7) {
 					prize = new BigDecimal(step6prize);
+				} else if (orderprizeamt >= step7) {
+					prize = new BigDecimal(step7prize);
 				}
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_Jingcai_2Chan1)) {
