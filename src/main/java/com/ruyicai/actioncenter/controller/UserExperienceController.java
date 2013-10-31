@@ -77,8 +77,9 @@ public class UserExperienceController {
 		ResponseData rd = new ResponseData();
 		ErrorCode result = ErrorCode.OK;
 		try {
-			UserExperience userExperience = userExperieneService.vote(voteruserno, userno);
-			rd.setValue(userExperience);
+//			UserExperience userExperience = userExperieneService.vote(voteruserno, userno);
+//			rd.setValue(userExperience);
+			throw new RuyicaiException(ErrorCode.UserExperience_Closed);
 		} catch (IllegalArgumentException e) {
 			rd.setValue(e.getMessage());
 			result = ErrorCode.PARAMTER_ERROR;
