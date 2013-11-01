@@ -15,6 +15,7 @@ import org.springframework.roo.addon.tostring.RooToString;
 @RooJavaBean
 @RooToString
 @RooJson
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 @Entity()
 @Table(name = "VipUser")
 public class VipUser {

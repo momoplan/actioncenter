@@ -20,6 +20,7 @@ import org.springframework.roo.addon.tostring.RooToString;
 @RooJavaBean
 @RooToString
 @RooJson
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 @Entity()
 @Table(name = "TUSERPRIZEDETAIL")
 public class TuserPrizeDetail {
