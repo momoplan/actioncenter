@@ -22,7 +22,6 @@ public class SystemServlet extends HttpServlet {
 			logger.info("********************** 启动加载开始 **********************");
 
 			logger.info("---------------------- SpringUtils 初始化开始   ----------------------");
-			SpringUtils.initApplicationContext(this.getServletContext());
 			logger.info("---------------------- SpringUtils 初始化结束   ----------------------");
 
 			logger.info("********************** 启动加载结束 **********************");

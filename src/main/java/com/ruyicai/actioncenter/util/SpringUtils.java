@@ -1,43 +1,30 @@
 package com.ruyicai.actioncenter.util;
 
-import javax.servlet.ServletContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.util.Assert;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Service;
 
 /**
  * @ClassName: SpringUtils
  * @Description: spring工具类
  * 
  */
-public class SpringUtils {
+@Service
+public class SpringUtils implements ApplicationContextAware {
 
 	private static Logger logger = LoggerFactory.getLogger(SpringUtils.class);
 
 	private static ApplicationContext applicationContext = null;
 
-	/**
-	 * 初始化SpringUtils
-	 * 
-	 * @param servletContext
-	 */
-	public static void initApplicationContext(ServletContext servletContext) {
-		Assert.notNull(servletContext);
+	@Override
+	public void setApplicationContext(ApplicationContext contex) throws BeansException {
+		logger.info("==========init spring context start============");
 		if (SpringUtils.applicationContext == null) {
-			SpringUtils.applicationContext = WebApplicationContextUtils
-					.getRequiredWebApplicationContext(servletContext);
-		}
-	}
-
-	/**
-	 * 设置存储静态变量中的ApplicationContext.
-	 */
-	public static void setApplicationContext(ApplicationContext applicationContext) {
-		if (SpringUtils.applicationContext == null) {
-			SpringUtils.applicationContext = applicationContext;
+			SpringUtils.applicationContext = contex;
+			logger.info("==========init spring context successful============");
 		}
 	}
 
