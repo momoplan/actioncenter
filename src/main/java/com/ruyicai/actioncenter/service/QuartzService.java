@@ -3,7 +3,8 @@ package com.ruyicai.actioncenter.service;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.ruyicai.actioncenter.util.DateUtil;
@@ -14,7 +15,7 @@ public class QuartzService implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = Logger.getLogger(QuartzService.class);
+	private static final Logger logger = LoggerFactory.getLogger(QuartzService.class);
 
 	/**
 	 * 定时调度执行增加充值可提现金额

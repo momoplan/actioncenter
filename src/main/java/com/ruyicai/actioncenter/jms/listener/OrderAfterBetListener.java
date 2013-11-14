@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.Body;
@@ -28,7 +27,6 @@ import com.ruyicai.actioncenter.service.LotteryService;
 import com.ruyicai.actioncenter.service.UserExperienceService;
 import com.ruyicai.actioncenter.util.DateUtil;
 import com.ruyicai.actioncenter.util.JsonUtil;
-import com.ruyicai.lottery.domain.CaseLotBuy;
 import com.ruyicai.lottery.domain.Torder;
 import com.ruyicai.lottery.domain.Tuserinfo;
 
