@@ -126,7 +126,8 @@ public enum ErrorCode {
 	UserExperience_MobileidNotMathUserno("902007", "手机号和用户ID不符合"),
 	UserExperience_Closed("902008", "活动截止"),
 	
-	SportsQuiz_AlreadyParticipate("903001","帐号已参与");
+	SportsQuiz_AlreadyParticipate("903001","帐号已参与"),
+	SportsQuiz_ActionEnd("903002","活动已截止");
 	
 	public String value;
 	

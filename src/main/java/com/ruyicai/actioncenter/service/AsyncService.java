@@ -44,11 +44,11 @@ public class AsyncService {
 			if(tuserinfo == null) {
 				logger.error("注册失败 mobileid:" + mobileid);
 			} else {
-				text.append("本场竞猜账户名：").append(tuserinfo.getUserName()).append(" 密码：").append(password).append(" 请比赛结束后登陆http://t.cn/8DDt8sY 领取赠送彩金");
+				text.append("成功参与竞猜，账户名：").append(tuserinfo.getUserName()).append(" 密码：").append(password).append(" 比赛结束后使用此账户登录如意彩http://t.cn/8DDt8sY? 领取赠送彩金");
 			}
 		} else {	//已注册用户
 			logger.info("已注册用户 mobileid:" + mobileid);
-			text.append("比赛结束后登陆http://t.cn/8DDt8sY 登录您手机号绑定的如意彩账户领取赠送彩金，详询4006651000");
+			text.append("成功参与竞猜，比赛结束后使用您的如意彩账户登录http://t.cn/8DDt8sY? 领取赠送彩金，详询4006651000");
 		}
 		//发送短信
 		String url = msgcenterurl + "/sms/send";
@@ -57,7 +57,7 @@ public class AsyncService {
 			ResponseData rd = JsonUtil.fromJsonToObject(result, ResponseData.class);
 			if (rd != null) {
 				if (rd.getErrorCode().equals(ErrorCode.OK.value)) {
-					
+					logger.info("参与体育竞猜发送短信成功 mobileid:" + mobileid + " text:" + text);
 				} else {
 					logger.error("参与体育竞猜发短信失败 mobileid:" + mobileid);
 				}
@@ -69,7 +69,6 @@ public class AsyncService {
 	}
 	
 	private void asyncSendSMS(String mobileid, String text) {
-		logger.info("异步发送短信 mobileid:" + mobileid + " text:" + text);
 		String url = msgcenterurl + "/sms/send";
 		try {
 			String result = HttpUtil.post(url, "mobileIds=" + mobileid + "&text=" + text);
@@ -94,7 +93,7 @@ public class AsyncService {
 		if(tuserinfo == null) {
 			throw new RuyicaiException(ErrorCode.UserMod_UserNotExists);
 		}
-		lotteryService.directChargeProcess(tuserinfo.getUserno(), amount, tuserinfo.getSubChannel(), tuserinfo.getChannel(), "如意彩竞猜奖金");
+		lotteryService.directChargeProcess(tuserinfo.getUserno(), amount, tuserinfo.getSubChannel(), tuserinfo.getChannel(), "体育之窗竞猜奖金");
 		this.asyncSendSMS(username, text);
 	}
 	

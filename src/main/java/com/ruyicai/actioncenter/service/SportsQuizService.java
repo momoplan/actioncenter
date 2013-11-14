@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.domain.SportsQuizPaper;
 import com.ruyicai.actioncenter.exception.RuyicaiException;
+import com.ruyicai.actioncenter.util.DateUtil;
 import com.ruyicai.actioncenter.util.ErrorCode;
 import com.ruyicai.actioncenter.util.Page;
 
@@ -31,6 +32,10 @@ public class SportsQuizService {
 	
 	@Transactional
 	public void participate(String mobileid, Integer answerid) {
+		Date now = new Date();
+		if(now.after(DateUtil.parse("2013-11-23 18:50:00"))) {
+			throw new RuyicaiException(ErrorCode.SportsQuiz_ActionEnd);
+		}
 		if(StringUtils.isBlank(mobileid)) {
 			throw new IllegalArgumentException("The argument mobileid is required.");
 		}
@@ -55,8 +60,11 @@ public class SportsQuizService {
 	
 	@Transactional
 	public void draw(Integer answerid) {
+		if(answerid == null) {
+			throw new IllegalArgumentException("The argument answerid is required.");
+		}
 		String winMsg = "您成功命中国安VS恒大比赛结果，如意彩5元彩金相送，邀请您参与并体验更多精彩赛事，请下载如意彩客户端领取您的彩金。";
-		String loseMsg = "您未命中国安vs恒大的比赛结果，不要气馁，如意彩送您 3元彩金，邀请您参与并体验更多精彩赛事，请下载如意彩客户端领取您的彩金。";
+		String loseMsg = "您未命中国安vs恒大的比赛结果，不要气馁，如意彩送您3元彩金，邀请您参与并体验更多精彩赛事，请下载如意彩客户端领取您的彩金。";
 		Page<SportsQuizPaper> page = new Page<SportsQuizPaper>(0, 100);
 		do {
 			SportsQuizPaper.findByPage(page);

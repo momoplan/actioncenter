@@ -26,17 +26,17 @@ public class SportsQuizController {
 	public @ResponseBody String participate(@RequestParam(value = "callBackMethod", required = true) String callBackMethod,
 			@RequestParam(value = "mobileid", required = false) String mobileid,
 			@RequestParam(value = "answerid", required = false) Integer answerid) {
-		logger.info("/sportsquiz/participate mobileid:{} answerid:{}", new String[] {mobileid, answerid+""});
+		logger.info("/sportsquiz/participate callBackMethod:{} mobileid:{} answerid:{}", new String[] {callBackMethod, mobileid, answerid+""});
 		ResponseData rd = new ResponseData();
 		ErrorCode result = ErrorCode.OK;
 		try {
 			sportsQuizService.participate(mobileid, answerid);
 		} catch (IllegalArgumentException e) {
-			logger.error("participate error", new String[] { e.getMessage() }, e);
+			logger.error("participate error" + e.getMessage());
 			rd.setValue(e.getMessage());
 			result = ErrorCode.PARAMTER_ERROR;
 		} catch(RuyicaiException e) {
-			logger.error("participate error", new String[] { e.getMessage() }, e);
+			logger.error("participate error" +e.getMessage());
 			rd.setValue(e.getMessage());
 			result = e.getErrorCode();
 		} catch (Exception e) {
@@ -52,17 +52,17 @@ public class SportsQuizController {
 	@RequestMapping("/draw")
 	public @ResponseBody String draw(@RequestParam(value = "callBackMethod", required = true) String callBackMethod,
 			@RequestParam(value = "answerid", required = false) Integer answerid) {
-		logger.info("/sportsquiz/draw answerid:{}", new String[] {answerid+""});
+		logger.info("/sportsquiz/draw callBackMethod:{} answerid:{}", new String[] {callBackMethod, answerid+""});
 		ResponseData rd = new ResponseData();
 		ErrorCode result = ErrorCode.OK;
 		try {
 			sportsQuizService.draw(answerid);
 		} catch (IllegalArgumentException e) {
-			logger.error("draw error", new String[] { e.getMessage() }, e);
+			logger.error("draw error" + e.getMessage());
 			rd.setValue(e.getMessage());
 			result = ErrorCode.PARAMTER_ERROR;
 		} catch(RuyicaiException e) {
-			logger.error("draw error", new String[] { e.getMessage() }, e);
+			logger.error("draw error" + e.getMessage());
 			rd.setValue(e.getMessage());
 			result = e.getErrorCode();
 		} catch (Exception e) {
