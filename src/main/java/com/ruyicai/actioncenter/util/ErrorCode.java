@@ -124,7 +124,9 @@ public enum ErrorCode {
 	UserExperience_AlreadyDownloadApp("902005", "已经通过下载客户端增加投票次数"),
 	UserExperience_ArreadyWeibo("902006", "已经通过分享微博增加投票次数"),
 	UserExperience_MobileidNotMathUserno("902007", "手机号和用户ID不符合"),
-	UserExperience_Closed("902008", "活动截止");
+	UserExperience_Closed("902008", "活动截止"),
+	
+	SportsQuiz_AlreadyParticipate("903001","帐号已参与");
 	
 	public String value;
 	

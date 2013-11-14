@@ -120,6 +120,83 @@ public class LotteryService {
 		}
 		return tuserinfo;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public Tuserinfo findByUsername(String username) {
+		if(StringUtils.isBlank(username)) {
+			throw new IllegalArgumentException("The argument username is required.");
+		}
+		Tuserinfo tuserinfo = null;
+		String url = lotteryurl + "/tuserinfoes?find=ByUserName&json&userName=" + username;
+		try {
+			String result = HttpUtil.getResultMessage(url.toString());
+			ResponseData rd = JsonUtil.fromJsonToObject(result, ResponseData.class);
+			if (rd != null) {
+				if (rd.getErrorCode().equals(ErrorCode.OK.value)) {
+					Map<String, Object> map = (Map<String, Object>) rd.getValue();
+					if (map.containsKey("userno")) {
+						String uno = (String) map.get("userno");
+						if (StringUtils.isNotBlank(uno)) {
+							tuserinfo = new Tuserinfo();
+							tuserinfo.setUserno(uno);
+							tuserinfo.setName((String) map.get("name"));
+							tuserinfo.setNickname((String) map.get("nickname"));
+							tuserinfo.setAgencyno((String) map.get("agencyno"));
+							tuserinfo.setMobileid((String) map.get("mobileid"));
+							tuserinfo.setChannel((String) map.get("channel"));
+							tuserinfo.setSubChannel((String) map.get("subChannel"));
+							tuserinfo.setEmail((String) map.get("email"));
+							tuserinfo.setUserName((String) map.get("userName"));
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error("请求" + url + "失败" + e.getMessage());
+			throw new RuyicaiException(ErrorCode.ERROR);
+		}
+		return tuserinfo;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Tuserinfo registerUserByMobileid(String mobileid, String password) {
+		if(StringUtils.isBlank(mobileid)) {
+			throw new IllegalArgumentException("The argument mobileid is required.");
+		}
+		if(StringUtils.isBlank(password)) {
+			throw new IllegalArgumentException("The argument password is required.");
+		}
+		Tuserinfo tuserinfo = null;
+		String url = lotteryurl + "/tuserinfoes/register?userName=" + mobileid + "&mobileid=" + mobileid + "&password=" + password;
+		try {
+			String result = HttpUtil.post(url.toString(), "");
+			ResponseData rd = JsonUtil.fromJsonToObject(result, ResponseData.class);
+			if (rd != null) {
+				if (rd.getErrorCode().equals(ErrorCode.OK.value)) {
+					Map<String, Object> map = (Map<String, Object>) rd.getValue();
+					if (map.containsKey("userno")) {
+						String uno = (String) map.get("userno");
+						if (StringUtils.isNotBlank(uno)) {
+							tuserinfo = new Tuserinfo();
+							tuserinfo.setUserno(uno);
+							tuserinfo.setName((String) map.get("name"));
+							tuserinfo.setNickname((String) map.get("nickname"));
+							tuserinfo.setAgencyno((String) map.get("agencyno"));
+							tuserinfo.setMobileid((String) map.get("mobileid"));
+							tuserinfo.setChannel((String) map.get("channel"));
+							tuserinfo.setSubChannel((String) map.get("subChannel"));
+							tuserinfo.setEmail((String) map.get("email"));
+							tuserinfo.setUserName((String) map.get("userName"));
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error("请求" + url + "失败" + e.getMessage());
+			throw new RuyicaiException(ErrorCode.ERROR);
+		}
+		return tuserinfo;
+	}
 
 	/**
 	 * 赠送彩金
