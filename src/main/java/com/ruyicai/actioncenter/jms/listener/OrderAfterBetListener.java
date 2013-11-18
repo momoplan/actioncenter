@@ -80,7 +80,6 @@ public class OrderAfterBetListener {
 		}
 		
 		try {
-			logger.info("→→→→→→→→→→→→→→→→→增加用户体验官投票次数");
 			addUserExperienceVoteTime(order.getUserno(), order.getAmt());
 		} catch (Exception e) {
 			logger.error("增加用户体验官投票次数出错", e);
@@ -178,6 +177,7 @@ public class OrderAfterBetListener {
 	
 	@Transactional
 	public void addUserExperienceVoteTime(String userno, BigDecimal amt) {
+		logger.info("→→→→→→→→→→→→→→→→→增加用户体验官投票次数");
 		userExperienceService.addAvailableVoteTimesByBuyAMT(userno, amt.divide(new BigDecimal(200)).intValue());
 	}
 }
