@@ -39,7 +39,7 @@ public class AsyncService {
 		Tuserinfo tuserinfo = lotteryService.findByUsername(mobileid);
 		String password = this.getRandomString(6);
 		if(tuserinfo == null) {
-			tuserinfo = lotteryService.registerUserByMobileid(mobileid, password);
+			tuserinfo = lotteryService.registerUserByMobileid(mobileid, password, "1047");
 			logger.info("注册用户：" + mobileid + " 密码：" + password);
 			if(tuserinfo == null) {
 				logger.error("注册失败 mobileid:" + mobileid);

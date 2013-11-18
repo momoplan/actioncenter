@@ -28,7 +28,7 @@ public class SportsQuizPaper {
 	@Column(name = "id")
 	private Long id;
 	
-	@Column(name="mobileid", length = 20)
+	@Column(name="mobileid", length = 20, unique = true)
 	private String mobileid;
 	
 	@Column(name = "answerid")

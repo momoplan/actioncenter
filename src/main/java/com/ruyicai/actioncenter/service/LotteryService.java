@@ -159,15 +159,18 @@ public class LotteryService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Tuserinfo registerUserByMobileid(String mobileid, String password) {
+	public Tuserinfo registerUserByMobileid(String mobileid, String password, String channel) {
 		if(StringUtils.isBlank(mobileid)) {
 			throw new IllegalArgumentException("The argument mobileid is required.");
 		}
 		if(StringUtils.isBlank(password)) {
 			throw new IllegalArgumentException("The argument password is required.");
 		}
+		if(StringUtils.isBlank(channel)) {
+			throw new IllegalArgumentException("The argument channel is required.");
+		}
 		Tuserinfo tuserinfo = null;
-		String url = lotteryurl + "/tuserinfoes/register?userName=" + mobileid + "&mobileid=" + mobileid + "&password=" + password;
+		String url = lotteryurl + "/tuserinfoes/register?userName=" + mobileid + "&mobileid=" + mobileid + "&password=" + password + "&channel=" + channel;
 		try {
 			String result = HttpUtil.post(url.toString(), "");
 			ResponseData rd = JsonUtil.fromJsonToObject(result, ResponseData.class);
