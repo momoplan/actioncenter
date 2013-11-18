@@ -50,8 +50,8 @@ public class RoutesConfiguration {
 						"bean:fund2DrawService?method=fund2Draw").routeId("增加用户可提现");
 				from("jms:queue:VirtualTopicConsumers.actioncenter.updateCouponBatchAndChannel?concurrentConsumers=10").to(
 						"bean:useCouponListener?method=updateCouponBatchAndChannel").routeId("使用兑换券后更新批次和渠道");
-				from("jms:queue:VirtualTopicConsumers.actioncenter.caselotFinish").to(
-						"bean:caselotFinishListener?method=caselotFinishCustomer").routeId("合买期截");
+//				from("jms:queue:VirtualTopicConsumers.actioncenter.caselotFinish").to(
+//						"bean:caselotFinishListener?method=caselotFinishCustomer").routeId("合买期截");
 			}
 		});
 	}

@@ -79,11 +79,20 @@ public class OrderAfterBetListener {
 			logger.error("广东快乐十分首单活动异常", e);
 		}
 		
+<<<<<<< HEAD
 		try {
 			addUserExperienceVoteTime(order.getUserno(), order.getAmt());
 		} catch (Exception e) {
 			logger.error("增加用户体验官投票次数出错", e);
 		}
+=======
+//		try {
+//			logger.info("→→→→→→→→→→→→→→→→→增加用户体验官投票次数");
+//			addUserExperienceVoteTime(order.getUserno(), order.getAmt());
+//		} catch (Exception e) {
+//			logger.error("增加用户体验官投票次数出错", e);
+//		}
+>>>>>>> 3f5418ad57e2c48ac5724a51c3901701b2c50ad2
 	}
 
 	@Transactional
