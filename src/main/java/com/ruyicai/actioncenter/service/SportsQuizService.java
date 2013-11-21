@@ -121,7 +121,9 @@ public class SportsQuizService {
 		return sqp;
 	}
 	
+	
 	public SportsQuizProperties getAnswerid() {
+		this.pv();
 		SportsQuizProperties sqp = SportsQuizProperties.getSportsQuizPropertiesByKey("answerid");
 		if(sqp == null) {
 			throw new RuyicaiException(ErrorCode.SportsQuiz_AnswerNotSet);
