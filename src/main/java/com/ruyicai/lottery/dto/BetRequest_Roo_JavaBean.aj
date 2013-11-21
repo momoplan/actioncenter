@@ -3,6 +3,7 @@
 
 package com.ruyicai.lottery.dto;
 
+import java.lang.String;
 import java.math.BigDecimal;
 
 privileged aspect BetRequest_Roo_JavaBean {

@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.ruyicai.actioncenter.controller.ResponseData;
+import com.ruyicai.actioncenter.domain.SportsQuizUserLog;
 import com.ruyicai.actioncenter.exception.RuyicaiException;
 import com.ruyicai.actioncenter.util.ErrorCode;
 import com.ruyicai.actioncenter.util.HttpUtil;
@@ -46,9 +47,11 @@ public class AsyncService {
 			} else {
 				text.append("成功参与竞猜，账户名：").append(tuserinfo.getUserName()).append(" 密码：").append(password).append(" 比赛结束后使用此账户登录如意彩http://t.cn/8DDt8sY? 领取赠送彩金");
 			}
+			SportsQuizUserLog.saveSportsQuizUserLog(mobileid, password);
 		} else {	//已注册用户
 			logger.info("已注册用户 mobileid:" + mobileid);
 			text.append("成功参与竞猜，比赛结束后使用您的如意彩账户登录http://t.cn/8DDt8sY? 领取赠送彩金，详询4006651000");
+			SportsQuizUserLog.saveSportsQuizUserLog(mobileid, "");
 		}
 		//发送短信
 		String url = msgcenterurl + "/sms/send";

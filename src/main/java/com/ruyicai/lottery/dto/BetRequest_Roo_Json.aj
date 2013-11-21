@@ -3,12 +3,13 @@
 
 package com.ruyicai.lottery.dto;
 
+import com.ruyicai.lottery.dto.BetRequest;
+import flexjson.JSONDeserializer;
+import flexjson.JSONSerializer;
+import java.lang.String;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
 
 privileged aspect BetRequest_Roo_Json {
     

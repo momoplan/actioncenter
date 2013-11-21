@@ -73,5 +73,78 @@ public class SportsQuizController {
 		rd.setErrorCode(result.value);
 		return JsonMapper.toJsonP(callBackMethod, rd);
 	}
+	
+	@RequestMapping("/getAnswerid")
+	public @ResponseBody String getAnswerid(@RequestParam(value = "callBackMethod", required = true) String callBackMethod) {
+		logger.info("/sportsquiz/getAnswerid callBackMethod:{}", new String[] {callBackMethod});
+		ResponseData rd = new ResponseData();
+		ErrorCode result = ErrorCode.OK;
+		try {
+			rd.setValue(sportsQuizService.getAnswerid());
+		} catch (IllegalArgumentException e) {
+			logger.error("getAnswerid error" + e.getMessage());
+			rd.setValue(e.getMessage());
+			result = ErrorCode.PARAMTER_ERROR;
+		} catch(RuyicaiException e) {
+			logger.error("getAnswerid error" + e.getMessage());
+			rd.setValue(e.getMessage());
+			result = e.getErrorCode();
+		} catch (Exception e) {
+			logger.error("getAnswerid error", new String[] { e.getMessage() }, e);
+			rd.setValue(e.getMessage());
+			result = ErrorCode.ERROR;
+		}
+		rd.setErrorCode(result.value);
+		return JsonMapper.toJsonP(callBackMethod, rd);
+	}
+	
+	@RequestMapping("/pv")
+	public @ResponseBody String pv(@RequestParam(value = "callBackMethod", required = true) String callBackMethod) {
+		logger.info("/sportsquiz/pv callBackMethod:{}", new String[] {callBackMethod});
+		ResponseData rd = new ResponseData();
+		ErrorCode result = ErrorCode.OK;
+		try {
+			rd.setValue(sportsQuizService.pv());
+		} catch (IllegalArgumentException e) {
+			logger.error("pv error" + e.getMessage());
+			rd.setValue(e.getMessage());
+			result = ErrorCode.PARAMTER_ERROR;
+		} catch(RuyicaiException e) {
+			logger.error("pv error" + e.getMessage());
+			rd.setValue(e.getMessage());
+			result = e.getErrorCode();
+		} catch (Exception e) {
+			logger.error("pv error", new String[] { e.getMessage() }, e);
+			rd.setValue(e.getMessage());
+			result = ErrorCode.ERROR;
+		}
+		rd.setErrorCode(result.value);
+		return JsonMapper.toJsonP(callBackMethod, rd);
+	}
+	
+	@RequestMapping("/verify")
+	public @ResponseBody String verify(@RequestParam(value = "callBackMethod", required = true) String callBackMethod,
+			@RequestParam(value = "mobileid", required = false) String mobileid) {
+		logger.info("/sportsquiz/verify callBackMethod:{} mobileid:{}", new String[] {callBackMethod, mobileid});
+		ResponseData rd = new ResponseData();
+		ErrorCode result = ErrorCode.OK;
+		try {
+			rd.setValue(sportsQuizService.verify(mobileid));
+		} catch (IllegalArgumentException e) {
+			logger.error("verify error" + e.getMessage());
+			rd.setValue(e.getMessage());
+			result = ErrorCode.PARAMTER_ERROR;
+		} catch(RuyicaiException e) {
+			logger.error("verify error" + e.getMessage());
+			rd.setValue(e.getMessage());
+			result = e.getErrorCode();
+		} catch (Exception e) {
+			logger.error("verify error", new String[] { e.getMessage() }, e);
+			rd.setValue(e.getMessage());
+			result = ErrorCode.ERROR;
+		}
+		rd.setErrorCode(result.value);
+		return JsonMapper.toJsonP(callBackMethod, rd);
+	}
 
 }

@@ -19,8 +19,10 @@ public class UseCouponThread extends Thread {
 		super.run();
 		try {
 			String param = "couponCode=" + couponCode + "&userno=" + userno;
-			String result = HttpUtil.post("http://192.168.0.118:8000/actioncenter/coupon/useCoupon", param);
-			System.out.println(result);
+//			String result = HttpUtil.post("http://192.168.0.118:8000/actioncenter/coupon/useCoupon", param);
+			for(int i = 0 ; i < 20 ; i++) {
+				String result = HttpUtil.post("http://192.168.0.118:8000/actioncenter/sportsquiz/pv", "callBackMethod=myMethod");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
