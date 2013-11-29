@@ -58,17 +58,19 @@ public class CouponController {
 	 * @param couponBatchId	批次id
 	 * @param channelName	渠道名称
 	 * @param memo				渠道说明
+	 * @param channelNo			渠道号
 	 * @return
 	 */
 	@RequestMapping(value = "/createCouponBatchChannel")
-	public @ResponseBody ResponseData createCouponBatchChannel(@RequestParam(value = "couponBatchId", required = true) String couponBatchId,
-			@RequestParam(value = "channelName", required = true) String channelName,
-			@RequestParam(value = "memo", required = true) String memo) {
+	public @ResponseBody ResponseData createCouponBatchChannel(@RequestParam(value = "couponBatchId", required = false) String couponBatchId,
+			@RequestParam(value = "channelName", required = false) String channelName,
+			@RequestParam(value = "memo", required = false) String memo,
+			@RequestParam(value = "channelNo", required = false) String channelNo) {
 		logger.info("/coupon/createCouponBatchChannel");
 		ResponseData rd = new ResponseData();
 		ErrorCode result = ErrorCode.OK;
 		try {
-			CouponBatchChannel channel = couponService.createCouponBatchChannel(couponBatchId, channelName, memo);
+			CouponBatchChannel channel = couponService.createCouponBatchChannel(couponBatchId, channelName, memo, channelNo);
 			rd.setValue(channel);
 		} catch (Exception e) {
 			logger.error("createCouponBatchChannel error", new String[] { e.getMessage() }, e);

@@ -4,6 +4,7 @@ package com.ruyicai.actioncenter.service;
 import java.math.BigDecimal;
 import java.util.Random;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,5 +110,31 @@ public class AsyncService {
 		    sb.append(base.charAt(number));   
 		}   
 		return sb.toString();  
+	}
+	
+	/**
+	 * 用户使用完兑换券以后，查询用户是否充值过，如果未充值过，则把用户的渠道号改为兑换券的渠道号。如果渠道号为空，不更改用户渠道号。
+	 * @param channel	渠道号
+	 * @param userno	用户id
+	 */
+	@Async
+	public void asyncUpdateUserChannel(String channel, String userno) {
+		if(StringUtils.isBlank(channel) || StringUtils.isBlank(userno)) {
+			return ;
+		}
+		//查找用户是否充值过
+		Integer chargeCount = lotteryService.getChargeRecordCountByUserno(userno);
+		if(chargeCount == null) {
+			logger.error("充值查询出错");
+		}
+		//如果没充值过修改为兑换券渠道
+		if(chargeCount.equals(0)) {
+			logger.info("未充值过 更改用户渠道 userno:" + userno + " channel:" + channel);
+			lotteryService.modifyUserChannel(userno, channel);
+		} else {
+			logger.info("充值过 不更改用户渠道 userno:" + userno + " chargeCount:" + chargeCount);
+		}
+		
+		
 	}
 }

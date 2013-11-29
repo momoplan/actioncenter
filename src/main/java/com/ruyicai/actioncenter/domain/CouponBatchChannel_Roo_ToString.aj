@@ -9,6 +9,7 @@ privileged aspect CouponBatchChannel_Roo_ToString {
     
     public String CouponBatchChannel.toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("Channel: ").append(getChannel()).append(", ");
         sb.append("Channelname: ").append(getChannelname()).append(", ");
         sb.append("Couponbatchchannelid: ").append(getCouponbatchchannelid()).append(", ");
         sb.append("Couponbatchid: ").append(getCouponbatchid()).append(", ");

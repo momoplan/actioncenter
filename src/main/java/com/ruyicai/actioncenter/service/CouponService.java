@@ -36,6 +36,9 @@ public class CouponService {
 	@Autowired
 	private LotteryService lotteryService;
 	
+	@Autowired
+	private AsyncService asyncService;
+	
 	@Produce(uri = "jms:topic:updateCouponBatchAndChannel")
 	private ProducerTemplate updateCouponBatchAndChannelProducer;
 	
@@ -63,10 +66,11 @@ public class CouponService {
 	 * @param couponBatchId	批次id
 	 * @param channelName	渠道名称
 	 * @param memo				渠道说明
+	 * @param channelNo				渠道号
 	 * @return CouponBatchChannel
 	 */
 	@Transactional
-	public CouponBatchChannel createCouponBatchChannel(String couponBatchId, String channelName, String memo) {
+	public CouponBatchChannel createCouponBatchChannel(String couponBatchId, String channelName, String memo, String channelNo) {
 		if(StringUtils.isBlank(couponBatchId)) {
 			throw new IllegalArgumentException("the argument couponBatchId is required");
 		}
@@ -76,8 +80,11 @@ public class CouponService {
 		if(StringUtils.isBlank(memo)) {
 			throw new IllegalArgumentException("the argument memo is required");
 		}
-		logger.info("createCouponBatchChannel couponBatchId:" + couponBatchId + " channelName:" + channelName + " memo:" + memo);
-		CouponBatchChannel channel = CouponBatchChannel.create(couponBatchId, channelName, memo);
+		if(StringUtils.isBlank(channelNo)) {
+			throw new IllegalArgumentException("The argument channelNo is required");
+		}
+		logger.info("createCouponBatchChannel couponBatchId:" + couponBatchId + " channelName:" + channelName + " memo:" + memo + " channelNo:" + channelNo);
+		CouponBatchChannel channel = CouponBatchChannel.create(couponBatchId, channelName, memo, channelNo);
 		return channel;
 	}
 	
@@ -219,6 +226,10 @@ public class CouponService {
 	 * @param userno
 	 */
 	private void doExchangeCoupon(Coupon coupon, String mobile, String userno) {
+		CouponBatchChannel batchChannel = CouponBatchChannel.find(coupon.getCouponbatchchannelid(), false);
+		if(batchChannel == null) {
+			throw new RuyicaiException(ErrorCode.ERROR);
+		}
 		coupon.setMobile(mobile);
 		coupon.setUserno(userno);
 		coupon.setState(1);
@@ -226,6 +237,8 @@ public class CouponService {
 		coupon.merge();
 		//更新CouponBatch和CouponBatchChannel
 		updateCouponBatchAndChannelJMS(coupon.getCouponbatchid(),coupon.getCouponbatchchannelid());
+		//异步尝试更新用户渠道号
+		asyncService.asyncUpdateUserChannel(batchChannel.getChannel(), userno);
 		//发送彩金
 		tactionService.sendPrize2UserJMS(userno, coupon.getAmount(), ActionJmsType.Coupon, coupon.getCouponcode(), coupon.getCouponcode(), "");
 	}

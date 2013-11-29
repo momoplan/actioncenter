@@ -603,5 +603,86 @@ public class LotteryService {
 		}
 		return resultList;
 	}
+	
+	/**
+	 * 更改用户渠道号
+	 * @param userno
+	 * @param channel
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Tuserinfo modifyUserChannel(String userno, String channel) {
+		if(StringUtils.isBlank(userno)) {
+			throw new IllegalArgumentException("The argument userno is required.");
+		}
+		if(StringUtils.isBlank(channel)) {
+			throw new IllegalArgumentException("The argument channel is required.");
+		}
+		String url = lotteryurl + "/tuserinfoes/modify";
+		String params = "userno=" + userno + "&channel=" + channel;
+		Tuserinfo tuserinfo = null;
+		try {
+			String result = HttpUtil.post(url, params);
+			if(StringUtils.isNotBlank(result)) {
+				ResponseData rd = JsonUtil.fromJsonToObject(result, ResponseData.class);
+				String errorCode = rd.getErrorCode();
+				if (errorCode.equals(ErrorCode.OK.value)) {
+					Map<String, Object> map = (Map<String, Object>) rd.getValue();
+					if (map.containsKey("userno")) {
+						String uno = (String) map.get("userno");
+						if (StringUtils.isNotBlank(uno)) {
+							tuserinfo = new Tuserinfo();
+							tuserinfo.setUserno(uno);
+							tuserinfo.setName((String) map.get("name"));
+							tuserinfo.setNickname((String) map.get("nickname"));
+							tuserinfo.setAgencyno((String) map.get("agencyno"));
+							tuserinfo.setMobileid((String) map.get("mobileid"));
+							tuserinfo.setChannel((String) map.get("channel"));
+							tuserinfo.setSubChannel((String) map.get("subChannel"));
+							tuserinfo.setEmail((String) map.get("email"));
+							tuserinfo.setUserName((String) map.get("userName"));
+						}
+					}
+				} else if(errorCode.equals(ErrorCode.UserMod_UserNotExists.value)) {
+					logger.error("更新用户渠道失败-用户不存在");
+				} else {
+					logger.error("更新用户渠道失败 errorCode:" + errorCode);
+				}
+			}
+		}catch (Exception e) {
+			logger.error("请求Lottery出错", e);
+		}
+		return tuserinfo;
+	}
+	
+	/**
+	 * 根据用户名Count充值次数
+	 * @param userno
+	 * @return
+	 */
+	public Integer getChargeRecordCountByUserno(String userno) {
+		if(StringUtils.isBlank(userno)) {
+			throw new IllegalArgumentException("The argument userno is required.");
+		}
+		String url = lotteryurl + "/ttransactions/getChargeRecordCountByUserno";
+		String params = "userno=" + userno;
+		try {
+			String result = HttpUtil.post(url, params);
+			if(StringUtils.isNotBlank(result)) {
+				JSONObject jsonObject = new JSONObject(result);
+				String errorCode = jsonObject.getString("errorCode");
+				if(errorCode.equals(ErrorCode.OK.value)) {
+					return jsonObject.getInt("value");
+				} else {
+					return null;
+				}
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			logger.error("请求Lottery出错", e);
+		}
+		return null;
+	}
 
 }

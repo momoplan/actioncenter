@@ -65,6 +65,14 @@ privileged aspect CouponBatchChannel_Roo_JavaBean {
         this.memo = memo;
     }
     
+    public String CouponBatchChannel.getChannel() {
+        return this.channel;
+    }
+    
+    public void CouponBatchChannel.setChannel(String channel) {
+        this.channel = channel;
+    }
+    
     public Date CouponBatchChannel.getCreateTime() {
         return this.createTime;
     }

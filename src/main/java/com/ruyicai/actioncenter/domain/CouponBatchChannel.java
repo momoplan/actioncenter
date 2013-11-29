@@ -77,6 +77,12 @@ public class CouponBatchChannel {
 	private String memo;
 	
 	/**
+	 * 渠道号
+	 */
+	@Column(name = "CHANNEL", length = 20)
+	private String channel;
+	
+	/**
 	 * 创建时间
 	 */
 	@Column(name = "CREATETIME")
@@ -108,9 +114,10 @@ public class CouponBatchChannel {
 	 * @param couponBatchId	批次id
 	 * @param channelName	渠道名称
 	 * @param memo				渠道备注
+	 * @param channelNo			渠道号
 	 * @return
 	 */
-	public static CouponBatchChannel create(String couponBatchId, String channelName, String memo) {
+	public static CouponBatchChannel create(String couponBatchId, String channelName, String memo, String channelNo) {
 		CouponBatchChannel channel = new CouponBatchChannel();
 		channel.setChannelname(channelName);
 		channel.setCouponbatchid(couponBatchId);
@@ -118,6 +125,7 @@ public class CouponBatchChannel {
 		channel.setCouponusage(0);
 		channel.setTotalamount(new BigDecimal(0));
 		channel.setMemo(memo);
+		channel.setChannel(channelNo);
 		channel.setCreateTime(new Date());
 		channel.persist();
 		return channel;
