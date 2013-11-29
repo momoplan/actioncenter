@@ -224,7 +224,7 @@ public class TactionService {
 				Integer step = (Integer) activity.get("step");
 				Integer prizeamt = (Integer) activity.get("prizeamt");
 				if (amt.compareTo(new BigDecimal(step)) >= 0 && regtimeStr.equals(todayStr)) {
-					Integer count = lotteryService.findTtransaction(tuserinfo.getUserno());
+					Integer count = lotteryService.getChargeRecordCountByUserno(tuserinfo.getUserno());
 					if (count == 1) {
 						if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {
 							Chong20Mobile chong20Mobile = Chong20Mobile.findChong20Mobile(tuserinfo.getMobileid());
