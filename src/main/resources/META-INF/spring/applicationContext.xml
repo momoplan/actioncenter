@@ -45,8 +45,7 @@
 	<task:executor id="executorWithPoolSizeRange" pool-size="20-100"
 		queue-capacity="1000" keep-alive="20" rejection-policy="CALLER_RUNS" />
 	<task:annotation-driven executor="executorWithPoolSizeRange" />
-	<bean class="org.apache.commons.dbcp.BasicDataSource"
-		destroy-method="close" id="dataSource">
+	<bean class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close" id="dataSource">
 		<property name="driverClassName" value="${database.driverClassName}" />
 		<property name="url" value="${database.url}" />
 		<property name="username" value="${database.username}" />
@@ -54,7 +53,7 @@
 		<property name="initialSize" value="10" />
 		<property name="maxActive" value="100" />
 		<property name="minIdle" value="10" />
-		<property name="maxIdle" value="30" />
+		<!-- <property name="maxIdle" value="30" /> -->
 		<property name="maxWait" value="60000" />
 		<property name="removeAbandoned" value="true" />
 		<property name="removeAbandonedTimeout" value="180" />
@@ -63,12 +62,14 @@
 		<property name="testOnReturn" value="false" />
 		<property name="testWhileIdle" value="true" />
 		<property name="timeBetweenEvictionRunsMillis" value="1800000" />
-		<property name="numTestsPerEvictionRun" value="30" />
+		<!-- <property name="numTestsPerEvictionRun" value="30" /> -->
 		<property name="minEvictableIdleTimeMillis" value="1800000" />
 		<property name="validationQuery" value="SELECT 1" />
 
 		<property name="poolPreparedStatements" value="true" />
 		<property name="maxOpenPreparedStatements" value="100" />
+		
+		<property name="filters" value="stat" />
 	</bean>
 	<bean class="org.springframework.orm.jpa.JpaTransactionManager"
 		id="transactionManager">
