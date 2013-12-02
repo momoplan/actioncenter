@@ -16,7 +16,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
-import com.ruyicai.actioncenter.domain.Tactivity;
+import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.domain.Tagent;
 import com.ruyicai.actioncenter.jms.listener.FundJmsListener;
 import com.ruyicai.actioncenter.service.MemcachedService;
@@ -39,6 +39,9 @@ public class AgentServiceTest {
 
 	@Autowired
 	MemcachedService<Tagent> memcachedService;
+	
+	@Autowired
+	TactivityDao tactivityDao;
 
 	@Before
 	public void clearCache() {
@@ -57,15 +60,15 @@ public class AgentServiceTest {
 		chongzhiActivity.put("ltPrizeRate", 5);
 		chongzhiActivity.put("gtPrizeRate", 7);
 		String jsonChongzhi = JsonUtil.toJson(chongzhiActivity);
-		Tactivity.saveOrUpdate(null, null, "00092493", null, ActionJmsType.CHONGZHI_SUCCESS.value, jsonChongzhi, 1,
+		tactivityDao.saveOrUpdate(null, null, "00092493", null, ActionJmsType.CHONGZHI_SUCCESS.value, jsonChongzhi, 1,
 				null);
 		Map<String, Object> goucaiActivity = new HashMap<String, Object>();
 		goucaiActivity.put("totalamt", 2000);
 		goucaiActivity.put("prizeamt", 200);
 		goucaiActivity.put("effectiveTime", "2011-1-1 00:00:00");
 		String jsonGoucai = JsonUtil.toJson(goucaiActivity);
-		Tactivity.saveOrUpdate(null, null, "00092493", "545", ActionJmsType.GOUCAI_SUCCESS.value, jsonGoucai, 1, null);
-		Tactivity.saveOrUpdate(null, null, "00092493", "651", ActionJmsType.GOUCAI_SUCCESS.value, jsonGoucai, 1, null);
+		tactivityDao.saveOrUpdate(null, null, "00092493", "545", ActionJmsType.GOUCAI_SUCCESS.value, jsonGoucai, 1, null);
+		tactivityDao.saveOrUpdate(null, null, "00092493", "651", ActionJmsType.GOUCAI_SUCCESS.value, jsonGoucai, 1, null);
 	}
 
 	@Test

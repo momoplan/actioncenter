@@ -12,8 +12,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
-import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.TaddNumActivity;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
 import com.ruyicai.actioncenter.jms.listener.AddNumSuccessListener;
@@ -43,6 +43,9 @@ public class TactivityTest {
 
 	@Autowired
 	TuserPrizeDetailDao tuserPrizeDetailDao;
+	
+	@Autowired
+	TactivityDao tactivityDao;
 
 	@Test
 	@SuppressWarnings("unchecked")
@@ -51,7 +54,7 @@ public class TactivityTest {
 		map.put("amt", 1000);
 		map.put("prize", 300);
 		String express = JsonUtil.toJson(map);
-		Tactivity.saveOrUpdate("T01015", null, "00092493", null, ActionJmsType.First_Order.value, express, 1,
+		tactivityDao.saveOrUpdate("T01015", null, "00092493", null, ActionJmsType.First_Order.value, express, 1,
 				ActionJmsType.First_Order.memo);
 	}
 
