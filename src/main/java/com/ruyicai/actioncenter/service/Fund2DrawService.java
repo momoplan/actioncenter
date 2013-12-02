@@ -89,6 +89,17 @@ public class Fund2DrawService {
 		}
 	}
 	
+	/**
+	 * 根据ttransactionid查找Fund2Draw
+	 * @param ttransactionid
+	 * @return
+	 */
+	public Fund2Draw findFund2Draw(String ttransactionid) {
+		if(StringUtils.isBlank(ttransactionid)) {
+			throw new IllegalArgumentException("The argument ttransactionid is required.");
+		}
+		return fund2DrawDao.findFund2Draw(ttransactionid);
+	}
 	
 	/**
 	 * 分页查询Fund2Draw
