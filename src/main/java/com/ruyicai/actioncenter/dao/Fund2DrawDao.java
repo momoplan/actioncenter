@@ -3,6 +3,7 @@ package com.ruyicai.actioncenter.dao;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -14,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.Const;
 import com.ruyicai.actioncenter.domain.Fund2Draw;
+import com.ruyicai.actioncenter.util.Page;
+import com.ruyicai.actioncenter.util.PropertyFilter;
+import com.ruyicai.actioncenter.util.Page.Sort;
 
 @Component
 public class Fund2DrawDao {
@@ -101,5 +105,40 @@ public class Fund2DrawDao {
 		q.setParameter("drawTime", date);
 		q.setMaxResults(5000);
 		return q.getResultList();
+	}
+	
+	public void findFund2DrawByPage(Map<String, Object> conditionMap, Page<Fund2Draw> page) {
+		String sql = "SELECT o FROM Fund2Draw o ";
+		String countSql = "SELECT count(*) FROM Fund2Draw o ";
+		StringBuilder whereSql = new StringBuilder(" WHERE 1=1 ");
+		List<PropertyFilter> pfList = null;
+		if (conditionMap != null && conditionMap.size() > 0) {
+			pfList = PropertyFilter.buildFromMap(conditionMap);
+			String buildSql = PropertyFilter.transfer2Sql(pfList, "o");
+			whereSql.append(buildSql);
+		}
+		List<Sort> sortList = page.fetchSort();
+		StringBuilder orderSql = new StringBuilder(" ORDER BY ");
+		if (page.isOrderBySetted()) {
+			for (Sort sort : sortList) {
+				orderSql.append(" " + sort.getProperty() + " " + sort.getDir() + ",");
+			}
+			orderSql.delete(orderSql.length() - 1, orderSql.length());
+		} else {
+			orderSql.append(" o.createTime DESC ");
+		}
+		String tsql = sql + whereSql.toString() + orderSql.toString();
+		String tCountSql = countSql + whereSql.toString();
+		TypedQuery<Fund2Draw> q = entityManager.createQuery(tsql, Fund2Draw.class);
+		TypedQuery<Long> total = entityManager.createQuery(tCountSql, Long.class);
+		if (conditionMap != null && conditionMap.size() > 0) {
+			PropertyFilter.setMatchValue2Query(q, pfList);
+			PropertyFilter.setMatchValue2Query(total, pfList);
+		}
+		q.setFirstResult(page.getPageIndex() * page.getMaxResult()).setMaxResults(page.getMaxResult());
+		List<Fund2Draw> resultList = q.getResultList();
+		int count = total.getSingleResult().intValue();
+		page.setList(resultList);
+		page.setTotalResult(count);
 	}
 }

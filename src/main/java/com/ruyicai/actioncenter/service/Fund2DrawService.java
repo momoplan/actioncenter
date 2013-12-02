@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.camel.Header;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import com.ruyicai.actioncenter.dao.Fund2DrawDao;
 import com.ruyicai.actioncenter.domain.Fund2Draw;
 import com.ruyicai.actioncenter.domain.FundAndJoinAction;
 import com.ruyicai.actioncenter.domain.Tactivity;
+import com.ruyicai.actioncenter.util.JsonUtil;
+import com.ruyicai.actioncenter.util.Page;
 
 @Service
 public class Fund2DrawService {
@@ -80,6 +83,23 @@ public class Fund2DrawService {
 		} else {
 			logger.info("充值增加提现ttransactionid:" + ttransactionid + "调用lottery失败");
 		}
+	}
+	
+	
+	/**
+	 * 分页查询Fund2Draw
+	 * @param condition	条件
+	 * @param pageIndex	页号
+	 * @param maxResult	返回结果数
+	 * @param orderBy		排序关键字
+	 * @param orderDir		排序顺序
+	 * @return
+	 */
+	public Page<Fund2Draw> findFund2DrawByPage(String condition, Integer pageIndex, Integer maxResult, String orderBy, String orderDir) {
+		Page<Fund2Draw> page = new Page<Fund2Draw>(pageIndex, maxResult, orderBy, orderDir);
+		Map<String, Object> conditionMap = JsonUtil.transferJson2Map(condition);
+		fund2DrawDao.findFund2DrawByPage(conditionMap, page);
+		return page;
 	}
 
 }

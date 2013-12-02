@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ruyicai.actioncenter.domain.Fund2Draw;
 import com.ruyicai.actioncenter.exception.RuyicaiException;
 import com.ruyicai.actioncenter.service.Fund2DrawService;
 import com.ruyicai.actioncenter.util.ErrorCode;
+import com.ruyicai.actioncenter.util.Page;
 
 @RequestMapping("/fund2draw")
 @Controller
@@ -42,6 +44,44 @@ public class Fund2DrawController {
 			result = ErrorCode.ERROR;
 		} catch (Exception e) {
 			logger.error("manualFund2Draw error", e);
+			result = ErrorCode.ERROR;
+			rd.setValue(e.getMessage());
+		}
+		rd.setErrorCode(result.value);
+		return rd;
+	}
+	
+	/**
+	 * 分页查询可提现记录
+	 * @param condition
+	 * @param pageIndex
+	 * @param maxResult
+	 * @param orderBy
+	 * @param orderDir
+	 * @return
+	 */
+	@RequestMapping(value = "/findFound2DrawByPage")
+	public @ResponseBody ResponseData findFound2DrawByPage(@RequestParam(value = "condition", required = false) String condition,
+			@RequestParam(value = "pageIndex", required = false, defaultValue = "0") int pageIndex,
+			@RequestParam(value = "maxResult", required = false, defaultValue = "30") int maxResult,
+			@RequestParam(value = "orderBy", required = false) String orderBy,
+			@RequestParam(value = "orderDir", required = false) String orderDir) {
+		logger.info("/fund2draw/findFound2DrawByPage condition:{} pageIndex:{} maxResult:{} orderBy:{} orderDir:{}", new String[] {condition, pageIndex+"", maxResult+"", orderBy, orderDir});
+		ResponseData rd = new ResponseData();
+		ErrorCode result = ErrorCode.OK;
+		try {
+			Page<Fund2Draw> page = fund2DrawService.findFund2DrawByPage(condition, pageIndex, maxResult, orderBy, orderDir);
+			rd.setValue(page);
+		} catch (RuyicaiException e) {
+			logger.error("findFound2DrawByPage error", e);
+			rd.setValue(e.getMessage());
+			result = ErrorCode.ERROR;
+		} catch(IllegalArgumentException e) {
+			logger.error("findFound2DrawByPage error", e);
+			rd.setValue(e.getMessage());
+			result = ErrorCode.ERROR;
+		} catch (Exception e) {
+			logger.error("findFound2DrawByPage error", e);
 			result = ErrorCode.ERROR;
 			rd.setValue(e.getMessage());
 		}
