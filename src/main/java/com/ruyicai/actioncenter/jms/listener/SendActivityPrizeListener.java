@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.FundAndJoinAction;
 import com.ruyicai.actioncenter.domain.Tactivity;
@@ -24,6 +25,9 @@ public class SendActivityPrizeListener {
 
 	@Autowired
 	private LotteryService lotteryService;
+	
+	@Autowired
+	private TactivityDao tactivityDao;
 
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
@@ -52,7 +56,7 @@ public class SendActivityPrizeListener {
 					if (Tjmsservice.createTjmsservice(ttransactionid + actionJmsType,
 							ActionJmsType.SEND_ACTION_PRIZE_SUCCESS)) {
 						try {
-							Tactivity tactivity = Tactivity.findTactivity(null, null, "00092493", null,
+							Tactivity tactivity = tactivityDao.findTactivity(null, null, "00092493", null,
 									ActionJmsType.Fund2Draw.value);
 							if (tactivity != null) {
 								FundAndJoinAction.createFundAndJoinAction(ttransactionid, detail.getUserno(),

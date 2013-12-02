@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.SSCPrizedDetail;
 import com.ruyicai.actioncenter.domain.SSCPrizedDetailPK;
@@ -36,6 +37,9 @@ public class OrderEncashListener {
 
 	@Autowired
 	private LotteryService lotteryService;
+	
+	@Autowired
+	private TactivityDao tactivityDao;
 
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
@@ -80,7 +84,7 @@ public class OrderEncashListener {
 			return;
 		}
 		Tuserinfo tuserinfo = orderUserInfo;
-		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(),
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(),
 				null, ActionJmsType.FuCai3D_JiaJiang.value);
 		if (tactivity != null) {
 			Long orderprizeamt = order.getOrderprizeamt().longValue();
@@ -117,7 +121,7 @@ public class OrderEncashListener {
 			return;
 		}
 		Tuserinfo tuserinfo = orderUserInfo;
-		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.Kuai3_JiaJiang.value);
 		if (tactivity != null) {
 			Long orderprizeamt = order.getOrderprizeamt().longValue();
@@ -168,7 +172,7 @@ public class OrderEncashListener {
 		if (!lotno.startsWith("J")) {
 			return;
 		}
-		Tactivity tactivity = Tactivity.findTactivity(null, order.getPlaytype(), tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(null, order.getPlaytype(), tuserinfo.getSubChannel(), null,
 				ActionJmsType.Encash_Jingcai_2Chan1.value);
 		if (tactivity != null) {
 			if (orderprizeamt > 0) {
@@ -231,7 +235,7 @@ public class OrderEncashListener {
 			logger.info("如意彩账户购买,不加奖");
 			return;
 		}
-		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.Encash_LanQiu_AddPrize.value);
 		if (tactivity != null) {
 			// Long orderprizeamt = order.getOrderprizeamt().longValue();
@@ -277,7 +281,7 @@ public class OrderEncashListener {
 			logger.info("如意彩账户购买,不加奖");
 			return;
 		}
-		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.Encash_ZuCai_AddPrize.value);
 		if (tactivity != null) {
 			Long orderprizeamt = order.getOrderprizeamt().longValue();
@@ -308,7 +312,7 @@ public class OrderEncashListener {
 			return;
 		}
 		Tuserinfo tuserinfo = orderUserInfo;
-		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(),
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(),
 				null, ActionJmsType.Encash_DaXiaoDanShuang_AddPrize.value);
 		if (tactivity != null) {
 			Long orderprizeamt = order.getOrderprizeamt().longValue();
@@ -355,7 +359,7 @@ public class OrderEncashListener {
 			return;
 		}
 		Tuserinfo tuserinfo = orderUserInfo;
-		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.Encash_DuoLeCai_AddPrize.value);
 		if (tactivity != null) {
 			Long orderprizeamt = order.getOrderprizeamt().longValue();
@@ -420,7 +424,7 @@ public class OrderEncashListener {
 			logger.info("如意彩账户购买,不加奖");
 			return;
 		}
-		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(),
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(),
 				null, ActionJmsType.Encash_2chuan1_AddPrize.value);
 		if (tactivity != null) {
 			// Long orderprizeamt = order.getOrderprizeamt().longValue();
@@ -453,7 +457,7 @@ public class OrderEncashListener {
 			return;
 		}
 		Tuserinfo tuserinfo = orderUserInfo;
-		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.EncashAddPrize.value);
 		if (tactivity != null) {
 			Long orderprizeamt = order.getOrderprizeamt().longValue();

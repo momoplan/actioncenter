@@ -1,77 +1,49 @@
-package com.ruyicai.actioncenter.domain;
+package com.ruyicai.actioncenter.dao;
 
-import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
-import org.springframework.roo.addon.javabean.RooJavaBean;
-import org.springframework.roo.addon.json.RooJson;
-import org.springframework.roo.addon.tostring.RooToString;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-@RooJavaBean
-@RooToString
-@RooJson
-@Entity()
-@Table(name = "TACTIVITY")
-public class Tactivity implements Serializable {
+import com.ruyicai.actioncenter.domain.Tactivity;
+import com.ruyicai.actioncenter.service.MemcachedService;
+import com.ruyicai.actioncenter.util.Page;
+import com.ruyicai.actioncenter.util.Page.Sort;
 
-	private static final long serialVersionUID = 1L;
+@Component
+public class TactivityDao {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id")
-	private Long id;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-	/** 彩种 */
-	@Column(name = "lotno")
-	private String lotno;
+	@Autowired
+	private MemcachedService<Tactivity> memcachedService;
 
-	/** 玩法 */
-	@Column(name = "playtype")
-	private String playtype;
+	public Tactivity findTactivity(Long id) {
+		return this.entityManager.find(Tactivity.class, id);
+	}
 
-	/** 大渠道 */
-	@Column(name = "subChannel")
-	private String subChannel;
+	@Transactional
+	public void persist(Tactivity tactivity) {
+		this.entityManager.persist(tactivity);
+	}
 
-	/** 渠道 */
-	@Column(name = "channel")
-	private String channel;
+	@Transactional
+	public Tactivity merge(Tactivity tactivity) {
+		Tactivity merge = this.entityManager.merge(tactivity);
+		this.entityManager.flush();
+		return merge;
+	}
 
-	/** 活动类型 */
-	@Column(name = "activityType")
-	private Integer activityType;
-
-	/** 活动描述 */
-	@Column(name = "memo", length = 100)
-	private String memo;
-
-	/** 活动金额表达式 */
-	@Column(name = "express", length = 500)
-	private String express;
-
-	/** 状态 0:失效,1:有效 */
-	@Column(name = "state")
-	private Integer state;
-
-	/** 创建时间 */
-	@Column(name = "createTime")
-	private Date createTime;
-
-	/** 最近修改时间 */
-	@Column(name = "lastmodifyTime")
-	private Date lastmodifyTime;
-
-	/*@Autowired
-	transient MemcachedService<Tactivity> memcachedService;
-
-	public static Tactivity saveOrUpdate(String lotno, String playtype, String subChannel, String channel,
+	@Transactional
+	public Tactivity saveOrUpdate(String lotno, String playtype, String subChannel, String channel,
 			Integer actionJmsType, String express, Integer state, String memo) {
 		Tactivity tactivity = null;
 		tactivity = findTactivityFromDB(lotno, playtype, subChannel, channel, actionJmsType);
@@ -86,7 +58,7 @@ public class Tactivity implements Serializable {
 			tactivity.setExpress(express);
 			tactivity.setState(state);
 			tactivity.setCreateTime(new Date());
-			tactivity.persist();
+			this.persist(tactivity);
 		} else {
 			tactivity.setLotno(lotno);
 			tactivity.setPlaytype(playtype);
@@ -97,28 +69,28 @@ public class Tactivity implements Serializable {
 			tactivity.setExpress(express);
 			tactivity.setState(state);
 			tactivity.setLastmodifyTime(new Date());
-			tactivity.merge();
+			this.merge(tactivity);
 		}
 		String uniqueKey = uniqueKey(tactivity);
-		new Tactivity().memcachedService.set(uniqueKey, tactivity);
+		this.memcachedService.set(uniqueKey, tactivity);
 		return tactivity;
 	}
 
 	@Transactional
-	public static Tactivity updateState(Long id, Integer state) {
+	public Tactivity updateState(Long id, Integer state) {
 		if (id == null || state == null) {
 			return null;
 		}
-		Tactivity tactivity = Tactivity.findTactivity(id);
+		Tactivity tactivity = this.findTactivity(id);
 		tactivity.setState(state);
 		tactivity.setLastmodifyTime(new Date());
-		tactivity.merge();
+		this.merge(tactivity);
 		String uniqueKey = uniqueKey(tactivity);
-		new Tactivity().memcachedService.set(uniqueKey, tactivity);
+		this.memcachedService.set(uniqueKey, tactivity);
 		return tactivity;
 	}
 
-	*//**
+	/**
 	 * 查询有效的活动
 	 * 
 	 * @param lotno
@@ -132,16 +104,16 @@ public class Tactivity implements Serializable {
 	 * @param activityType
 	 *            活动类型
 	 * @return
-	 *//*
-	public static Tactivity findTactivity(String lotno, String playtype, String subChannel, String channel,
+	 */
+	public Tactivity findTactivity(String lotno, String playtype, String subChannel, String channel,
 			Integer actionJmsType) {
 		if (actionJmsType == null)
-			throw new IllegalArgumentException("The activityType argument is required");
+			throw new IllegalArgumentException("the argument actionJmsType is required");
 		if (StringUtils.isBlank(subChannel) && StringUtils.isBlank(channel))
 			throw new IllegalArgumentException("subChannel或channel至少有一个不为空");
 		Tactivity tactivity = null;
 		String uniqueKey = uniqueKey(lotno, playtype, subChannel, channel, actionJmsType);
-		tactivity = new Tactivity().memcachedService.get(uniqueKey);
+		tactivity = this.memcachedService.get(uniqueKey);
 		if (tactivity == null) {
 			tactivity = findTactivityFromDB(lotno, playtype, subChannel, channel, actionJmsType);
 		}
@@ -156,7 +128,7 @@ public class Tactivity implements Serializable {
 		}
 	}
 
-	*//**
+	/**
 	 * 查询有效的活动
 	 * 
 	 * @param lotno
@@ -170,15 +142,14 @@ public class Tactivity implements Serializable {
 	 * @param activityType
 	 *            活动类型
 	 * @return
-	 *//*
-	private static Tactivity findTactivityFromDB(String lotno, String playtype, String subChannel, String channel,
+	 */
+	private Tactivity findTactivityFromDB(String lotno, String playtype, String subChannel, String channel,
 			Integer actionJmsType) {
 		if (actionJmsType == null)
 			throw new IllegalArgumentException("The argument actionDetailType is required");
 		if (StringUtils.isBlank(subChannel) && StringUtils.isBlank(channel))
 			throw new IllegalArgumentException("subChannel或channel至少有一个不为空");
 		Tactivity tactivity = null;
-		EntityManager em = Tactivity.entityManager();
 		StringBuffer sql = new StringBuffer("SELECT o FROM Tactivity AS o WHERE o.activityType = :activityType");
 		if (StringUtils.isNotBlank(lotno)) {
 			sql.append(" AND o.lotno = :lotno");
@@ -192,7 +163,7 @@ public class Tactivity implements Serializable {
 		if (StringUtils.isNotBlank(channel)) {
 			sql.append(" AND o.channel = :channel");
 		}
-		TypedQuery<Tactivity> q = em.createQuery(sql.toString(), Tactivity.class);
+		TypedQuery<Tactivity> q = this.entityManager.createQuery(sql.toString(), Tactivity.class);
 		q.setParameter("activityType", actionJmsType);
 		if (StringUtils.isNotBlank(lotno)) {
 			q.setParameter("lotno", lotno);
@@ -212,19 +183,19 @@ public class Tactivity implements Serializable {
 		}
 		if (tactivity != null) {
 			String uniqueKey = uniqueKey(tactivity);
-			new Tactivity().memcachedService.set(uniqueKey, tactivity);
+			this.memcachedService.set(uniqueKey, tactivity);
 		}
 		return tactivity;
 	}
 
-	public static String uniqueKey(Tactivity tactivity) {
+	public String uniqueKey(Tactivity tactivity) {
 		return uniqueKey(tactivity.getLotno(), tactivity.getPlaytype(), tactivity.getSubChannel(),
 				tactivity.getChannel(), tactivity.getActivityType());
 	}
 
-	public static String uniqueKey(String lotno, String playtype, String subChannel, String channel,
-			Integer actionJmsType) {
+	public String uniqueKey(String lotno, String playtype, String subChannel, String channel, Integer actionJmsType) {
 		StringBuffer sb = new StringBuffer("Tactivity");
+		sb.append(actionJmsType);
 		if (StringUtils.isNotBlank(lotno)) {
 			sb.append(lotno);
 		}
@@ -237,12 +208,10 @@ public class Tactivity implements Serializable {
 		if (StringUtils.isNotBlank(channel)) {
 			sb.append(channel);
 		}
-		sb.append(actionJmsType);
 		return sb.toString();
 	}
 
-	public static void findTactivityByPage(Page<Tactivity> page) {
-		EntityManager em = Tactivity.entityManager();
+	public void findTactivityByPage(Page<Tactivity> page) {
 		String sql = "SELECT o FROM Tactivity o ";
 		String countSql = "SELECT count(*) FROM Tactivity o ";
 		StringBuilder whereSql = new StringBuilder(" WHERE 1=1 ");
@@ -258,12 +227,13 @@ public class Tactivity implements Serializable {
 		}
 		String tsql = sql + whereSql.toString() + orderSql.toString();
 		String tCountSql = countSql + whereSql.toString();
-		TypedQuery<Tactivity> q = em.createQuery(tsql, Tactivity.class);
-		TypedQuery<Long> total = em.createQuery(tCountSql, Long.class);
+		TypedQuery<Tactivity> q = this.entityManager.createQuery(tsql, Tactivity.class);
+		TypedQuery<Long> total = this.entityManager.createQuery(tCountSql, Long.class);
 		q.setFirstResult(page.getPageIndex()).setMaxResults(page.getMaxResult());
 		List<Tactivity> resultList = q.getResultList();
 		int count = total.getSingleResult().intValue();
 		page.setList(resultList);
 		page.setTotalResult(count);
-	}*/
+	}
+
 }

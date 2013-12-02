@@ -4,10 +4,19 @@
 package com.ruyicai.actioncenter.domain;
 
 import java.lang.Integer;
+import java.lang.Long;
 import java.lang.String;
 import java.util.Date;
 
 privileged aspect Tactivity_Roo_JavaBean {
+    
+    public Long Tactivity.getId() {
+        return this.id;
+    }
+    
+    public void Tactivity.setId(Long id) {
+        this.id = id;
+    }
     
     public String Tactivity.getLotno() {
         return this.lotno;

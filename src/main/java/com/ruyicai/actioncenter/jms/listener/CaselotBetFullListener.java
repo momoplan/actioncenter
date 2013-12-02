@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
@@ -33,6 +34,9 @@ public class CaselotBetFullListener {
 
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
+	
+	@Autowired
+	private TactivityDao tactivityDao;
 
 	@Produce(uri = "jms:topic:sendActivityPrize")
 	private ProducerTemplate sendActivityPrizeProducer;
@@ -57,7 +61,7 @@ public class CaselotBetFullListener {
 				return;
 			}
 		}
-		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.CASELOT_SUCCESS.value);
 		BigDecimal prize = BigDecimal.ZERO;
 		if (tactivity != null) {

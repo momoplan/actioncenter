@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.dao.Fund2DrawDao;
+import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.dao.VipUserDao;
 import com.ruyicai.actioncenter.domain.Chong20Mobile;
@@ -46,6 +47,9 @@ public class TactionService {
 
 	@Autowired
 	private LotteryService lotteryService;
+	
+	@Autowired
+	private TactivityDao tactivityDao;
 
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
@@ -112,7 +116,7 @@ public class TactionService {
 	private Boolean save2cashTransaction(String ttransactionid, String userno, BigDecimal amt) {
 		logger.info("保存充值等待可提现ttransactionid:{},userno:{},amt:{}", new String[] { ttransactionid, userno, amt + "" });
 		Boolean flag = false;
-		Tactivity tactivity = Tactivity.findTactivity(null, null, "00092493", null, ActionJmsType.Fund2Draw.value);
+		Tactivity tactivity = tactivityDao.findTactivity(null, null, "00092493", null, ActionJmsType.Fund2Draw.value);
 		if (tactivity != null) {
 			Fund2Draw draw = fund2DrawDao.createFund2Draw(ttransactionid, userno, amt);
 			if (draw != null) {
@@ -131,7 +135,7 @@ public class TactionService {
 		if (tuserinfo == null) {
 			return flag;
 		}
-		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.OLD_USER_CHONGZHI_ZENGSONG.value);
 		if (tactivity == null) {
 			logger.info("老用户充值赠送活动未开启");
@@ -177,7 +181,7 @@ public class TactionService {
 		logger.info("充值满百开始");
 		Boolean flag = false;
 		if (tuserinfo != null) {
-			Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+			Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 					ActionJmsType.CHONGZHI_100_ZENGSONG.value);
 			if (tactivity != null) {
 				// if (ladderpresentflag != null && 1 == ladderpresentflag) {
@@ -213,7 +217,7 @@ public class TactionService {
 			return flag;
 		}
 		if (tuserinfo != null) {
-			Tactivity suningtactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(),
+			Tactivity suningtactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(),
 					tuserinfo.getChannel(), ActionJmsType.SUNING_ZENGSONG.value);
 			if (suningtactivity != null) {
 				String express = suningtactivity.getExpress();
@@ -266,7 +270,7 @@ public class TactionService {
 				logger.info("苏宁渠道首次充值赠送活动未开启");
 			}
 			if (suningtactivity == null) {
-				Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+				Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 						ActionJmsType.FIRST_CHONGZHI_ZENGSONG.value);
 				if (tactivity != null) {
 					String express = tactivity.getExpress();
@@ -329,7 +333,7 @@ public class TactionService {
 		Boolean flag = false;
 		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
 		if (tuserinfo != null) {
-			Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(),
+			Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(),
 					tuserinfo.getChannel(), ActionJmsType.GOUCAI_SUCCESS.value);
 			if (tactivity != null) {
 				String express = tactivity.getExpress();
@@ -381,7 +385,7 @@ public class TactionService {
 			}
 		}
 		if (tuserinfo != null) {
-			Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+			Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 					ActionJmsType.VIP_USER_GOUCAI_ZENGSONG.value);
 			if (tactivity != null) {
 				String express = tactivity.getExpress();
@@ -418,7 +422,7 @@ public class TactionService {
 	public Boolean chargeCase(Tagent tagent, BigDecimal amt) {
 		Boolean flag = false;
 		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(tagent.getUserno());
-		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.CHONGZHI_SUCCESS.value);
 		if (tactivity != null) {
 			Tagent parentAgent = Tagent.findTagent(tagent.getAgentId());

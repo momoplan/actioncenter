@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
@@ -27,6 +28,9 @@ public class TactivityController {
 
 	@Autowired
 	private SendActivityPrizeListener sendActivityPrizeListener;
+	
+	@Autowired
+	private TactivityDao tactivityDao;
 
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
@@ -38,7 +42,7 @@ public class TactivityController {
 		ResponseData rd = new ResponseData();
 		ErrorCode result = ErrorCode.OK;
 		try {
-			rd.setValue(Tactivity.updateState(id, state));
+			rd.setValue(tactivityDao.updateState(id, state));
 		} catch (RuyicaiException e) {
 			logger.error("修改活动状态出错id:" + id + ",state:" + state + ",{}", new String[] { e.getMessage() }, e);
 			rd.setValue(e.getMessage());
@@ -81,7 +85,7 @@ public class TactivityController {
 		ResponseData rd = new ResponseData();
 		ErrorCode result = ErrorCode.OK;
 		try {
-			Tactivity tactivity = Tactivity.saveOrUpdate(lotno, playtype, subChannel, channel, actionJmsType, express,
+			Tactivity tactivity = tactivityDao.saveOrUpdate(lotno, playtype, subChannel, channel, actionJmsType, express,
 					state, memo);
 			rd.setValue(tactivity);
 		} catch (RuyicaiException e) {
@@ -109,7 +113,7 @@ public class TactivityController {
 		ErrorCode result = ErrorCode.OK;
 		Page<Tactivity> page = new Page<Tactivity>(startLine, endLine, orderBy, orderDir);
 		try {
-			Tactivity.findTactivityByPage(page);
+			tactivityDao.findTactivityByPage(page);
 			rd.setValue(page);
 		} catch (RuyicaiException e) {
 			logger.error("findAllTactivity出错,{}", new String[] { e.getMessage() }, e);

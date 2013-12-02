@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.FirstOrder;
 import com.ruyicai.actioncenter.domain.Tactivity;
@@ -37,6 +38,9 @@ public class OrderAfterBetListener {
 
 	@Autowired
 	private LotteryService lotteryService;
+	
+	@Autowired
+	private TactivityDao tactivityDao;
 
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
@@ -89,7 +93,7 @@ public class OrderAfterBetListener {
 
 	@Transactional
 	public void firstorder(Torder order, Tuserinfo tuserinfo) {
-		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.First_Order.value);
 		if (tactivity != null) {
 			Date regtime = tuserinfo.getRegtime();
@@ -134,7 +138,7 @@ public class OrderAfterBetListener {
 	}
 
 	public void ssqzengsong(Torder order, Tuserinfo tuserinfo) {
-		Tactivity tactivity = Tactivity.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.Friday_SSQ_ZENGSONG.value);
 		if (tactivity != null) {
 			String express = tactivity.getExpress();
