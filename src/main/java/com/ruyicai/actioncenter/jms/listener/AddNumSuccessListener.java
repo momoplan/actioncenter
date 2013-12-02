@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.TaddNumActivity;
@@ -37,6 +38,9 @@ public class AddNumSuccessListener {
 
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
+	
+	@Autowired
+	private TactivityDao tactivityDao;
 
 	@Produce(uri = "jms:topic:sendActivityPrize")
 	private ProducerTemplate sendActivityPrizeProducer;
@@ -61,7 +65,7 @@ public class AddNumSuccessListener {
 				return;
 			}
 		}
-		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.AddNumOneYear.value);
 		if (tactivity == null) {
 			return;
@@ -128,7 +132,7 @@ public class AddNumSuccessListener {
 			logger.info("null return");
 			return;
 		}
-		Tactivity addNum15 = Tactivity.findTactivity(tsubscribe.getLotno(), null, tuserinfo.getSubChannel(), null,
+		Tactivity addNum15 = tactivityDao.findTactivity(tsubscribe.getLotno(), null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.AddNum15.value);
 		if (addNum15 != null) {
 			String express = addNum15.getExpress();

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
 import com.ruyicai.actioncenter.service.LotteryService;
@@ -27,6 +28,9 @@ public class DispatchCaseLotFinishListener {
 
 	@Autowired
 	private LotteryService lotteryService;
+	
+	@Autowired
+	private TactivityDao tactivityDao;
 
 	@Autowired
 	private OrderEncashListener orderEncashListener;
@@ -70,7 +74,7 @@ public class DispatchCaseLotFinishListener {
 		if (!lotno.startsWith("J")) {
 			return;
 		}
-		Tactivity tactivity = Tactivity.findTactivity(null, torder.getPlaytype(), userinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(null, torder.getPlaytype(), userinfo.getSubChannel(), null,
 				ActionJmsType.Encash_Jingcai_2Chan1.value);
 		if (tactivity != null) {
 			String caselotId = caseLot.getId();
@@ -121,7 +125,7 @@ public class DispatchCaseLotFinishListener {
 
 	@Transactional
 	public void addPrize2Chuan1(CaseLot caseLot, Torder torder, Tuserinfo userinfo) {
-		Tactivity tactivity = Tactivity.findTactivity(torder.getLotno(), torder.getPlaytype(),
+		Tactivity tactivity = tactivityDao.findTactivity(torder.getLotno(), torder.getPlaytype(),
 				userinfo.getSubChannel(), null, ActionJmsType.Encash_2chuan1_AddPrize.value);
 		if (tactivity != null) {
 			String caselotId = caseLot.getId();
@@ -149,7 +153,7 @@ public class DispatchCaseLotFinishListener {
 
 	@Transactional
 	public void addPrizeLanQiu(CaseLot caseLot, Torder torder, Tuserinfo userinfo) {
-		Tactivity tactivity = Tactivity.findTactivity(torder.getLotno(), null, userinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(torder.getLotno(), null, userinfo.getSubChannel(), null,
 				ActionJmsType.Encash_LanQiu_AddPrize.value);
 		if (tactivity != null) {
 			String caselotId = caseLot.getId();

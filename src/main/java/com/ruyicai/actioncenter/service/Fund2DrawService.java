@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.consts.Fund2DrawState;
 import com.ruyicai.actioncenter.dao.Fund2DrawDao;
+import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.domain.Fund2Draw;
 import com.ruyicai.actioncenter.domain.FundAndJoinAction;
 import com.ruyicai.actioncenter.domain.Tactivity;
@@ -31,6 +32,9 @@ public class Fund2DrawService {
 
 	@Autowired
 	private Fund2DrawDao fund2DrawDao;
+	
+	@Autowired
+	private TactivityDao tactivityDao;
 
 	@Autowired
 	private LotteryService lotteryService;
@@ -39,7 +43,7 @@ public class Fund2DrawService {
 	private ProducerTemplate sendFund2Draw;
 
 	public void quartzFindFund2Draw() {
-		Tactivity tactivity = Tactivity.findTactivity(null, null, "00092493", null, ActionJmsType.Fund2Draw.value);
+		Tactivity tactivity = tactivityDao.findTactivity(null, null, "00092493", null, ActionJmsType.Fund2Draw.value);
 		if (tactivity != null) {
 			logger.info("查询待增加可提现充值");
 			List<Fund2Draw> list = fund2DrawDao.findCanFund2Draw(Fund2DrawState.waitToDraw.value(), new Date());

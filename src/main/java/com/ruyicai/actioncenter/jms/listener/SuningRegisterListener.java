@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
+import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Chong20Mobile;
 import com.ruyicai.actioncenter.domain.FirstChargeUser;
@@ -34,6 +35,9 @@ public class SuningRegisterListener {
 
 	@Autowired
 	private TactionService tactionService;
+	
+	@Autowired
+	private TactivityDao tactivityDao;
 
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
@@ -71,7 +75,7 @@ public class SuningRegisterListener {
 			return;
 		}
 		String userno = tuserinfo.getUserno();
-		Tactivity tactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.FIRST_CHONGZHI_ZENGSONG.value);
 		if (tactivity != null) {
 			logger.info("首次充值用户信息修改userno:" + userno);
@@ -123,7 +127,7 @@ public class SuningRegisterListener {
 			return;
 		}
 		String userno = tuserinfo.getUserno();
-		Tactivity suningtactivity = Tactivity.findTactivity(null, null, tuserinfo.getSubChannel(),
+		Tactivity suningtactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(),
 				tuserinfo.getChannel(), ActionJmsType.SuNing_REGISTER.value);
 		if (suningtactivity != null) {
 			if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {
