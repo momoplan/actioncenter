@@ -45,7 +45,8 @@
 	<task:executor id="executorWithPoolSizeRange" pool-size="20-100"
 		queue-capacity="1000" keep-alive="20" rejection-policy="CALLER_RUNS" />
 	<task:annotation-driven executor="executorWithPoolSizeRange" />
-	<bean class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close" id="dataSource">
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
 		<property name="driverClassName" value="${database.driverClassName}" />
 		<property name="url" value="${database.url}" />
 		<property name="username" value="${database.username}" />
@@ -68,7 +69,7 @@
 
 		<property name="poolPreparedStatements" value="true" />
 		<property name="maxOpenPreparedStatements" value="100" />
-		
+
 		<property name="filters" value="stat" />
 	</bean>
 	<bean class="org.springframework.orm.jpa.JpaTransactionManager"
