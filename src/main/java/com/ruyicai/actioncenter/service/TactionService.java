@@ -364,13 +364,30 @@ public class TactionService {
 		return flag;
 	}
 
-	@Transactional
 	public Boolean vipCase(Tuserinfo tuserinfo, BigDecimal amt, String businessId, Integer businessType) {
 		Boolean flag = false;
 		logger.info("VIP购彩活动开始");
 		if (!tuserinfo.getSubChannel().equals("00092493")) {
 			return flag;
 		}
+		
+		//增加vip购彩金额
+		this.doAddVipUserBuyAmount(tuserinfo, amt);
+		
+		//查找大用户购彩活动并且赠送彩金
+		flag = this.doFindActivityAndPresent(tuserinfo, amt, businessId);
+		
+		logger.info("VIP购彩活动结束");
+		return flag;
+	}
+	
+	/**
+	 * 增加本月用户购彩金额
+	 * @param tuserinfo	用户
+	 * @param amt			购彩金额
+	 */
+	@Transactional
+	private void doAddVipUserBuyAmount(Tuserinfo tuserinfo, BigDecimal amt) {
 		String currentMonth = DateUtil.format("yyyy-MM", new Date());
 		if (tuserinfo != null) {
 			VipUser vipUser = vipUserDao.findVipUser(tuserinfo.getUserno(), currentMonth, true);
@@ -384,6 +401,17 @@ public class TactionService {
 				logger.info("大客户userno:{},增加购买金额{}", new String[] { tuserinfo.getUserno(), amt + "" });
 			}
 		}
+	}
+	
+	/**
+	 * 查找大户购彩赠送活动，符合条件的用户赠送彩金
+	 * @param tuserinfo		用户
+	 * @param amt				本次购彩金额
+	 * @param businessId		
+	 * @return
+	 */
+	private Boolean doFindActivityAndPresent(Tuserinfo tuserinfo, BigDecimal amt, String businessId) {
+		Boolean flag = false;
 		if (tuserinfo != null) {
 			Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 					ActionJmsType.VIP_USER_GOUCAI_ZENGSONG.value);
@@ -396,7 +424,7 @@ public class TactionService {
 
 				calendar.add(Calendar.MONTH, -1);
 				String lastMonth = DateUtil.format("yyyy-MM", calendar.getTime());
-				VipUser lastMonthVipUser = vipUserDao.findVipUser(tuserinfo.getUserno(), lastMonth, false);
+				VipUser lastMonthVipUser = vipUserDao.findVipUser(tuserinfo.getUserno(), lastMonth);
 				if (lastMonthVipUser != null && lastMonthVipUser.getBuyamt().compareTo(new BigDecimal(step)) >= 0) {
 					if (amt.compareTo(BigDecimal.ZERO) >= 0) {
 						flag = true;
@@ -414,7 +442,6 @@ public class TactionService {
 				}
 			}
 		}
-		logger.info("VIP购彩活动结束");
 		return flag;
 	}
 

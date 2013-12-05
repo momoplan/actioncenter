@@ -24,6 +24,11 @@ public class VipUserDao {
 				lock ? LockModeType.PESSIMISTIC_WRITE : LockModeType.NONE);
 		return vipUser;
 	}
+	
+	public VipUser findVipUser(String userno, String yearAndMonth) {
+		VipUser vipUser = entityManager.find(VipUser.class, new VipUserPK(userno, yearAndMonth));
+		return vipUser;
+	}
 
 	@Transactional
 	public VipUser createVipUser(String userno, String yearAndMonth) {
