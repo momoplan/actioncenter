@@ -8,6 +8,8 @@
 	<version>0.1.0.BUILD-SNAPSHOT</version>
 	<name>actioncenter</name>
 	<properties>
+		<camel.version>2.12.2</camel.version>
+		<camel.jmxAgent.registryPort>2099</camel.jmxAgent.registryPort>
 		<roo.version>1.1.5.RELEASE</roo.version>
 		<spring.version>3.2.4.RELEASE</spring.version>
 		<aspectj.version>1.6.11</aspectj.version>
@@ -19,16 +21,6 @@
 		<database.username>jrtConsole</database.username>
 		<database.password>jrtConsole321</database.password>
 		<memcache.client.ip>219.148.162.70:12000</memcache.client.ip>
-		
-		<jms.routes>
-		  <![CDATA[
-		  from("jms:queue:VirtualTopicConsumers.actioncenter.sendActivityPrize").to("bean:sendActivityPrizeListener?method=sendActivityPrizeCustomer").routeId("发放活动奖金");
-		  from("jms:queue:VirtualTopicConsumers.actioncenter.actioncenter").to("bean:fundJmsListener?method=fundJmsCustomer").routeId("用户充值或购彩");
-		  from("jms:queue:VirtualTopicConsumers.actioncenter.caselotBetFull").to("bean:caselotBetFullListener?method=encashCustomer").routeId("合买成功");
-		  from("jms:queue:VirtualTopicConsumers.actioncenter.addnumsuccess").to("bean:addNumSuccessListener?method=addNumSuccessCustomer").routeId("追号成功");
-		  from("jms:queue:VirtualTopicConsumers.actioncenter.orderPirzeend").to("bean:orderEncashListener?method=orderEncashCustomer").routeId("派奖加奖");
-		  ]]>
-		</jms.routes>
 	</properties>
 	<repositories>
 		<repository>
@@ -53,11 +45,11 @@
 		</dependency>
 		<!-- connection pool -->
 		<dependency>
-		     <groupId>com.alibaba</groupId>
-		     <artifactId>druid</artifactId>
-		     <version>1.0.0</version>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>1.0.0</version>
 		</dependency>
-		 
+
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
@@ -416,17 +408,17 @@
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-spring</artifactId>
-			<version>2.8.1</version>
+			<version>${camel.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-jms</artifactId>
-			<version>2.8.1</version>
+			<version>${camel.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-spring-javaconfig</artifactId>
-			<version>2.8.1</version>
+			<version>${camel.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.mail</groupId>
@@ -448,7 +440,7 @@
 			<artifactId>quartz</artifactId>
 			<version>1.7.3</version>
 		</dependency>
-		
+
 		<!-- JSON begin -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -473,7 +465,7 @@
 			<version>${jackson.version}</version>
 		</dependency>
 		<!-- JSON end -->
-		
+
 	</dependencies>
 	<build>
 		<finalName>actioncenter</finalName>
@@ -767,7 +759,6 @@
 				<tomcat.manager.port>9080</tomcat.manager.port>
 				<jms.new-issue.brokerURL>tcp://localhost:61616</jms.new-issue.brokerURL>
 				<ruyicaiUserno>00000059</ruyicaiUserno>
-				<camel.jmxAgent.registryPort>2099</camel.jmxAgent.registryPort>
 				<memcache.client.ip>192.168.0.92:12000</memcache.client.ip>
 				<lotteryurl>http://192.168.0.42:8080/lottery</lotteryurl>
 				<chargecenterurl>http://192.168.0.118:8090/ChargeCenter</chargecenterurl>
@@ -785,7 +776,6 @@
 				<tomcat.manager.port>9080</tomcat.manager.port>
 				<jms.new-issue.brokerURL>tcp://192.168.0.92:61616</jms.new-issue.brokerURL>
 				<ruyicaiUserno>00000059</ruyicaiUserno>
-				<camel.jmxAgent.registryPort>2099</camel.jmxAgent.registryPort>
 				<memcache.client.ip>192.168.0.92:12000</memcache.client.ip>
 				<lotteryurl>http://192.168.0.42:8080/lottery</lotteryurl>
 				<chargecenterurl>http://192.168.0.118:8090/ChargeCenter</chargecenterurl>
@@ -803,7 +793,6 @@
 				<maven.test.skip>true</maven.test.skip>
 				<jms.new-issue.brokerURL>failover://(tcp://192.168.99.30:61616,tcp://192.168.99.31:61616)?randomize=false</jms.new-issue.brokerURL>
 				<ruyicaiUserno>00808738</ruyicaiUserno>
-				<camel.jmxAgent.registryPort>2099</camel.jmxAgent.registryPort>
 				<memcache.client.ip>192.168.99.30:12000,192.168.99.31:12000</memcache.client.ip>
 				<lotteryurl>http://192.168.99.6/lotteryprize</lotteryurl>
 				<chargecenterurl>http://192.168.99.121:8088/ChargeCenter</chargecenterurl>
