@@ -117,6 +117,7 @@ import org.springframework.util.MethodInvoker;
  * 
  * @see #afterPropertiesSet()
  */
+@SuppressWarnings("rawtypes")
 public class BeanInvokingJobDetailFactoryBean implements FactoryBean, BeanNameAware, InitializingBean, ApplicationContextAware {
 	/**
 	 * Set by <code>setApplicationContext</code> when a

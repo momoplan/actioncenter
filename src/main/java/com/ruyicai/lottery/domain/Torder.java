@@ -32,9 +32,6 @@ public class Torder {
 
 	private BigDecimal orderpreprizeamt;
 
-	/** @deprecated 是否有战绩 0：没有，1：有 */
-	private BigDecimal hasachievement;
-
 	private String winbasecode;
 
 	private BigDecimal ordertype;
@@ -100,9 +97,4 @@ public class Torder {
 
 	private Date successtime;
 
-	private transient BigDecimal orderamt;
-
-	private transient Date modifytime;
-
-	private transient BigDecimal orderprize;
 }

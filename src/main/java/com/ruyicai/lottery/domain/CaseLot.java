@@ -105,9 +105,6 @@ public class CaseLot {
 	/** 方案类型 */
 	private BigDecimal lotsType;
 
-	/** @deprecated 是否有战绩 0：没有，1：有 */
-	private BigDecimal hasachievement;
-
 	/** 是否中奖 0：没有，1：有.(取消的合买也会有中奖状态) */
 	private BigDecimal isWinner;
 

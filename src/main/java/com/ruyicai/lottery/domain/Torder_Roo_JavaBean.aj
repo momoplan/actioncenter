@@ -89,14 +89,6 @@ privileged aspect Torder_Roo_JavaBean {
         this.orderpreprizeamt = orderpreprizeamt;
     }
     
-    public BigDecimal Torder.getHasachievement() {
-        return this.hasachievement;
-    }
-    
-    public void Torder.setHasachievement(BigDecimal hasachievement) {
-        this.hasachievement = hasachievement;
-    }
-    
     public String Torder.getWinbasecode() {
         return this.winbasecode;
     }

@@ -259,14 +259,6 @@ privileged aspect CaseLot_Roo_JavaBean {
         this.lotsType = lotsType;
     }
     
-    public BigDecimal CaseLot.getHasachievement() {
-        return this.hasachievement;
-    }
-    
-    public void CaseLot.setHasachievement(BigDecimal hasachievement) {
-        this.hasachievement = hasachievement;
-    }
-    
     public BigDecimal CaseLot.getIsWinner() {
         return this.isWinner;
     }

@@ -26,7 +26,6 @@ privileged aspect Torder_Roo_ToString {
         sb.append("Endtime: ").append(getEndtime()).append(", ");
         sb.append("Errorcode: ").append(getErrorcode()).append(", ");
         sb.append("Eventcode: ").append(getEventcode()).append(", ");
-        sb.append("Hasachievement: ").append(getHasachievement()).append(", ");
         sb.append("Id: ").append(getId()).append(", ");
         sb.append("Instate: ").append(getInstate()).append(", ");
         sb.append("Lastprinttime: ").append(getLastprinttime()).append(", ");

@@ -97,6 +97,7 @@ import org.springframework.util.MethodInvoker;
  * 
  * @see #afterPropertiesSet()
  */
+@SuppressWarnings("rawtypes")
 public class MethodInvokingJobDetailFactoryBean implements FactoryBean, BeanNameAware, InitializingBean {
 	private Log logger = LogFactory.getLog(getClass());
 

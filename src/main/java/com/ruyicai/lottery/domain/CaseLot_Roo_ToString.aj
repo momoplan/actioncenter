@@ -19,7 +19,6 @@ privileged aspect CaseLot_Roo_ToString {
         sb.append("DisplayState: ").append(getDisplayState()).append(", ");
         sb.append("DisplayStateMemo: ").append(getDisplayStateMemo()).append(", ");
         sb.append("EndTime: ").append(getEndTime()).append(", ");
-        sb.append("Hasachievement: ").append(getHasachievement()).append(", ");
         sb.append("Id: ").append(getId()).append(", ");
         sb.append("IsWinner: ").append(getIsWinner()).append(", ");
         sb.append("Lotno: ").append(getLotno()).append(", ");
