@@ -120,10 +120,10 @@ public class LotteryService {
 		}
 		return tuserinfo;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Tuserinfo findByUsername(String username) {
-		if(StringUtils.isBlank(username)) {
+		if (StringUtils.isBlank(username)) {
 			throw new IllegalArgumentException("The argument username is required.");
 		}
 		Tuserinfo tuserinfo = null;
@@ -157,20 +157,21 @@ public class LotteryService {
 		}
 		return tuserinfo;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Tuserinfo registerUserByMobileid(String mobileid, String password, String channel) {
-		if(StringUtils.isBlank(mobileid)) {
+		if (StringUtils.isBlank(mobileid)) {
 			throw new IllegalArgumentException("The argument mobileid is required.");
 		}
-		if(StringUtils.isBlank(password)) {
+		if (StringUtils.isBlank(password)) {
 			throw new IllegalArgumentException("The argument password is required.");
 		}
-		if(StringUtils.isBlank(channel)) {
+		if (StringUtils.isBlank(channel)) {
 			throw new IllegalArgumentException("The argument channel is required.");
 		}
 		Tuserinfo tuserinfo = null;
-		String url = lotteryurl + "/tuserinfoes/register?userName=" + mobileid + "&mobileid=" + mobileid + "&password=" + password + "&channel=" + channel;
+		String url = lotteryurl + "/tuserinfoes/register?userName=" + mobileid + "&mobileid=" + mobileid + "&password="
+				+ password + "&channel=" + channel;
 		try {
 			String result = HttpUtil.post(url.toString(), "");
 			ResponseData rd = JsonUtil.fromJsonToObject(result, ResponseData.class);
@@ -209,9 +210,12 @@ public class LotteryService {
 	 * @param subchannel
 	 * @param channel
 	 * @param memo
+	 * @param flowno
+	 * @param otherid
 	 * @return
 	 */
-	public Boolean directChargeProcess(String userno, BigDecimal amt, String subchannel, String channel, String memo) {
+	public Boolean directChargeProcess(String userno, BigDecimal amt, String subchannel, String channel, String memo,
+			String flowno, String otherid) {
 		Boolean flag = false;
 		if (StringUtils.isBlank(userno)) {
 			throw new IllegalArgumentException("the argument mobileid is required");
@@ -226,8 +230,14 @@ public class LotteryService {
 		StringBuffer params = new StringBuffer();
 		params.append("userno=" + userno).append("&amt=" + amt.toString()).append("&accesstype=2")
 				.append("&subchannel=" + subchannelStr).append("&channel=" + channelStr);
-		if (memo != null) {
+		if (StringUtils.isNotBlank(memo)) {
 			params.append("&memo=" + memo);
+		}
+		if (StringUtils.isNotBlank(flowno)) {
+			params.append("&flowno=" + flowno);
+		}
+		if (StringUtils.isNotBlank(otherid)) {
+			params.append("&otherid=" + otherid);
 		}
 		try {
 			String result = HttpUtil.post(url, params.toString());
@@ -564,7 +574,7 @@ public class LotteryService {
 		}
 		return minAmt;
 	}
-	
+
 	/**
 	 * 查询合买参与人
 	 * 
@@ -603,19 +613,20 @@ public class LotteryService {
 		}
 		return resultList;
 	}
-	
+
 	/**
 	 * 更改用户渠道号
+	 * 
 	 * @param userno
 	 * @param channel
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	public Tuserinfo modifyUserChannel(String userno, String channel) {
-		if(StringUtils.isBlank(userno)) {
+		if (StringUtils.isBlank(userno)) {
 			throw new IllegalArgumentException("The argument userno is required.");
 		}
-		if(StringUtils.isBlank(channel)) {
+		if (StringUtils.isBlank(channel)) {
 			throw new IllegalArgumentException("The argument channel is required.");
 		}
 		String url = lotteryurl + "/tuserinfoes/modify";
@@ -623,7 +634,7 @@ public class LotteryService {
 		Tuserinfo tuserinfo = null;
 		try {
 			String result = HttpUtil.post(url, params);
-			if(StringUtils.isNotBlank(result)) {
+			if (StringUtils.isNotBlank(result)) {
 				ResponseData rd = JsonUtil.fromJsonToObject(result, ResponseData.class);
 				String errorCode = rd.getErrorCode();
 				if (errorCode.equals(ErrorCode.OK.value)) {
@@ -643,35 +654,36 @@ public class LotteryService {
 							tuserinfo.setUserName((String) map.get("userName"));
 						}
 					}
-				} else if(errorCode.equals(ErrorCode.UserMod_UserNotExists.value)) {
+				} else if (errorCode.equals(ErrorCode.UserMod_UserNotExists.value)) {
 					logger.error("更新用户渠道失败-用户不存在");
 				} else {
 					logger.error("更新用户渠道失败 errorCode:" + errorCode);
 				}
 			}
-		}catch (Exception e) {
+		} catch (Exception e) {
 			logger.error("请求Lottery出错", e);
 		}
 		return tuserinfo;
 	}
-	
+
 	/**
 	 * 根据用户名Count充值次数
+	 * 
 	 * @param userno
 	 * @return
 	 */
 	public Integer getChargeRecordCountByUserno(String userno) {
-		if(StringUtils.isBlank(userno)) {
+		if (StringUtils.isBlank(userno)) {
 			throw new IllegalArgumentException("The argument userno is required.");
 		}
 		String url = lotteryurl + "/ttransactions/getChargeRecordCountByUserno";
 		String params = "userno=" + userno;
 		try {
 			String result = HttpUtil.post(url, params);
-			if(StringUtils.isNotBlank(result)) {
+			if (StringUtils.isNotBlank(result)) {
 				JSONObject jsonObject = new JSONObject(result);
 				String errorCode = jsonObject.getString("errorCode");
-				if(errorCode.equals(ErrorCode.OK.value)) {
+				if (errorCode.equals(ErrorCode.OK.value)) {
 					return jsonObject.getInt("value");
 				} else {
 					return null;

@@ -16,6 +16,7 @@ import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
 import com.ruyicai.actioncenter.service.LotteryService;
+import com.ruyicai.actioncenter.service.SendActivityPrizeJms;
 import com.ruyicai.actioncenter.util.JsonUtil;
 import com.ruyicai.lottery.domain.CaseLot;
 import com.ruyicai.lottery.domain.Torder;
@@ -28,12 +29,12 @@ public class DispatchCaseLotFinishListener {
 
 	@Autowired
 	private LotteryService lotteryService;
-	
+
 	@Autowired
 	private TactivityDao tactivityDao;
 
 	@Autowired
-	private OrderEncashListener orderEncashListener;
+	private SendActivityPrizeJms sendActivityPrizeJms;
 
 	public void dispatchCaseLotFinishCustomer(@Body String caseLotJson) {
 		logger.info("合买派奖完成caseLotJson:" + caseLotJson);
@@ -115,8 +116,8 @@ public class DispatchCaseLotFinishListener {
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_Jingcai_2Chan1)) {
 						logger.info(tactivity.getMemo() + prize);
-						orderEncashListener.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_Jingcai_2Chan1,
-								caselotId, tactivity.getMemo());
+						sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_Jingcai_2Chan1,
+								tactivity.getMemo(), caselotId, "", "");
 					}
 				}
 			}
@@ -143,8 +144,8 @@ public class DispatchCaseLotFinishListener {
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_2chuan1_AddPrize)) {
 						logger.info(tactivity.getMemo() + "合买中奖加奖prize:" + prize.longValue());
-						orderEncashListener.sendPrize2UserJMS(userinfo.getUserno(), prize,
-								ActionJmsType.Encash_2chuan1_AddPrize, caselotId, tactivity.getMemo());
+						sendActivityPrizeJms.sendPrize2UserJMS(userinfo.getUserno(), prize,
+								ActionJmsType.Encash_2chuan1_AddPrize, tactivity.getMemo(), caselotId, "", "");
 					}
 				}
 			}
@@ -178,8 +179,8 @@ public class DispatchCaseLotFinishListener {
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_LanQiu_AddPrize)) {
 						logger.info(tactivity.getMemo() + "合买中奖加奖prize:" + prize.longValue());
-						orderEncashListener.sendPrize2UserJMS(userinfo.getUserno(), prize,
-								ActionJmsType.Encash_LanQiu_AddPrize, caselotId, tactivity.getMemo());
+						sendActivityPrizeJms.sendPrize2UserJMS(userinfo.getUserno(), prize,
+								ActionJmsType.Encash_LanQiu_AddPrize, tactivity.getMemo(), caselotId, "", "");
 					}
 				}
 			}

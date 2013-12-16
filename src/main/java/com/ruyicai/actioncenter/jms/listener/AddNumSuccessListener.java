@@ -2,13 +2,10 @@ package com.ruyicai.actioncenter.jms.listener;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.Body;
 import org.apache.camel.Header;
-import org.apache.camel.Produce;
-import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +20,7 @@ import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.TaddNumActivity;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
 import com.ruyicai.actioncenter.service.LotteryService;
+import com.ruyicai.actioncenter.service.SendActivityPrizeJms;
 import com.ruyicai.actioncenter.util.DateUtil;
 import com.ruyicai.actioncenter.util.JsonUtil;
 import com.ruyicai.lottery.domain.Tsubscribe;
@@ -38,12 +36,12 @@ public class AddNumSuccessListener {
 
 	@Autowired
 	private TuserPrizeDetailDao tuserPrizeDetailDao;
-	
+
 	@Autowired
 	private TactivityDao tactivityDao;
 
-	@Produce(uri = "jms:topic:sendActivityPrize")
-	private ProducerTemplate sendActivityPrizeProducer;
+	@Autowired
+	private SendActivityPrizeJms sendActivityPrizeJms;
 
 	@Transactional
 	public void addNumSuccessCustomer(@Header("flowno") String flowno, @Header("userno") String userno) {
@@ -78,8 +76,8 @@ public class AddNumSuccessListener {
 		Date date = null;
 		if (prizeDetail == null) {
 			logger.info("第一次赠送追号包年套餐奖金");
-			sendPrize2UserJMS(addNumActivity.getUserno(), new BigDecimal(prize), ActionJmsType.AddNumOneYear,
-					tactivity.getMemo(), flowno);
+			sendActivityPrizeJms.sendPrize2UserJMS(addNumActivity.getUserno(), new BigDecimal(prize),
+					ActionJmsType.AddNumOneYear, tactivity.getMemo(), flowno, "", "");
 		} else {
 			date = prizeDetail.getCreateTime();
 			String dateStr = DateUtil.format(date);
@@ -92,22 +90,11 @@ public class AddNumSuccessListener {
 					addNumActivity.merge();
 				} else {
 					logger.info("赠送用户追号包年套餐userno:" + userno + ",prize:" + prize);
-					sendPrize2UserJMS(addNumActivity.getUserno(), new BigDecimal(prize), ActionJmsType.AddNumOneYear,
-							tactivity.getMemo(), flowno);
+					sendActivityPrizeJms.sendPrize2UserJMS(addNumActivity.getUserno(), new BigDecimal(prize),
+							ActionJmsType.AddNumOneYear, tactivity.getMemo(), flowno, "", "");
 				}
 			}
 		}
-	}
-
-	private void sendPrize2UserJMS(String userno, BigDecimal amt, ActionJmsType actionJmsType, String memo,
-			String businessId) {
-		TuserPrizeDetail userPrizeDetail = tuserPrizeDetailDao.createTprizeUserBuyLog(userno, amt, actionJmsType,
-				businessId);
-		Map<String, Object> headers = new HashMap<String, Object>();
-		headers.put("prizeDetailId", userPrizeDetail.getId());
-		headers.put("actionJmsType", actionJmsType.value);
-		headers.put("memo", memo);
-		sendActivityPrizeProducer.sendBodyAndHeaders(null, headers);
 	}
 
 	@Transactional
@@ -150,7 +137,8 @@ public class AddNumSuccessListener {
 					minAmt = new BigDecimal(maxprizeamt);
 				}
 				logger.info("追号15期赠送" + minAmt);
-				sendPrize2UserJMS(userno, minAmt, ActionJmsType.AddNum15, addNum15.getMemo(), tsubscribe.getFlowno());
+				sendActivityPrizeJms.sendPrize2UserJMS(userno, minAmt, ActionJmsType.AddNum15, addNum15.getMemo(),
+						tsubscribe.getFlowno(), null, null);
 			}
 		}
 	}

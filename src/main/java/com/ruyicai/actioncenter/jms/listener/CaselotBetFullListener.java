@@ -1,12 +1,9 @@
 package com.ruyicai.actioncenter.jms.listener;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.Body;
-import org.apache.camel.Produce;
-import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.dao.TactivityDao;
-import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
-import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
 import com.ruyicai.actioncenter.service.LotteryService;
+import com.ruyicai.actioncenter.service.SendActivityPrizeJms;
 import com.ruyicai.actioncenter.util.JsonUtil;
 import com.ruyicai.lottery.domain.CaseLot;
 import com.ruyicai.lottery.domain.Tuserinfo;
@@ -33,13 +29,10 @@ public class CaselotBetFullListener {
 	private LotteryService lotteryService;
 
 	@Autowired
-	private TuserPrizeDetailDao tuserPrizeDetailDao;
-	
-	@Autowired
 	private TactivityDao tactivityDao;
 
-	@Produce(uri = "jms:topic:sendActivityPrize")
-	private ProducerTemplate sendActivityPrizeProducer;
+	@Autowired
+	private SendActivityPrizeJms sendActivityPrizeJms;
 
 	@Transactional
 	public void encashCustomer(@Body String body) {
@@ -83,21 +76,10 @@ public class CaselotBetFullListener {
 				if (Tjmsservice.createTjmsservice(caseLot.getId(), ActionJmsType.CASELOT_SUCCESS)) {
 					logger.info("合买满员返奖{},caselotid:{},starter:{}", new String[] { prize.toString(), caseLot.getId(),
 							starter });
-					sendPrize2UserJMS(tuserinfo.getUserno(), prize, ActionJmsType.CASELOT_SUCCESS, caseLot.getId(),
-							tactivity.getMemo());
+					sendActivityPrizeJms.sendPrize2UserJMS(tuserinfo.getUserno(), prize, ActionJmsType.CASELOT_SUCCESS,
+							tactivity.getMemo(), caseLot.getId(), "", "");
 				}
 			}
 		}
-	}
-
-	private void sendPrize2UserJMS(String userno, BigDecimal amt, ActionJmsType actionJmsType, String businessId,
-			String memo) {
-		TuserPrizeDetail userPrizeDetail = tuserPrizeDetailDao.createTprizeUserBuyLog(userno, amt, actionJmsType,
-				businessId);
-		Map<String, Object> headers = new HashMap<String, Object>();
-		headers.put("prizeDetailId", userPrizeDetail.getId());
-		headers.put("actionJmsType", actionJmsType.value);
-		headers.put("memo", memo);
-		sendActivityPrizeProducer.sendBodyAndHeaders(null, headers);
 	}
 }

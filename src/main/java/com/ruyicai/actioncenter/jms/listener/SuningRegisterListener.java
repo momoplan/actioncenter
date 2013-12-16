@@ -2,12 +2,9 @@ package com.ruyicai.actioncenter.jms.listener;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.Body;
-import org.apache.camel.Produce;
-import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.dao.TactivityDao;
-import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Chong20Mobile;
 import com.ruyicai.actioncenter.domain.FirstChargeUser;
 import com.ruyicai.actioncenter.domain.SuningRegister;
 import com.ruyicai.actioncenter.domain.Tactivity;
-import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
-import com.ruyicai.actioncenter.service.TactionService;
+import com.ruyicai.actioncenter.service.SendActivityPrizeJms;
 import com.ruyicai.actioncenter.util.DateUtil;
 import com.ruyicai.actioncenter.util.JsonUtil;
 import com.ruyicai.lottery.domain.Tuserinfo;
@@ -34,16 +29,10 @@ public class SuningRegisterListener {
 	private Logger logger = LoggerFactory.getLogger(SuningRegisterListener.class);
 
 	@Autowired
-	private TactionService tactionService;
-	
-	@Autowired
 	private TactivityDao tactivityDao;
 
 	@Autowired
-	private TuserPrizeDetailDao tuserPrizeDetailDao;
-
-	@Produce(uri = "jms:topic:sendActivityPrize")
-	private ProducerTemplate sendActivityPrizeProducer;
+	private SendActivityPrizeJms sendActivityPrizeJms;
 
 	public void userCreatedCustomer(@Body String userInfoJson) {
 		suningRegisterAction(userInfoJson);
@@ -103,9 +92,9 @@ public class SuningRegisterListener {
 				Integer prizeamt = (Integer) activity.get("prizeamt");
 				Chong20Mobile.createChong20Mobile(tuserinfo.getMobileid(), userno);
 				FirstChargeUser.updateFirstChargeUser(fcu, 1);
-				tactionService.sendPrize2UserJMS(tuserinfo.getUserno(), new BigDecimal(prizeamt),
-						ActionJmsType.FIRST_CHONGZHI_ZENGSONG, fcu.getTtransactionid(), fcu.getTtransactionid(),
-						tactivity.getMemo());
+				sendActivityPrizeJms.sendPrize2UserJMS(tuserinfo.getUserno(), new BigDecimal(prizeamt),
+						ActionJmsType.FIRST_CHONGZHI_ZENGSONG, tactivity.getMemo(), fcu.getTtransactionid(), "",
+						fcu.getTtransactionid());
 			}
 		}
 	}
@@ -149,8 +138,8 @@ public class SuningRegisterListener {
 						logger.info("苏宁完善用户信息赠送userno:{},mobileid:{},prizeamt:{}",
 								new String[] { userno, tuserinfo.getMobileid(), prizeamt + "" });
 						SuningRegister.createSuningRegister(tuserinfo.getMobileid(), userno);
-						sendPrize2UserJMS(userno, new BigDecimal(prizeamt), ActionJmsType.SuNing_REGISTER, null,
-								suningtactivity.getMemo());
+						sendActivityPrizeJms.sendPrize2UserJMS(userno, new BigDecimal(prizeamt),
+								ActionJmsType.SuNing_REGISTER, suningtactivity.getMemo(), "", "", "");
 					} else {
 						logger.info("苏宁渠道完善信息赠送3元,用户手机号已赠送过.mobileid:{},user:{}",
 								new String[] { tuserinfo.getMobileid(), tuserinfo.toString() });
@@ -166,17 +155,4 @@ public class SuningRegisterListener {
 			logger.info("苏宁渠道注册送彩金未开启");
 		}
 	}
-
-	@Transactional
-	public void sendPrize2UserJMS(String userno, BigDecimal amt, ActionJmsType actionJmsType, String ttransactionid,
-			String memo) {
-		TuserPrizeDetail userPrizeDetail = tuserPrizeDetailDao.createTprizeUserBuyLog(userno, amt, actionJmsType);
-		Map<String, Object> headers = new HashMap<String, Object>();
-		headers.put("prizeDetailId", userPrizeDetail.getId());
-		headers.put("actionJmsType", actionJmsType.value);
-		headers.put("ttransactionid", ttransactionid);
-		headers.put("memo", memo);
-		sendActivityPrizeProducer.sendBodyAndHeaders(null, headers);
-	}
-
 }

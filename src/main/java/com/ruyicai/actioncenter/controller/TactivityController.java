@@ -28,7 +28,7 @@ public class TactivityController {
 
 	@Autowired
 	private SendActivityPrizeListener sendActivityPrizeListener;
-	
+
 	@Autowired
 	private TactivityDao tactivityDao;
 
@@ -85,8 +85,8 @@ public class TactivityController {
 		ResponseData rd = new ResponseData();
 		ErrorCode result = ErrorCode.OK;
 		try {
-			Tactivity tactivity = tactivityDao.saveOrUpdate(lotno, playtype, subChannel, channel, actionJmsType, express,
-					state, memo);
+			Tactivity tactivity = tactivityDao.saveOrUpdate(lotno, playtype, subChannel, channel, actionJmsType,
+					express, state, memo);
 			rd.setValue(tactivity);
 		} catch (RuyicaiException e) {
 			logger.error("saveorupdateActivity出错,{}", new String[] { e.getMessage() }, e);
@@ -138,7 +138,7 @@ public class TactivityController {
 			List<TuserPrizeDetail> list = tuserPrizeDetailDao.findFailingAgencyPrizeDetails();
 			for (TuserPrizeDetail detail : list) {
 				sendActivityPrizeListener.sendActivityPrizeCustomer(detail.getId(), detail.getActivityType(), null,
-						null);
+						null, detail.getBusinessId(), null);
 			}
 			rd.setValue(list.size() + "条数据执行成功");
 		} catch (RuyicaiException e) {

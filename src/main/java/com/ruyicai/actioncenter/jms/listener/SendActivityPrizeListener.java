@@ -25,7 +25,7 @@ public class SendActivityPrizeListener {
 
 	@Autowired
 	private LotteryService lotteryService;
-	
+
 	@Autowired
 	private TactivityDao tactivityDao;
 
@@ -35,8 +35,9 @@ public class SendActivityPrizeListener {
 	@Transactional
 	public void sendActivityPrizeCustomer(@Header("prizeDetailId") Long prizeDetailId,
 			@Header("actionJmsType") Integer actionJmsType, @Header("ttransactionid") String ttransactionid,
-			@Header("memo") String memo) {
-		logger.info("发送奖励prizeDetailId:{},actionJmsType:{}", new String[] { prizeDetailId + "", actionJmsType + "" });
+			@Header("memo") String memo, @Header("flowno") String flowno, @Header("otherid") String otherid) {
+		logger.info("发送奖励prizeDetailId:{},actionJmsType:{},ttransactionid:{},memo:{},flowno:{},otherid:{}",
+				new String[] { prizeDetailId + "", actionJmsType + "", ttransactionid, memo, flowno, otherid });
 		if (StringUtils.isBlank(memo)) {
 			ActionJmsType type = ActionJmsType.get(actionJmsType);
 			if (type != null && StringUtils.isNotBlank(type.memo)) {
@@ -47,7 +48,7 @@ public class SendActivityPrizeListener {
 		if (detail != null && detail.getState() == 0) {
 			Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(detail.getUserno());
 			Boolean flag = lotteryService.directChargeProcess(tuserinfo.getUserno(), detail.getAmt(),
-					tuserinfo.getSubChannel(), tuserinfo.getChannel(), memo);
+					tuserinfo.getSubChannel(), tuserinfo.getChannel(), memo, flowno, otherid);
 			if (flag) {
 				detail.setState(1);
 				logger.info("TuserPrizeDetail id:{},prizeAmt:{},userno:{},actionJmsType:{}.奖励成功", new String[] {

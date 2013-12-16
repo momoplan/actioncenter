@@ -2,12 +2,9 @@ package com.ruyicai.actioncenter.jms.listener;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.Body;
-import org.apache.camel.Produce;
-import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.dao.TactivityDao;
-import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.SSCPrizedDetail;
 import com.ruyicai.actioncenter.domain.SSCPrizedDetailPK;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
-import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
 import com.ruyicai.actioncenter.service.LotteryService;
+import com.ruyicai.actioncenter.service.SendActivityPrizeJms;
 import com.ruyicai.actioncenter.util.DateUtil;
 import com.ruyicai.actioncenter.util.JsonUtil;
 import com.ruyicai.lottery.domain.Torder;
@@ -37,15 +33,12 @@ public class OrderEncashListener {
 
 	@Autowired
 	private LotteryService lotteryService;
-	
+
 	@Autowired
 	private TactivityDao tactivityDao;
 
 	@Autowired
-	private TuserPrizeDetailDao tuserPrizeDetailDao;
-
-	@Produce(uri = "jms:topic:sendActivityPrize")
-	private ProducerTemplate sendActivityPrizeProducer;
+	private SendActivityPrizeJms sendActivityPrizeJms;
 
 	@Value("${ruyicaiUserno}")
 	private String ruyicaiUserno;
@@ -84,8 +77,8 @@ public class OrderEncashListener {
 			return;
 		}
 		Tuserinfo tuserinfo = orderUserInfo;
-		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(),
-				null, ActionJmsType.FuCai3D_JiaJiang.value);
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(),
+				tuserinfo.getSubChannel(), null, ActionJmsType.FuCai3D_JiaJiang.value);
 		if (tactivity != null) {
 			Long orderprizeamt = order.getOrderprizeamt().longValue();
 			if (orderprizeamt > 0) {
@@ -105,8 +98,8 @@ public class OrderEncashListener {
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.FuCai3D_JiaJiang)) {
 						logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
-						sendPrize2UserJMS(userno, prize, ActionJmsType.FuCai3D_JiaJiang, order.getId(),
-								tactivity.getMemo());
+						sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.FuCai3D_JiaJiang,
+								tactivity.getMemo(), order.getId(), "", "");
 					}
 				}
 			}
@@ -141,8 +134,8 @@ public class OrderEncashListener {
 					if (prize.compareTo(BigDecimal.ZERO) > 0) {
 						if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Kuai3_JiaJiang)) {
 							logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
-							sendPrize2UserJMS(userno, prize, ActionJmsType.Kuai3_JiaJiang, order.getId(),
-									tactivity.getMemo());
+							sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Kuai3_JiaJiang,
+									tactivity.getMemo(), order.getId(), "", "");
 						}
 					}
 				} else {
@@ -211,8 +204,8 @@ public class OrderEncashListener {
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_Jingcai_2Chan1)) {
 						logger.info(tactivity.getMemo() + prize);
-						sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_Jingcai_2Chan1, order.getId(),
-								tactivity.getMemo());
+						sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_Jingcai_2Chan1,
+								tactivity.getMemo(), order.getId(), "", "");
 					}
 				}
 			}
@@ -259,8 +252,8 @@ public class OrderEncashListener {
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_LanQiu_AddPrize)) {
 						logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
-						sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_LanQiu_AddPrize, order.getId(),
-								tactivity.getMemo());
+						sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_LanQiu_AddPrize,
+								tactivity.getMemo(), order.getId(), "", "");
 					}
 				}
 			}
@@ -295,8 +288,8 @@ public class OrderEncashListener {
 					if (prize.compareTo(BigDecimal.ZERO) > 0) {
 						if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_ZuCai_AddPrize)) {
 							logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
-							sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_ZuCai_AddPrize, order.getId(),
-									tactivity.getMemo());
+							sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_ZuCai_AddPrize,
+									tactivity.getMemo(), order.getId(), "", "");
 						}
 					}
 				}
@@ -312,8 +305,8 @@ public class OrderEncashListener {
 			return;
 		}
 		Tuserinfo tuserinfo = orderUserInfo;
-		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(),
-				null, ActionJmsType.Encash_DaXiaoDanShuang_AddPrize.value);
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(),
+				tuserinfo.getSubChannel(), null, ActionJmsType.Encash_DaXiaoDanShuang_AddPrize.value);
 		if (tactivity != null) {
 			Long orderprizeamt = order.getOrderprizeamt().longValue();
 			if (orderprizeamt > 0) {
@@ -343,8 +336,9 @@ public class OrderEncashListener {
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_DaXiaoDanShuang_AddPrize)) {
 						logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
-						sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_DaXiaoDanShuang_AddPrize, order.getId(),
-								tactivity.getMemo());
+						sendActivityPrizeJms.sendPrize2UserJMS(userno, prize,
+								ActionJmsType.Encash_DaXiaoDanShuang_AddPrize, tactivity.getMemo(), order.getId(), "",
+								"");
 					}
 				}
 			}
@@ -400,8 +394,8 @@ public class OrderEncashListener {
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_DuoLeCai_AddPrize)) {
 						logger.info(tactivity.getMemo() + "中奖加奖prize:" + prize.longValue());
-						sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_DuoLeCai_AddPrize, order.getId(),
-								tactivity.getMemo());
+						sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_DuoLeCai_AddPrize,
+								tactivity.getMemo(), order.getId(), "", "");
 					}
 				}
 			}
@@ -424,8 +418,8 @@ public class OrderEncashListener {
 			logger.info("如意彩账户购买,不加奖");
 			return;
 		}
-		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(),
-				null, ActionJmsType.Encash_2chuan1_AddPrize.value);
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(),
+				tuserinfo.getSubChannel(), null, ActionJmsType.Encash_2chuan1_AddPrize.value);
 		if (tactivity != null) {
 			// Long orderprizeamt = order.getOrderprizeamt().longValue();
 			if (orderprizeamt > 0) {
@@ -441,8 +435,8 @@ public class OrderEncashListener {
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_2chuan1_AddPrize)) {
 						logger.info(tactivity.getMemo() + "加奖prize:" + prize.longValue());
-						sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_2chuan1_AddPrize, order.getId(),
-								tactivity.getMemo());
+						sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_2chuan1_AddPrize,
+								tactivity.getMemo(), order.getId(), "", "");
 					}
 				}
 			}
@@ -488,25 +482,11 @@ public class OrderEncashListener {
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.EncashAddPrize)) {
 						logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
-						sendPrize2UserJMS(userno, prize, ActionJmsType.EncashAddPrize, order.getId(),
-								tactivity.getMemo());
+						sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.EncashAddPrize,
+								tactivity.getMemo(), order.getId(), "", "");
 					}
 				}
 			}
 		}
 	}
-
-	@Transactional
-	public void sendPrize2UserJMS(String userno, BigDecimal amt, ActionJmsType actionJmsType, String businessId,
-			String memo) {
-		TuserPrizeDetail userPrizeDetail = tuserPrizeDetailDao.createTprizeUserBuyLog(userno, amt, actionJmsType,
-				businessId);
-		Map<String, Object> headers = new HashMap<String, Object>();
-		headers.put("prizeDetailId", userPrizeDetail.getId());
-		headers.put("actionJmsType", actionJmsType.value);
-		headers.put("memo", memo);
-		logger.info("发送派奖JMS.TuserPrizeDetailId:" + userPrizeDetail.getId());
-		sendActivityPrizeProducer.sendBodyAndHeaders(null, headers);
-	}
-
 }

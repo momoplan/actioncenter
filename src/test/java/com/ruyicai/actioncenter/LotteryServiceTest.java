@@ -31,7 +31,7 @@ public class LotteryServiceTest {
 		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno("00000717");
 		System.out.println(tuserinfo);
 		Boolean flag = lotteryService.directChargeProcess(tuserinfo.getUserno(), new BigDecimal(100000),
-				tuserinfo.getSubChannel(), tuserinfo.getChannel(), null);
+				tuserinfo.getSubChannel(), tuserinfo.getChannel(), null, "", "");
 		Assert.assertEquals(flag, true);
 	}
 

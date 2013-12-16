@@ -3,12 +3,9 @@ package com.ruyicai.actioncenter.jms.listener;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.Body;
-import org.apache.camel.Produce;
-import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.dao.TactivityDao;
-import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.FirstOrder;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
-import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
 import com.ruyicai.actioncenter.service.LotteryService;
+import com.ruyicai.actioncenter.service.SendActivityPrizeJms;
 import com.ruyicai.actioncenter.service.UserExperienceService;
 import com.ruyicai.actioncenter.util.DateUtil;
 import com.ruyicai.actioncenter.util.JsonUtil;
@@ -38,19 +34,16 @@ public class OrderAfterBetListener {
 
 	@Autowired
 	private LotteryService lotteryService;
-	
+
 	@Autowired
 	private TactivityDao tactivityDao;
 
 	@Autowired
-	private TuserPrizeDetailDao tuserPrizeDetailDao;
-
-	@Produce(uri = "jms:topic:sendActivityPrize")
-	private ProducerTemplate sendActivityPrizeProducer;
+	private SendActivityPrizeJms sendActivityPrizeJms;
 
 	@Value("${ruyicaiUserno}")
 	private String ruyicaiUserno;
-	
+
 	@Autowired
 	private UserExperienceService userExperienceService;
 
@@ -82,13 +75,13 @@ public class OrderAfterBetListener {
 		} catch (Exception e) {
 			logger.error("广东快乐十分首单活动异常", e);
 		}
-		
-//		try {
-//			logger.info("→→→→→→→→→→→→→→→→→增加用户体验官投票次数");
-//			addUserExperienceVoteTime(order.getUserno(), order.getAmt());
-//		} catch (Exception e) {
-//			logger.error("增加用户体验官投票次数出错", e);
-//		}
+
+		// try {
+		// logger.info("→→→→→→→→→→→→→→→→→增加用户体验官投票次数");
+		// addUserExperienceVoteTime(order.getUserno(), order.getAmt());
+		// } catch (Exception e) {
+		// logger.error("增加用户体验官投票次数出错", e);
+		// }
 	}
 
 	@Transactional
@@ -129,8 +122,8 @@ public class OrderAfterBetListener {
 					fo.persist();
 					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.First_Order)) {
 						logger.info(ActionJmsType.First_Order.memo + "prize:" + prize.longValue());
-						sendPrize2UserJMS(tuserinfo.getUserno(), new BigDecimal(prize), ActionJmsType.First_Order,
-								order.getId(), tactivity.getMemo());
+						sendActivityPrizeJms.sendPrize2UserJMS(tuserinfo.getUserno(), new BigDecimal(prize),
+								ActionJmsType.First_Order, tactivity.getMemo(), order.getId(), "", "");
 					}
 				}
 			}
@@ -159,8 +152,8 @@ public class OrderAfterBetListener {
 					if (prize.compareTo(BigDecimal.ZERO) > 0) {
 						if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Friday_SSQ_ZENGSONG)) {
 							logger.info(ActionJmsType.Friday_SSQ_ZENGSONG.memo + "prize:" + prize.longValue());
-							sendPrize2UserJMS(tuserinfo.getUserno(), prize, ActionJmsType.Friday_SSQ_ZENGSONG,
-									order.getId(), tactivity.getMemo());
+							sendActivityPrizeJms.sendPrize2UserJMS(tuserinfo.getUserno(), prize,
+									ActionJmsType.Friday_SSQ_ZENGSONG, tactivity.getMemo(), order.getId(), "", "");
 						}
 					}
 				}
@@ -168,18 +161,6 @@ public class OrderAfterBetListener {
 		}
 	}
 
-	@Transactional
-	public void sendPrize2UserJMS(String userno, BigDecimal amt, ActionJmsType actionJmsType, String businessId,
-			String memo) {
-		TuserPrizeDetail userPrizeDetail = tuserPrizeDetailDao.createTprizeUserBuyLog(userno, amt, actionJmsType,
-				businessId);
-		Map<String, Object> headers = new HashMap<String, Object>();
-		headers.put("prizeDetailId", userPrizeDetail.getId());
-		headers.put("actionJmsType", actionJmsType.value);
-		headers.put("memo", memo);
-		sendActivityPrizeProducer.sendBodyAndHeaders(null, headers);
-	}
-	
 	@Transactional
 	public void addUserExperienceVoteTime(String userno, BigDecimal amt) {
 		userExperienceService.addAvailableVoteTimesByBuyAMT(userno, amt.divide(new BigDecimal(200)).intValue());
