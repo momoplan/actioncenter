@@ -35,10 +35,12 @@ public class SuningRegisterListener {
 	private SendActivityPrizeJms sendActivityPrizeJms;
 
 	public void userCreatedCustomer(@Body String userInfoJson) {
+		logger.info("用户信息创建:" + userInfoJson);
 		suningRegisterAction(userInfoJson);
 	}
 
 	public void userModifyCustomer(@Body String userInfoJson) {
+		logger.info("用户信息修改:" + userInfoJson);
 		suningRegisterAction(userInfoJson);
 		try {
 			firstCharge(userInfoJson);
@@ -95,6 +97,8 @@ public class SuningRegisterListener {
 				sendActivityPrizeJms.sendPrize2UserJMS(tuserinfo.getUserno(), new BigDecimal(prizeamt),
 						ActionJmsType.FIRST_CHONGZHI_ZENGSONG, tactivity.getMemo(), fcu.getTtransactionid(), "",
 						fcu.getTtransactionid());
+			} else {
+				logger.info("首次充值用户信息修改手机号未完善userno:" + userno);
 			}
 		}
 	}
