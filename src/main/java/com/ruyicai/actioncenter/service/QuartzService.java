@@ -26,4 +26,13 @@ public class QuartzService implements Serializable {
 		fund2DrawService.quartzFindFund2Draw();
 	}
 
+	/**
+	 * 定时执行增加延迟赠送金额
+	 */
+	public void scheduleFirstChargeDelaySend() {
+		logger.info("定时执行首次充值赠送延迟赠送金额" + DateUtil.format(new Date()));
+		FirstChargeDelaySendService fcdsService = SpringUtils.getBean(FirstChargeDelaySendService.class);
+		fcdsService.sendFirstChargeDelay();
+	}
+
 }

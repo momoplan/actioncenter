@@ -91,7 +91,7 @@ public class TactivityDao {
 	}
 
 	/**
-	 * 查询有效的活动
+	 * 查询有效的活动,不满足活动条件的返回NULL
 	 * 
 	 * @param lotno
 	 *            彩种,不需要的传Null

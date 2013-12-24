@@ -31,7 +31,8 @@ public enum ActionJmsType {
 	AddNum15(21,"追号满15期赠送"),
 	Fund2Draw(22,"增加可提现金额"),
 	First_Order(23,"广东快乐十分首单赠送"),
-	Coupon(24,"兑换券赠送彩金");
+	Coupon(24,"兑换券赠送彩金"),
+	FIRST_CHONGZHI_ZENGSONG_20(25, "首次充值赠送");
 
 	public int value;
 

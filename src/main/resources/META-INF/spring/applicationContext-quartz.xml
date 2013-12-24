@@ -37,4 +37,20 @@
 			<value>0 0/20 * * * ?</value>
 		</property>
 	</bean>
+
+	<bean id="sendChargeDelaySendDetail1"
+		class="frameworkx.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="quartzService" />
+		<property name="targetMethod" value="scheduleFirstChargeDelaySend" />
+		<property name="shouldRecover" value="false" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="sendChargeDelaySendTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="sendChargeDelaySendDetail1" />
+		</property>
+		<property name="cronExpression">
+			<value>0 0 9 15 * ?</value>
+		</property>
+	</bean>
 </beans>

@@ -18,6 +18,7 @@ import com.ruyicai.actioncenter.dao.Fund2DrawDao;
 import com.ruyicai.actioncenter.dao.TactivityDao;
 import com.ruyicai.actioncenter.dao.VipUserDao;
 import com.ruyicai.actioncenter.domain.Chong20Mobile;
+import com.ruyicai.actioncenter.domain.FirstChargeDelaySend;
 import com.ruyicai.actioncenter.domain.FirstChargeUser;
 import com.ruyicai.actioncenter.domain.Fund2Draw;
 import com.ruyicai.actioncenter.domain.OldUserChongZhi;
@@ -74,7 +75,8 @@ public class TactionService {
 				save2cashTransaction(ttransactionid, userno, amt);
 			}
 		} catch (Exception e) {
-			logger.error("充值可提现功能异常  userno:" + userno + ",amt:" + amtLong + ",actionJmsType:" + actionJmsType, e);
+			logger.error("充值可提现功能异常 ttransactionid:" + ttransactionid + ",userno:" + userno + ",amt:" + amtLong
+					+ ",actionJmsType:" + actionJmsType, e);
 		}
 
 		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
@@ -91,6 +93,8 @@ public class TactionService {
 				chongzhiManBaiZengSong(ttransactionid, ladderpresentflag, tuserinfo, amt);
 				/** 第一次充值活动 */
 				firshChongzhiZengSong(ttransactionid, tuserinfo, amt);
+				/** 第一次充值活动冲20送20 */
+				firshChongzhiZengSong20(ttransactionid, tuserinfo, amt);
 				/** 2013.5.1老用户充值赠送 */
 				oldUserZengSong(ttransactionid, tuserinfo, amt);
 			}
@@ -314,6 +318,89 @@ public class TactionService {
 				} else {
 					logger.info("首次充值赠送活动未开启");
 				}
+			}
+		}
+		logger.info("第一次充值结束");
+		return flag;
+	}
+
+	public static void main(String[] args) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.MONTH, 1);
+		calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 15, 8, 0, 0);
+		System.out.println(DateUtil.format(calendar.getTime()));
+		calendar.add(Calendar.MONTH, 1);
+		System.out.println(DateUtil.format(calendar.getTime()));
+	}
+
+	@Transactional
+	public Boolean firshChongzhiZengSong20(String ttransactionid, Tuserinfo tuserinfo, BigDecimal amt) {
+		logger.info("第一次充值20送20开始");
+		Boolean flag = false;
+		if (tuserinfo.getSubChannel().equals("984") || tuserinfo.getSubChannel().equals("985")) {
+			logger.info("U付如意彩用户不参与活动,user:" + tuserinfo.getUserno());
+			return flag;
+		}
+		if (tuserinfo != null) {
+			Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+					ActionJmsType.FIRST_CHONGZHI_ZENGSONG_20.value);
+			if (tactivity != null) {
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Date regtime = tuserinfo.getRegtime();
+				String regtimeStr = DateUtil.format("yyyyMMdd", regtime);
+				String todayStr = DateUtil.format("yyyyMMdd", new Date());
+				Integer step = (Integer) activity.get("step");
+				Integer prizeamt = (Integer) activity.get("prizeamt");
+				if (amt.compareTo(new BigDecimal(step)) >= 0 && regtimeStr.equals(todayStr)) {
+					Integer count = lotteryService.findTtransaction(tuserinfo.getUserno());
+					if (count == 1 || count == null) {
+						if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {
+							Chong20Mobile chong20Mobile = Chong20Mobile.findChong20Mobile(tuserinfo.getMobileid());
+							if (chong20Mobile == null) {
+								logger.info("第一次充值赠送,userno:{},amt:{},prizeamt:{}",
+										new String[] { tuserinfo.getUserno(), amt + "", prizeamt + "" });
+								Chong20Mobile.createChong20Mobile(tuserinfo.getMobileid(), tuserinfo.getUserno());
+								sendActivityPrizeJms.sendPrize2UserJMS(tuserinfo.getUserno(), new BigDecimal(prizeamt),
+										ActionJmsType.FIRST_CHONGZHI_ZENGSONG_20, tactivity.getMemo(), ttransactionid,
+										"", ttransactionid);
+								// 增加延迟赠送记录
+								Calendar calendar = Calendar.getInstance();
+								calendar.add(Calendar.MONTH, 1);
+								calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 15, 8, 0, 0);
+								FirstChargeDelaySend.createFirstChargeDelaySend(tuserinfo.getUserno(), new BigDecimal(
+										500), tactivity.getMemo(), calendar.getTime(), ttransactionid);
+								calendar.add(Calendar.MONTH, 1);
+								FirstChargeDelaySend.createFirstChargeDelaySend(tuserinfo.getUserno(), new BigDecimal(
+										500), tactivity.getMemo(), calendar.getTime(), ttransactionid);
+								flag = true;
+							} else {
+								logger.info("第一次充值活动,用户手机号已赠送过.mobileid:{}amt:{},user:{}",
+										new String[] { tuserinfo.getMobileid(), amt + "", tuserinfo.toString() });
+							}
+						} else {
+							logger.info("第一次充值活动,用户信息未完善.amt:{},user:{}",
+									new String[] { amt + "", tuserinfo.toString() });
+							FirstChargeUser fcu = FirstChargeUser.findFirstChargeUser(tuserinfo.getUserno());
+							if (fcu == null) {
+								logger.info("创建FirstChargeUser等待用户完善信息userno:" + tuserinfo.getUserno()
+										+ ",ttransactionid:" + ttransactionid);
+								FirstChargeUser.createFirstChargeUser(tuserinfo.getUserno(), 0, ttransactionid);
+							} else {
+								logger.info("等待用户完善信息已创建userno:" + tuserinfo.getUserno() + ",ttransactionid:"
+										+ ttransactionid);
+							}
+						}
+					} else {
+						logger.info("不是第一次充值，不参加活动.userno:{},amt:{},count:{}", new String[] { tuserinfo.getUserno(),
+								amt + "", count + "" });
+					}
+				} else {
+					logger.info("第一次充值，不满足条件.userno:{},amt:{},sep:{},regtime,{}", new String[] { tuserinfo.getUserno(),
+							amt + "", step + "", regtimeStr });
+				}
+			} else {
+				logger.info("首次充值赠送活动未开启");
 			}
 		}
 		logger.info("第一次充值结束");
