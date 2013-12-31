@@ -20,7 +20,7 @@
 				<!-- 增加用户可提现 -->
 				<ref bean="fund2DrawTrigger" />
 				<!-- 冲20送20每月15号赠送5元 -->
-				<ref bean="sendChargeDelaySendDetail1" />
+				<ref bean="sendChargeDelaySendTrigger" />
 			</list>
 		</property>
 	</bean>
