@@ -454,7 +454,7 @@ public class TactionService {
 			if (!tuserinfo.getSubChannel().equals("00092493")) {
 				return flag;
 			}
-			if (!Tjmsservice.createTjmsservice(businessId, ActionJmsType.VIP_USER_GOUCAI_ZENGSONG)) {
+			if (!Tjmsservice.createTjmsservice(businessId + businessType, ActionJmsType.VIP_USER_GOUCAI_ZENGSONG)) {
 				return flag;
 			}
 			// 增加vip购彩金额
