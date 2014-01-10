@@ -447,18 +447,22 @@ public class TactionService {
 
 	public Boolean vipCase(Tuserinfo tuserinfo, BigDecimal amt, String businessId, Integer businessType) {
 		Boolean flag = false;
-		logger.info("VIP购彩活动开始");
-		if (!tuserinfo.getSubChannel().equals("00092493")) {
-			return flag;
+		Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+				ActionJmsType.VIP_USER_GOUCAI_ZENGSONG.value);
+		if (tactivity != null) {
+			logger.info("VIP购彩活动开始,businessId:" + businessId);
+			if (!tuserinfo.getSubChannel().equals("00092493")) {
+				return flag;
+			}
+			if (!Tjmsservice.createTjmsservice(businessId, ActionJmsType.VIP_USER_GOUCAI_ZENGSONG)) {
+				return flag;
+			}
+			// 增加vip购彩金额
+			this.doAddVipUserBuyAmount(tuserinfo, amt);
+			// 查找大用户购彩活动并且赠送彩金
+			flag = this.doFindActivityAndPresent(tuserinfo, amt, businessId);
+			logger.info("VIP购彩活动结束");
 		}
-
-		// 增加vip购彩金额
-		this.doAddVipUserBuyAmount(tuserinfo, amt);
-
-		// 查找大用户购彩活动并且赠送彩金
-		flag = this.doFindActivityAndPresent(tuserinfo, amt, businessId);
-
-		logger.info("VIP购彩活动结束");
 		return flag;
 	}
 
