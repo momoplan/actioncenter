@@ -14,6 +14,7 @@ import com.ruyicai.actioncenter.service.LotteryService;
 import com.ruyicai.actioncenter.service.UserExperienceService;
 import com.ruyicai.lottery.domain.CaseLot;
 import com.ruyicai.lottery.domain.CaseLotBuy;
+import com.ruyicai.lottery.domain.Tuserinfo;
 
 @Service
 public class CaselotFinishListener {
@@ -26,15 +27,17 @@ public class CaselotFinishListener {
 	@Autowired
 	private UserExperienceService userExperienceService;
 	
+	@Autowired
+	private OrderAfterBetListener orderAfterBetListener;
+	
 	@Transactional
 	public void caselotFinishCustomer(@Body String caseLotJson) {
 		logger.info("合买结期 caseLotJson:" + caseLotJson);
 		CaseLot caseLot = CaseLot.fromJsonToCaseLot(caseLotJson);
-		try {
-			addUserExperienceVoteTime(caseLot.getId());	//增加用户体验官用户投票次数
-		} catch (Exception e) {
-			logger.error("增加用户体验官投票次数出错", e);
-		}
+//		addUserExperienceVoteTime(caseLot.getId());	//增加用户体验官用户投票次数
+		
+		//合买期截 增加用户购彩金额、返点
+		this.addVipCase(caseLot);
 	}
 	
 	@Transactional
@@ -45,4 +48,17 @@ public class CaselotFinishListener {
 			userExperienceService.addAvailableVoteTimesByBuyAMT(buy.getUserno(), buy.getNum().divide(new BigDecimal(200)).intValue());
 		}
 	}
+	
+	public void addVipCase(CaseLot caselot) {
+		List<CaseLotBuy> list = lotteryService.selectCaseLotBuysWithOutPage(caselot.getId());
+		for (CaseLotBuy caselotBuy : list) {
+			Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(caselotBuy.getUserno());
+			if (tuserinfo == null) {
+				return;
+			}
+			orderAfterBetListener.vipCase(tuserinfo, caselotBuy.getNum(), caselotBuy.getId().toString());
+		}
+	}
+	
+	
 }
