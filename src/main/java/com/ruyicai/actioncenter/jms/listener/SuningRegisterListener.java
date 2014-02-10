@@ -73,6 +73,10 @@ public class SuningRegisterListener {
 				ActionJmsType.FIRST_CHONGZHI_ZENGSONG.value);
 		if (tactivity != null) {
 			logger.info("首次充值用户信息修改userno:" + userno);
+			if (StringUtils.isBlank(tuserinfo.getCertid())) {
+				logger.info("第一次充值活动，用户未绑定身份证号 userno:" + userno);
+				return ;
+			}
 			if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {
 				Chong20Mobile chong20Mobile = Chong20Mobile.findChong20Mobile(tuserinfo.getMobileid());
 				if (chong20Mobile != null) {
@@ -127,6 +131,10 @@ public class SuningRegisterListener {
 				ActionJmsType.FIRST_CHONGZHI_ZENGSONG_20.value);
 		if (tactivity != null) {
 			logger.info("首次充值用户信息修改userno:" + userno);
+			if (StringUtils.isBlank(tuserinfo.getCertid())) {
+				logger.info("第一次充值活动，用户未绑定身份证号 userno:" + userno);
+				return ;
+			}
 			if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {
 				Chong20Mobile chong20Mobile = Chong20Mobile.findChong20Mobile(tuserinfo.getMobileid());
 				if (chong20Mobile != null) {
