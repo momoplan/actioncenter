@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.dao.Fund2DrawDao;
 import com.ruyicai.actioncenter.dao.TactivityDao;
-import com.ruyicai.actioncenter.dao.VipUserDao;
 import com.ruyicai.actioncenter.domain.Chong20Mobile;
 import com.ruyicai.actioncenter.domain.FirstChargeDelaySend;
 import com.ruyicai.actioncenter.domain.FirstChargeUser;
@@ -45,9 +44,6 @@ public class TactionService {
 
 	@Autowired
 	private TactivityDao tactivityDao;
-
-	@Autowired
-	private VipUserDao vipUserDao;
 
 	@Autowired
 	private SendActivityPrizeJms sendActivityPrizeJms;

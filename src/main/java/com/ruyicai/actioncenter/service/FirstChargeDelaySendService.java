@@ -27,6 +27,8 @@ public class FirstChargeDelaySendService {
 				if (fcds != null && fcds.getSendState() == 0) {
 					sendActivityPrizeJms.sendPrize2UserJMS(fcds.getUserno(), fcds.getAmt(),
 							ActionJmsType.FIRST_CHONGZHI_ZENGSONG_20, fcds.getMemo(), fcds.getBusinessId(), null, null);
+					fcds.setSendState(1);
+					fcds.merge();
 				}
 			} catch (Exception e) {
 				logger.error("赠送首次充值延迟金额异常:" + fcds, e);
