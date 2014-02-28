@@ -66,6 +66,39 @@ public class DispatchCaseLotFinishListener {
 		addPrize2Chuan1(caseLot, torder, userInfo);
 		addPrizeLanQiu(caseLot, torder, userInfo);
 		addPrizeJingcai2chuan1(caseLot, torder, userInfo);
+		addPrize3D(caseLot, torder, userInfo);
+	}
+	
+	@Transactional
+	public void addPrize3D(CaseLot caseLot, Torder order, Tuserinfo tuserinfo) {
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(),
+				tuserinfo.getSubChannel(), null, ActionJmsType.FuCai3D_JiaJiang.value);
+		if (tactivity != null) {
+			String caselotId = caseLot.getId();
+			Integer caselotprize = lotteryService.findCaseLotBuyAllPrizeamtById(caselotId, tuserinfo.getUserno());
+			if (caselotprize > 0) {
+				BigDecimal prize = BigDecimal.ZERO;
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Integer step = (Integer) activity.get("step");
+				Integer prizeamt = (Integer) activity.get("prizeamt");
+				Integer topprize = (Integer) activity.get("topprize");
+				int multiple = caselotprize / step;
+				if (multiple > 0) {
+					prize = new BigDecimal(multiple * prizeamt);
+				}
+				if (prize.compareTo(new BigDecimal(topprize)) > 0) {
+					prize = new BigDecimal(topprize);
+				}
+				if (prize.compareTo(BigDecimal.ZERO) > 0) {
+					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.FuCai3D_JiaJiang)) {
+						logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
+						sendActivityPrizeJms.sendPrize2UserJMS(tuserinfo.getUserno(), prize,
+								ActionJmsType.FuCai3D_JiaJiang, tactivity.getMemo(), order.getId(), "", "");
+					}
+				}
+			}
+		}
 	}
 
 	@Transactional
