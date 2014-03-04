@@ -74,8 +74,7 @@ public class DispatchCaseLotFinishListener {
 		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(),
 				tuserinfo.getSubChannel(), null, ActionJmsType.FuCai3D_JiaJiang.value);
 		if (tactivity != null) {
-			String caselotId = caseLot.getId();
-			Integer caselotprize = lotteryService.findCaseLotBuyAllPrizeamtById(caselotId, tuserinfo.getUserno());
+			int caselotprize = caseLot.getWinPreAmt().intValue();
 			if (caselotprize > 0) {
 				BigDecimal prize = BigDecimal.ZERO;
 				String express = tactivity.getExpress();
