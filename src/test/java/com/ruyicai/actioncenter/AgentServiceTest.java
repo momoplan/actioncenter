@@ -39,7 +39,7 @@ public class AgentServiceTest {
 
 	@Autowired
 	MemcachedService<Tagent> memcachedService;
-	
+
 	@Autowired
 	TactivityDao tactivityDao;
 
@@ -67,15 +67,18 @@ public class AgentServiceTest {
 		goucaiActivity.put("prizeamt", 200);
 		goucaiActivity.put("effectiveTime", "2011-1-1 00:00:00");
 		String jsonGoucai = JsonUtil.toJson(goucaiActivity);
-		tactivityDao.saveOrUpdate(null, null, "00092493", "545", ActionJmsType.GOUCAI_SUCCESS.value, jsonGoucai, 1, null);
-		tactivityDao.saveOrUpdate(null, null, "00092493", "651", ActionJmsType.GOUCAI_SUCCESS.value, jsonGoucai, 1, null);
+		tactivityDao.saveOrUpdate(null, null, "00092493", "545", ActionJmsType.GOUCAI_SUCCESS.value, jsonGoucai, 1,
+				null);
+		tactivityDao.saveOrUpdate(null, null, "00092493", "651", ActionJmsType.GOUCAI_SUCCESS.value, jsonGoucai, 1,
+				null);
 	}
 
 	@Test
 	public void testFundJmsListener() throws InterruptedException {
-		fundJmsListener
-				.fundJmsCustomer(null, 0L, "00000619", 10000L, ActionJmsType.CHONGZHI_SUCCESS.value, "123456", 1);
-		fundJmsListener.fundJmsCustomer(null, 0L, "00000619", 2000L, ActionJmsType.GOUCAI_SUCCESS.value, "111111", 3);
+		fundJmsListener.fundJmsCustomer(null, 0L, "00000619", 10000L, ActionJmsType.CHONGZHI_SUCCESS.value, "123456",
+				1, null);
+		fundJmsListener.fundJmsCustomer(null, 0L, "00000619", 2000L, ActionJmsType.GOUCAI_SUCCESS.value, "111111", 3,
+				null);
 		Thread.sleep(1000 * 5);
 		memcachedService.flushAll();
 	}

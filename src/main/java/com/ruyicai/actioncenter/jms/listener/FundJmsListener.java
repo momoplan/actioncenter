@@ -15,9 +15,9 @@ public class FundJmsListener {
 	public void fundJmsCustomer(@Header("TTRANSACTIONID") String ttransactionid,
 			@Header("LADDERPRESENTFLAG") Long ladderpresentflag, @Header("USERNO") String userno,
 			@Header("AMT") Long amt, @Header("TYPE") Integer type, @Header("BUSINESSID") String businessId,
-			@Header("BUSINESSTYPE") Integer businessType) {
+			@Header("BUSINESSTYPE") Integer businessType,@Header("BANKID") String bankid) {
 		actionService.processFundJMSCustomer(ttransactionid, ladderpresentflag, userno, amt, type, businessId,
-				businessType);
+				businessType,bankid);
 	}
 
 }

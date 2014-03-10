@@ -55,7 +55,7 @@ public class TactionService {
 	private Fund2DrawDao fund2DrawDao;
 
 	public void processFundJMSCustomer(String ttransactionid, Long ladderpresentflag, String userno, Long amtLong,
-			Integer actionJmsType, String businessId, Integer businessType) {
+			Integer actionJmsType, String businessId, Integer businessType, String bankid) {
 		logger.info(
 				"processFundJMSCustomer  userno:{},amt:{},actionJmsType:{},ttransactionid:{},ladderpresentflag:{},businessId:{},businessType:{}",
 				new String[] { userno, amtLong.toString(), actionJmsType + "", ttransactionid, ladderpresentflag + "",
@@ -67,7 +67,17 @@ public class TactionService {
 		try {
 			if (actionJmsType == ActionJmsType.CHONGZHI_SUCCESS.value) {
 				/** 充值可提现功能 */
-				save2cashTransaction(ttransactionid, userno, amt);
+				if (bankid != null) {
+					if (bankid.equalsIgnoreCase("gyj001") || bankid.equalsIgnoreCase("szf001")
+							|| bankid.equalsIgnoreCase("ump002")) {
+						logger.info("不可提现充值userno:{},ttransactionid:{},bankid:{}", new String[] { userno,
+								ttransactionid, bankid });
+					} else {
+						save2cashTransaction(ttransactionid, userno, amt);
+					}
+				} else {
+					save2cashTransaction(ttransactionid, userno, amt);
+				}
 			}
 		} catch (Exception e) {
 			logger.error("充值可提现功能异常 ttransactionid:" + ttransactionid + ",userno:" + userno + ",amt:" + amtLong
@@ -96,7 +106,7 @@ public class TactionService {
 			if (actionJmsType == ActionJmsType.GOUCAI_SUCCESS.value) {
 				logger.info("购彩成功事件");
 				/** vip 购彩 活动 */
-//				vipCase(tuserinfo, amt, businessId, businessType);
+				// vipCase(tuserinfo, amt, businessId, businessType);
 			}
 		} catch (Exception e) {
 			logger.error("活动异常  userno:" + userno + ",amt:" + amtLong + ",actionJmsType:" + actionJmsType, e);
@@ -439,9 +449,6 @@ public class TactionService {
 		logger.info("91购彩活动结束");
 		return flag;
 	}
-
-
-	
 
 	@Transactional
 	public Boolean chargeCase(Tagent tagent, BigDecimal amt) {

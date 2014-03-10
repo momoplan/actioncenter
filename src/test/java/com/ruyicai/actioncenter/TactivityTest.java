@@ -43,7 +43,7 @@ public class TactivityTest {
 
 	@Autowired
 	TuserPrizeDetailDao tuserPrizeDetailDao;
-	
+
 	@Autowired
 	TactivityDao tactivityDao;
 
@@ -91,13 +91,13 @@ public class TactivityTest {
 	@Test
 	public void testFundJmsListener() {
 		fundJmsListener.fundJmsCustomer(null, 0L, "00000619", 2000L, ActionJmsType.CHONGZHI_SUCCESS.value, "22222222",
-				1);
+				1, "111");
 	}
 
 	@Test
 	public void testChongZhiJmsListener() {
 		fundJmsListener.fundJmsCustomer(null, 0L, "00000193", 500000L, ActionJmsType.GOUCAI_SUCCESS.value,
-				"3333333333333333", 3);
+				"3333333333333333", 3, null);
 	}
 
 	@Test
