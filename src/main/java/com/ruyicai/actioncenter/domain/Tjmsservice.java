@@ -8,7 +8,6 @@ import javax.persistence.Column;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.tostring.RooToString;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 
@@ -32,7 +31,6 @@ public class Tjmsservice {
 		return tjmsservice;
 	}
 
-	@Transactional
 	public static boolean createTjmsservice(String value, ActionJmsType actionJmsType) {
 		TjmsservicePK id = new TjmsservicePK(value, actionJmsType.decimal());
 		Tjmsservice tjmsservice = Tjmsservice.findTjmsservice(id);

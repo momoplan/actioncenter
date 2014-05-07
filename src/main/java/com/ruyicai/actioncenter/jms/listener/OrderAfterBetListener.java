@@ -39,10 +39,9 @@ public class OrderAfterBetListener {
 
 	@Autowired
 	private TactivityDao tactivityDao;
-	
+
 	@Autowired
 	private VipUserDao vipUserDao;
-
 
 	@Autowired
 	private SendActivityPrizeJms sendActivityPrizeJms;
@@ -82,31 +81,33 @@ public class OrderAfterBetListener {
 			logger.error("广东快乐十分首单活动异常", e);
 		}
 
-		// try {
-		// logger.info("→→→→→→→→→→→→→→→→→增加用户体验官投票次数");
-		// addUserExperienceVoteTime(order.getUserno(), order.getAmt());
-		// } catch (Exception e) {
-		// logger.error("增加用户体验官投票次数出错", e);
-		// }
-		
-		//普通投注 增加用户购彩金额、返点
+		// 普通投注 增加用户购彩金额、返点
 		this.vipCase(tuserinfo, order.getAmt(), order.getId());
 	}
-	
+
+	@Transactional
 	public Boolean vipCase(Tuserinfo tuserinfo, BigDecimal amt, String businessId) {
 		Boolean flag = false;
 		logger.info("VIP购彩活动开始,businessId:" + businessId + " userno:" + tuserinfo.getUserno() + " amt:" + amt);
-		if (!tuserinfo.getSubChannel().equals("00092493")) {
-			return flag;
+		try {
+			if (!tuserinfo.getSubChannel().equals("00092493")) {
+				return flag;
+			}
+			if (!Tjmsservice.createTjmsservice(businessId, ActionJmsType.VIP_USER_GOUCAI_ZENGSONG)) {
+				logger.info("大客户赠送已重复 businessId:" + businessId + " userno:" + tuserinfo.getUserno());
+				return false;
+			}
+			// 增加vip购彩金额
+			this.doAddVipUserBuyAmount(tuserinfo, amt);
+			// 查找大用户购彩活动并且赠送彩金
+			flag = this.doFindActivityAndPresent(tuserinfo, amt, businessId);
+			logger.info("VIP购彩活动结束");
+		} catch (Exception e) {
+			logger.error("VIP购彩活动异常", e);
 		}
-		// 增加vip购彩金额
-		this.doAddVipUserBuyAmount(tuserinfo, amt);
-		// 查找大用户购彩活动并且赠送彩金
-		flag = this.doFindActivityAndPresent(tuserinfo, amt, businessId);
-		logger.info("VIP购彩活动结束");
 		return flag;
 	}
-	
+
 	/**
 	 * 增加本月用户购彩金额
 	 * 
@@ -166,10 +167,6 @@ public class OrderAfterBetListener {
 						logger.info("大客户userno:{},时间:{},总购彩金额:{},本次购彩:{},赠送金额:{}", new String[] {
 								lastMonthVipUser.getId().getUserno(), lastMonthVipUser.getId().getYearAndMonth(),
 								lastMonthVipUser.getBuyamt() + "", amt + "", prizeamt + "" });
-						if (!Tjmsservice.createTjmsservice(businessId, ActionJmsType.VIP_USER_GOUCAI_ZENGSONG)) {
-							logger.info("大客户赠送已重复 businessId:" + businessId + " userno:" + tuserinfo.getUserno());
-							return false;
-						}
 						sendActivityPrizeJms.sendPrize2UserJMS(tuserinfo.getUserno(), prizeamt,
 								ActionJmsType.VIP_USER_GOUCAI_ZENGSONG, tactivity.getMemo(), businessId, "", "");
 					}

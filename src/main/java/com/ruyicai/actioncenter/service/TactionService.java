@@ -103,11 +103,6 @@ public class TactionService {
 				/** 2013.5.1老用户充值赠送 */
 				oldUserZengSong(ttransactionid, tuserinfo, amt);
 			}
-			if (actionJmsType == ActionJmsType.GOUCAI_SUCCESS.value) {
-				logger.info("购彩成功事件");
-				/** vip 购彩 活动 */
-				// vipCase(tuserinfo, amt, businessId, businessType);
-			}
 		} catch (Exception e) {
 			logger.error("活动异常  userno:" + userno + ",amt:" + amtLong + ",actionJmsType:" + actionJmsType, e);
 		}
