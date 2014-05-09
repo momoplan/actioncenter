@@ -16,11 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.dao.TactivityDao;
-import com.ruyicai.actioncenter.dao.VipUserDao;
 import com.ruyicai.actioncenter.domain.FirstOrder;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
-import com.ruyicai.actioncenter.domain.VipUser;
 import com.ruyicai.actioncenter.service.LotteryService;
 import com.ruyicai.actioncenter.service.SendActivityPrizeJms;
 import com.ruyicai.actioncenter.service.UserExperienceService;
@@ -39,9 +37,6 @@ public class OrderAfterBetListener {
 
 	@Autowired
 	private TactivityDao tactivityDao;
-
-	@Autowired
-	private VipUserDao vipUserDao;
 
 	@Autowired
 	private SendActivityPrizeJms sendActivityPrizeJms;
@@ -80,103 +75,6 @@ public class OrderAfterBetListener {
 		} catch (Exception e) {
 			logger.error("广东快乐十分首单活动异常", e);
 		}
-
-		// 普通投注 增加用户购彩金额、返点
-		this.vipCase(tuserinfo, order.getAmt(), order.getId());
-	}
-
-	@Transactional
-	public Boolean vipCase(Tuserinfo tuserinfo, BigDecimal amt, String businessId) {
-		Boolean flag = false;
-		logger.info("VIP购彩活动开始,businessId:" + businessId + " userno:" + tuserinfo.getUserno() + " amt:" + amt);
-		try {
-			if (!tuserinfo.getSubChannel().equals("00092493")) {
-				return flag;
-			}
-			if (!Tjmsservice.createTjmsservice(businessId, ActionJmsType.VIP_USER_GOUCAI_ZENGSONG)) {
-				logger.info("大客户赠送已重复 businessId:" + businessId + " userno:" + tuserinfo.getUserno());
-				return false;
-			}
-			// 增加vip购彩金额
-			this.doAddVipUserBuyAmount(tuserinfo, amt);
-			// 查找大用户购彩活动并且赠送彩金
-			flag = this.doFindActivityAndPresent(tuserinfo, amt, businessId);
-			logger.info("VIP购彩活动结束");
-		} catch (Exception e) {
-			logger.error("VIP购彩活动异常", e);
-		}
-		return flag;
-	}
-
-	/**
-	 * 增加本月用户购彩金额
-	 * 
-	 * @param tuserinfo
-	 *            用户
-	 * @param amt
-	 *            购彩金额
-	 */
-	@Transactional
-	public void doAddVipUserBuyAmount(Tuserinfo tuserinfo, BigDecimal amt) {
-		String currentMonth = DateUtil.format("yyyy-MM", new Date());
-		if (tuserinfo != null) {
-			VipUser vipUser = vipUserDao.findVipUser(tuserinfo.getUserno(), currentMonth, true);
-			if (vipUser == null) {
-				vipUser = vipUserDao.createVipUser(tuserinfo.getUserno(), currentMonth);
-			}
-			if (vipUser != null) {
-				vipUser.setBuyamt(vipUser.getBuyamt() == null ? amt : vipUser.getBuyamt().add(amt));
-				vipUser.setModifyTime(new Date());
-				vipUserDao.merge(vipUser);
-				logger.info("大客户userno:{},增加购买金额{}", new String[] { tuserinfo.getUserno(), amt + "" });
-			}
-		}
-	}
-
-	/**
-	 * 查找大户购彩赠送活动，符合条件的用户赠送彩金
-	 * 
-	 * @param tuserinfo
-	 *            用户
-	 * @param amt
-	 *            本次购彩金额
-	 * @param businessId
-	 * @return
-	 */
-	@Transactional
-	public Boolean doFindActivityAndPresent(Tuserinfo tuserinfo, BigDecimal amt, String businessId) {
-		Boolean flag = false;
-		if (tuserinfo != null) {
-			Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
-					ActionJmsType.VIP_USER_GOUCAI_ZENGSONG.value);
-			if (tactivity != null) {
-				String express = tactivity.getExpress();
-				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
-				Integer step = (Integer) activity.get("step");
-				Integer present = (Integer) activity.get("present");
-				Calendar calendar = Calendar.getInstance();
-
-				calendar.add(Calendar.MONTH, -1);
-				String lastMonth = DateUtil.format("yyyy-MM", calendar.getTime());
-				VipUser lastMonthVipUser = vipUserDao.findVipUser(tuserinfo.getUserno(), lastMonth);
-				if (lastMonthVipUser != null && lastMonthVipUser.getBuyamt().compareTo(new BigDecimal(step)) >= 0) {
-					if (amt.compareTo(BigDecimal.ZERO) >= 0) {
-						flag = true;
-						BigDecimal prizeamt = amt.multiply(new BigDecimal(present)).divideToIntegralValue(
-								new BigDecimal(100));
-						logger.info("大客户userno:{},时间:{},总购彩金额:{},本次购彩:{},赠送金额:{}", new String[] {
-								lastMonthVipUser.getId().getUserno(), lastMonthVipUser.getId().getYearAndMonth(),
-								lastMonthVipUser.getBuyamt() + "", amt + "", prizeamt + "" });
-						sendActivityPrizeJms.sendPrize2UserJMS(tuserinfo.getUserno(), prizeamt,
-								ActionJmsType.VIP_USER_GOUCAI_ZENGSONG, tactivity.getMemo(), businessId, "", "");
-					}
-				} else {
-					logger.info("不满大户购彩赠送条件userno:" + tuserinfo.getUserno() + ",vipUser:"
-							+ (lastMonthVipUser == null ? "" : lastMonthVipUser));
-				}
-			}
-		}
-		return flag;
 	}
 
 	@Transactional

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.dao.Fund2DrawDao;
 import com.ruyicai.actioncenter.dao.TactivityDao;
+import com.ruyicai.actioncenter.dao.VipUserDao;
 import com.ruyicai.actioncenter.domain.Chong20Mobile;
 import com.ruyicai.actioncenter.domain.FirstChargeDelaySend;
 import com.ruyicai.actioncenter.domain.FirstChargeUser;
@@ -26,7 +27,7 @@ import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.TaddNumActivity;
 import com.ruyicai.actioncenter.domain.Tagent;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
-import com.ruyicai.actioncenter.domain.Tuseraction;
+import com.ruyicai.actioncenter.domain.VipUser;
 import com.ruyicai.actioncenter.exception.RuyicaiException;
 import com.ruyicai.actioncenter.util.DateUtil;
 import com.ruyicai.actioncenter.util.ErrorCode;
@@ -47,6 +48,9 @@ public class TactionService {
 
 	@Autowired
 	private SendActivityPrizeJms sendActivityPrizeJms;
+
+	@Autowired
+	private VipUserDao vipUserDao;
 
 	@Value("${addNumOneYearSwitch}")
 	private String addNumOneYearSwitch;
@@ -83,7 +87,6 @@ public class TactionService {
 			logger.error("充值可提现功能异常 ttransactionid:" + ttransactionid + ",userno:" + userno + ",amt:" + amtLong
 					+ ",actionJmsType:" + actionJmsType, e);
 		}
-
 		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
 		if (tuserinfo == null) {
 			return;
@@ -102,6 +105,10 @@ public class TactionService {
 				firshChongzhiZengSong20(ttransactionid, tuserinfo, amt);
 				/** 2013.5.1老用户充值赠送 */
 				oldUserZengSong(ttransactionid, tuserinfo, amt);
+			}
+			if (actionJmsType == ActionJmsType.GOUCAI_SUCCESS.value) {
+				logger.info("购彩成功事件");
+				vipCase(tuserinfo, amt, businessId);
 			}
 		} catch (Exception e) {
 			logger.error("活动异常  userno:" + userno + ",amt:" + amtLong + ",actionJmsType:" + actionJmsType, e);
@@ -408,44 +415,6 @@ public class TactionService {
 	}
 
 	@Transactional
-	public Boolean buyCase(String userno, BigDecimal amt) {
-		logger.info("91购彩活动开始");
-		Boolean flag = false;
-		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(userno);
-		if (tuserinfo != null) {
-			Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(),
-					tuserinfo.getChannel(), ActionJmsType.GOUCAI_SUCCESS.value);
-			if (tactivity != null) {
-				String express = tactivity.getExpress();
-				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
-				Integer totalamt = (Integer) activity.get("totalamt");
-				Integer prizeamt = (Integer) activity.get("prizeamt");
-				String time = (String) activity.get("effectiveTime");
-				Date effectiveTime = DateUtil.parse(time);
-				if (totalamt != null && prizeamt != null && effectiveTime != null) {
-					if (tuserinfo.getRegtime() == null) {
-						return flag;
-					}
-					if (tuserinfo.getRegtime().compareTo(effectiveTime) >= 0) {
-						Tuseraction tuseraction = Tuseraction.createIfNotExists(tuserinfo.getUserno(), amt);
-						if (tuseraction.getTotalBuyAmt().compareTo(new BigDecimal(totalamt)) >= 0) {
-							if (Tjmsservice.createTjmsservice(tuserinfo.getUserno(), ActionJmsType.GOUCAI_SUCCESS)) {
-								flag = true;
-								sendActivityPrizeJms.sendPrize2UserJMS(tuseraction.getUserno(),
-										new BigDecimal(prizeamt), ActionJmsType.GOUCAI_SUCCESS, tactivity.getMemo(),
-										"", "", "");
-							}
-						}
-					}
-				}
-
-			}
-		}
-		logger.info("91购彩活动结束");
-		return flag;
-	}
-
-	@Transactional
 	public Boolean chargeCase(Tagent tagent, BigDecimal amt) {
 		Boolean flag = false;
 		Tuserinfo tuserinfo = lotteryService.findTuserinfoByUserno(tagent.getUserno());
@@ -561,5 +530,99 @@ public class TactionService {
 		details.merge();
 		logger.info("领取成功 presentId:{},reciverUserno:{}", new String[] { details.getId(), details.getReciverUserno() });
 		return details;
+	}
+
+	@Transactional
+	public Boolean vipCase(Tuserinfo tuserinfo, BigDecimal amt, String businessId) {
+		Boolean flag = false;
+		logger.info("VIP购彩活动开始,businessId:" + businessId + " userno:" + tuserinfo.getUserno() + " amt:" + amt);
+		try {
+			if (!tuserinfo.getSubChannel().equals("00092493")) {
+				return flag;
+			}
+			// 查找大用户购彩活动并且赠送彩金
+			if (!Tjmsservice.createTjmsservice(businessId, ActionJmsType.VIP_USER_GOUCAI_ZENGSONG)) {
+				logger.info("大客户赠送已重复 businessId:" + businessId + " userno:" + tuserinfo.getUserno());
+				return false;
+			}
+			// 增加vip购彩金额
+			this.doAddVipUserBuyAmount(tuserinfo, amt);
+			flag = this.doFindActivityAndPresent(tuserinfo, amt, businessId);
+			logger.info("VIP购彩活动结束");
+		} catch (Exception e) {
+			logger.error("VIP购彩活动异常", e);
+		}
+		return flag;
+	}
+
+	/**
+	 * 增加本月用户购彩金额
+	 * 
+	 * @param tuserinfo
+	 *            用户
+	 * @param amt
+	 *            购彩金额
+	 */
+	@Transactional
+	public void doAddVipUserBuyAmount(Tuserinfo tuserinfo, BigDecimal amt) {
+		String currentMonth = DateUtil.format("yyyy-MM", new Date());
+		if (tuserinfo != null) {
+			VipUser vipUser = vipUserDao.findVipUser(tuserinfo.getUserno(), currentMonth, true);
+			if (vipUser == null) {
+				vipUser = vipUserDao.createVipUser(tuserinfo.getUserno(), currentMonth);
+			}
+			if (vipUser != null) {
+				vipUser.setBuyamt(vipUser.getBuyamt() == null ? amt : vipUser.getBuyamt().add(amt));
+				vipUser.setModifyTime(new Date());
+				vipUserDao.merge(vipUser);
+				logger.info("大客户userno:{},增加购买金额{}", new String[] { tuserinfo.getUserno(), amt + "" });
+			}
+		}
+	}
+
+	/**
+	 * 查找大户购彩赠送活动，符合条件的用户赠送彩金
+	 * 
+	 * @param tuserinfo
+	 *            用户
+	 * @param amt
+	 *            本次购彩金额
+	 * @param businessId
+	 * @return
+	 */
+	@Transactional
+	public Boolean doFindActivityAndPresent(Tuserinfo tuserinfo, BigDecimal amt, String businessId) {
+		Boolean flag = false;
+		if (tuserinfo != null) {
+			Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
+					ActionJmsType.VIP_USER_GOUCAI_ZENGSONG.value);
+			if (tactivity != null) {
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Integer step = (Integer) activity.get("step");
+				Integer present = (Integer) activity.get("present");
+				Calendar calendar = Calendar.getInstance();
+
+				calendar.add(Calendar.MONTH, -1);
+				String lastMonth = DateUtil.format("yyyy-MM", calendar.getTime());
+				VipUser lastMonthVipUser = vipUserDao.findVipUser(tuserinfo.getUserno(), lastMonth);
+				if (lastMonthVipUser != null && lastMonthVipUser.getBuyamt().compareTo(new BigDecimal(step)) >= 0) {
+					if (amt.compareTo(BigDecimal.ZERO) >= 0) {
+						flag = true;
+						BigDecimal prizeamt = amt.multiply(new BigDecimal(present)).divideToIntegralValue(
+								new BigDecimal(100));
+						logger.info("大客户userno:{},时间:{},总购彩金额:{},本次购彩:{},赠送金额:{}", new String[] {
+								lastMonthVipUser.getId().getUserno(), lastMonthVipUser.getId().getYearAndMonth(),
+								lastMonthVipUser.getBuyamt() + "", amt + "", prizeamt + "" });
+						sendActivityPrizeJms.sendPrize2UserJMS(tuserinfo.getUserno(), prizeamt,
+								ActionJmsType.VIP_USER_GOUCAI_ZENGSONG, tactivity.getMemo(), businessId, "", "");
+					}
+				} else {
+					logger.info("不满大户购彩赠送条件userno:" + tuserinfo.getUserno() + ",vipUser:"
+							+ (lastMonthVipUser == null ? "" : lastMonthVipUser));
+				}
+			}
+		}
+		return flag;
 	}
 }
