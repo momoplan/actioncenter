@@ -10,6 +10,7 @@ privileged aspect Coupon_Roo_ToString {
     public String Coupon.toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Amount: ").append(getAmount()).append(", ");
+        sb.append("Belonguserno: ").append(getBelonguserno()).append(", ");
         sb.append("Couponbatchchannelid: ").append(getCouponbatchchannelid()).append(", ");
         sb.append("Couponbatchid: ").append(getCouponbatchid()).append(", ");
         sb.append("Couponcode: ").append(getCouponcode()).append(", ");

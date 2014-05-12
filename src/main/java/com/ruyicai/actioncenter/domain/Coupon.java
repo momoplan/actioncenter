@@ -80,6 +80,12 @@ public class Coupon {
 	private String userno;
 	
 	/**
+	 * 所属用户编号
+	 */
+	@Column(name = "BELONGUSERNO", length = 20)
+	private String belonguserno;
+	
+	/**
 	 * 使用者手机号
 	 */
 	@Column(name = "MOBILE", length = 20)
@@ -102,7 +108,7 @@ public class Coupon {
 		return coupon;
 	}
 	
-	public static Coupon create(String couponCode, Boolean reusable, long couponBatchChannelId, String couponBatchId, BigDecimal couponAmount, Date validity, Date createTime) {
+	public static Coupon create(String couponCode, Boolean reusable, long couponBatchChannelId, String couponBatchId, BigDecimal couponAmount, Date validity, Date createTime,String belonguserno) {
 		Coupon coupon = new Coupon();
 		coupon.setCouponcode(couponCode);
 		coupon.setCouponbatchchannelid(couponBatchChannelId);
@@ -112,6 +118,7 @@ public class Coupon {
 		coupon.setState(0);
 		coupon.setValidity(validity);
 		coupon.setCreatetime(createTime);
+		coupon.setBelonguserno(belonguserno);
 		coupon.persist();
 		return coupon;
 	}

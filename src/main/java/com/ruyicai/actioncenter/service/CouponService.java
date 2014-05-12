@@ -113,7 +113,7 @@ public class CouponService {
 	 */
 	@Transactional
 	public void createCoupons(String couponBatchId, Long couponBatchChannelId, Integer couponQuantity, String validity,
-			BigDecimal couponAmount) {
+			BigDecimal couponAmount,String belonguserno) {
 		if (StringUtils.isBlank(couponBatchId)) {
 			throw new IllegalArgumentException("the argument couponBatchId is required");
 		}
@@ -144,7 +144,7 @@ public class CouponService {
 		channel.merge();
 		// 创建兑换券
 		doCreateCoupons(couponBatchId, couponBatchChannelId, couponQuantity, couponBatch.getReusable(), validity,
-				couponAmount);
+				couponAmount,belonguserno);
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class CouponService {
 	 */
 	@Transactional
 	public void doCreateCoupons(String couponBatchId, long couponBatchChannelId, int couponQuantity, Boolean reusable,
-			String validity, BigDecimal couponAmount) {
+			String validity, BigDecimal couponAmount,String belonguserno) {
 		logger.info("doCreateCoupons couponBatchId:" + couponBatchId + " couponBatchChannelId:" + couponBatchChannelId
 				+ " couponQuantity:" + couponQuantity + " reusable:" + reusable + " validity:" + validity
 				+ " couponAmount:" + couponAmount);
@@ -173,7 +173,7 @@ public class CouponService {
 		for (int i = 0; i < couponQuantity; i++) {
 			try {
 				Coupon.create(getRandomString(12), reusable, couponBatchChannelId, couponBatchId, couponAmount,
-						DateUtil.parse(validity), date);
+						DateUtil.parse(validity), date,belonguserno);
 			} catch (Exception e) {
 				logger.error("doCreateCoupons error", e.getMessage(), e);
 			}

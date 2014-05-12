@@ -96,12 +96,13 @@ public class CouponController {
 			@RequestParam(value = "couponBatchChannelId", required = true) Long couponBatchChannelId,
 			@RequestParam(value = "couponQuantity", required = true) Integer couponQuantity,
 			@RequestParam(value = "validity", required = true) String validity,
-			@RequestParam(value = "couponAmount", required = true) BigDecimal couponAmount) {
+			@RequestParam(value = "couponAmount", required = true) BigDecimal couponAmount,
+			@RequestParam(value = "belonguserno", required = false) String belonguserno) {
 		logger.info("/coupon/createCoupon");
 		ResponseData rd = new ResponseData();
 		ErrorCode result = ErrorCode.OK;
 		try {
-			couponService.createCoupons(couponBatchId, couponBatchChannelId, couponQuantity, validity, couponAmount);
+			couponService.createCoupons(couponBatchId, couponBatchChannelId, couponQuantity, validity, couponAmount,belonguserno);
 		} catch(IllegalArgumentException e) {
 			logger.error("createCoupon error", new String[] { e.getMessage() }, e);
 			result = ErrorCode.ERROR;

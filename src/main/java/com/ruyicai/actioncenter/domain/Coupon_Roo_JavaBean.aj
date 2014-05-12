@@ -74,6 +74,14 @@ privileged aspect Coupon_Roo_JavaBean {
         this.userno = userno;
     }
     
+    public String Coupon.getBelonguserno() {
+        return this.belonguserno;
+    }
+    
+    public void Coupon.setBelonguserno(String belonguserno) {
+        this.belonguserno = belonguserno;
+    }
+    
     public String Coupon.getMobile() {
         return this.mobile;
     }
