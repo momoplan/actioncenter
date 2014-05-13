@@ -41,6 +41,9 @@ public class CouponService {
 
 	@Produce(uri = "jms:topic:updateCouponBatchAndChannel")
 	private ProducerTemplate updateCouponBatchAndChannelProducer;
+	
+	@Produce(uri = "jms:topic:sendAgencyCouponToBinding")
+	private ProducerTemplate sendAgencyCouponToBindingProducer;
 
 	/**
 	 * 创建兑换券批次
@@ -278,6 +281,10 @@ public class CouponService {
 		// 发送彩金
 		sendActivityPrizeJms.sendPrize2UserJMS(userno, coupon.getAmount(), ActionJmsType.Coupon,
 				ActionJmsType.Coupon.memo, coupon.getCouponcode(), "", "");
+		//发送代理兑换券消息
+		if(!StringUtils.isEmpty(coupon.getBelonguserno())){
+			sendAgencyCouponToBindingJMS(coupon.getCouponcode(),coupon.getUserno(),coupon.getBelonguserno());
+		}
 	}
 
 	/**
@@ -294,5 +301,20 @@ public class CouponService {
 		headers.put("couponBatchId", couponBatchId);
 		headers.put("couponBatchChannelId", couponBatchChannelId);
 		updateCouponBatchAndChannelProducer.sendBodyAndHeaders(null, headers);
+	}
+	
+	/**
+	 * 发送使用兑换券后，绑定相关代理用户关系的JMS
+	 * @param couponcode 兑换券号
+	 * @param userno 用户编号
+	 * @param belonguserno 兑换券所属用户编号
+	 */
+	@Transactional
+	public void sendAgencyCouponToBindingJMS(String couponcode,String userno,String belonguserno){
+		Map<String, Object> headers = new HashMap<String, Object>();
+		headers.put("couponcode", couponcode);
+		headers.put("userno", userno);
+		headers.put("belonguserno", belonguserno);
+		sendAgencyCouponToBindingProducer.sendBodyAndHeaders(null, headers);
 	}
 }
