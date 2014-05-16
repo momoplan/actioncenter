@@ -315,6 +315,8 @@ public class CouponService {
 		headers.put("couponcode", couponcode);
 		headers.put("userno", userno);
 		headers.put("belonguserno", belonguserno);
+		logger.info("发送使用兑换券后，绑定相关代理用户关系的JMS.couponcode:{},userno:{},belonguserno:{}",
+				new String[] { couponcode , userno + "", belonguserno});
 		sendAgencyCouponToBindingProducer.sendBodyAndHeaders(null, headers);
 	}
 }
