@@ -59,6 +59,16 @@ public class TactivityTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
+	public void testCreateTactivity2() {
+		Map<String, Object> map = new LinkedMap();
+		map.put("percent", 15);
+		String express = JsonUtil.toJson(map);
+		tactivityDao.saveOrUpdate(null, null, "00092493", null, ActionJmsType.World_Cup_BigUser.value, express, 1,
+				ActionJmsType.World_Cup_BigUser.memo);
+	}
+
+	@Test
 	public void testCaselotBetFull() throws InterruptedException {
 		int nextInt = new Random().nextInt(10000);
 		String body = "{\"batchcode\":\"2011148\",\"buyAmtByFollower\":0,\"buyAmtByStarter\":10000,\"caselotinfo\":null,\"commisionRatio\":10,\"content\":null,\"description\":\"\",\"displayState\":2,\"displayStateMemo\":\"满员\",\"endTime\":null,\"full\":true,\"hasachievement\":0,\"id\":\"C"

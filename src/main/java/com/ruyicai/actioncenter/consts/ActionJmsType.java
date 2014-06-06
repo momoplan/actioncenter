@@ -33,7 +33,8 @@ public enum ActionJmsType {
 	First_Order(23,"广东快乐十分首单赠送"),
 	Coupon(24,"兑换券赠送彩金"),
 	FIRST_CHONGZHI_ZENGSONG_20(25, "首次充值赠送10+5+5"),
-	BeiDan_JiaJiang(26, "北单加奖");
+	BeiDan_JiaJiang(26, "北单加奖"),
+	World_Cup_BigUser(27,"世界杯大户加奖");
 
 	public int value;
 
