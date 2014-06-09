@@ -5,8 +5,8 @@ package com.ruyicai.actioncenter.domain;
 
 import org.springframework.beans.factory.annotation.Configurable;
 
-privileged aspect OldUserChongZhi_Roo_Configurable {
+privileged aspect YinLianNewUser_Roo_Configurable {
     
-    declare @type: OldUserChongZhi: @Configurable;
+    declare @type: YinLianNewUser: @Configurable;
     
 }

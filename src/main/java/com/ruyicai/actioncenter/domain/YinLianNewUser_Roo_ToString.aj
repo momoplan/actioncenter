@@ -5,14 +5,13 @@ package com.ruyicai.actioncenter.domain;
 
 import java.lang.String;
 
-privileged aspect OldUserChongZhi_Roo_ToString {
+privileged aspect YinLianNewUser_Roo_ToString {
     
-    public String OldUserChongZhi.toString() {
+    public String YinLianNewUser.toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("ChongZhiAmt: ").append(getChongZhiAmt()).append(", ");
+        sb.append("Amt: ").append(getAmt()).append(", ");
         sb.append("CreateTime: ").append(getCreateTime()).append(", ");
-        sb.append("Userno: ").append(getUserno()).append(", ");
-        sb.append("ZengsongAmt: ").append(getZengsongAmt());
+        sb.append("Userno: ").append(getUserno());
         return sb.toString();
     }
     

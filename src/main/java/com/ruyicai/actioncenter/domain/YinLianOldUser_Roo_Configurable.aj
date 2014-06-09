@@ -5,8 +5,8 @@ package com.ruyicai.actioncenter.domain;
 
 import org.springframework.beans.factory.annotation.Configurable;
 
-privileged aspect SportsQuizProperties_Roo_Configurable {
+privileged aspect YinLianOldUser_Roo_Configurable {
     
-    declare @type: SportsQuizProperties: @Configurable;
+    declare @type: YinLianOldUser: @Configurable;
     
 }

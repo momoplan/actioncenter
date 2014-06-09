@@ -5,13 +5,13 @@ package com.ruyicai.actioncenter.domain;
 
 import java.lang.String;
 
-privileged aspect SportsQuizProperties_Roo_ToString {
+privileged aspect YinLianOldUser_Roo_ToString {
     
-    public String SportsQuizProperties.toString() {
+    public String YinLianOldUser.toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Id: ").append(getId()).append(", ");
-        sb.append("Spkey: ").append(getSpkey()).append(", ");
-        sb.append("Spvalue: ").append(getSpvalue());
+        sb.append("Amt: ").append(getAmt()).append(", ");
+        sb.append("CreateTime: ").append(getCreateTime()).append(", ");
+        sb.append("Userno: ").append(getUserno());
         return sb.toString();
     }
     

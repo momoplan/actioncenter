@@ -21,9 +21,8 @@ public enum ActionJmsType {
 	Encash_DuoLeCai_AddPrize(11, "广东11选5加奖"),
 	Encash_DaXiaoDanShuang_AddPrize(12, "大小单双加奖"),
 	Encash_ZuCai_AddPrize(13, "足彩加奖"),
-	SUNING_ZENGSONG(14,"苏宁首次充值赠送"),
 	Friday_SSQ_ZENGSONG(15,"购买双色球赠送"),
-	SuNing_REGISTER(16,"苏宁新用户注册赠送"),
+	NEW_USER_REGISTER(16,"新用户注册赠送"),
 	Encash_LanQiu_AddPrize(17,"竞彩篮球加奖"),
 	Encash_Jingcai_2Chan1(18,"竞彩2串1加奖"),
 	Kuai3_JiaJiang(19,"快3加奖"),
@@ -32,9 +31,10 @@ public enum ActionJmsType {
 	Fund2Draw(22,"增加可提现金额"),
 	First_Order(23,"广东快乐十分首单赠送"),
 	Coupon(24,"兑换券赠送彩金"),
-	FIRST_CHONGZHI_ZENGSONG_20(25, "首次充值赠送10+5+5"),
 	BeiDan_JiaJiang(26, "北单加奖"),
-	World_Cup_BigUser(27,"世界杯大户加奖");
+	World_Cup_BigUser(27,"世界杯大户加奖"),
+	YinLian_New_User_Zengsong(28,"银联手机充值新用户赠送"),
+	YinLian_Old_User_Zengsong(28,"银联手机充值老用户赠送");
 
 	public int value;
 

@@ -3,7 +3,7 @@
 
 package com.ruyicai.actioncenter.domain;
 
-import com.ruyicai.actioncenter.domain.OldUserChongZhi;
+import com.ruyicai.actioncenter.domain.YinLianNewUser;
 import java.lang.String;
 import java.util.List;
 import javax.persistence.Entity;
@@ -12,73 +12,73 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Table;
 import org.springframework.transaction.annotation.Transactional;
 
-privileged aspect OldUserChongZhi_Roo_Entity {
+privileged aspect YinLianNewUser_Roo_Entity {
     
-    declare @type: OldUserChongZhi: @Entity;
+    declare @type: YinLianNewUser: @Entity;
     
-    declare @type: OldUserChongZhi: @Table(name = "OldUserChongZhi");
+    declare @type: YinLianNewUser: @Table(name = "YinLianNewUser");
     
     @PersistenceContext
-    transient EntityManager OldUserChongZhi.entityManager;
+    transient EntityManager YinLianNewUser.entityManager;
     
     @Transactional
-    public void OldUserChongZhi.persist() {
+    public void YinLianNewUser.persist() {
         if (this.entityManager == null) this.entityManager = entityManager();
         this.entityManager.persist(this);
     }
     
     @Transactional
-    public void OldUserChongZhi.remove() {
+    public void YinLianNewUser.remove() {
         if (this.entityManager == null) this.entityManager = entityManager();
         if (this.entityManager.contains(this)) {
             this.entityManager.remove(this);
         } else {
-            OldUserChongZhi attached = OldUserChongZhi.findOldUserChongZhi(this.userno);
+            YinLianNewUser attached = YinLianNewUser.findYinLianNewUser(this.userno);
             this.entityManager.remove(attached);
         }
     }
     
     @Transactional
-    public void OldUserChongZhi.flush() {
+    public void YinLianNewUser.flush() {
         if (this.entityManager == null) this.entityManager = entityManager();
         this.entityManager.flush();
     }
     
     @Transactional
-    public void OldUserChongZhi.clear() {
+    public void YinLianNewUser.clear() {
         if (this.entityManager == null) this.entityManager = entityManager();
         this.entityManager.clear();
     }
     
     @Transactional
-    public OldUserChongZhi OldUserChongZhi.merge() {
+    public YinLianNewUser YinLianNewUser.merge() {
         if (this.entityManager == null) this.entityManager = entityManager();
-        OldUserChongZhi merged = this.entityManager.merge(this);
+        YinLianNewUser merged = this.entityManager.merge(this);
         this.entityManager.flush();
         return merged;
     }
     
-    public static final EntityManager OldUserChongZhi.entityManager() {
-        EntityManager em = new OldUserChongZhi().entityManager;
+    public static final EntityManager YinLianNewUser.entityManager() {
+        EntityManager em = new YinLianNewUser().entityManager;
         if (em == null) throw new IllegalStateException("Entity manager has not been injected (is the Spring Aspects JAR configured as an AJC/AJDT aspects library?)");
         return em;
     }
     
-    public static long OldUserChongZhi.countOldUserChongZhis() {
-        return entityManager().createQuery("SELECT COUNT(o) FROM OldUserChongZhi o", Long.class).getSingleResult();
+    public static long YinLianNewUser.countYinLianNewUsers() {
+        return entityManager().createQuery("SELECT COUNT(o) FROM YinLianNewUser o", Long.class).getSingleResult();
     }
     
-    public static List<OldUserChongZhi> OldUserChongZhi.findAllOldUserChongZhis() {
-        return entityManager().createQuery("SELECT o FROM OldUserChongZhi o", OldUserChongZhi.class).getResultList();
+    public static List<YinLianNewUser> YinLianNewUser.findAllYinLianNewUsers() {
+        return entityManager().createQuery("SELECT o FROM YinLianNewUser o", YinLianNewUser.class).getResultList();
     }
     
-    public static OldUserChongZhi OldUserChongZhi.findOldUserChongZhi(String userno) {
+    public static YinLianNewUser YinLianNewUser.findYinLianNewUser(String userno) {
         if (userno == null || userno.length() == 0) return null;
-        return entityManager().find(OldUserChongZhi.class, userno);
+        return entityManager().find(YinLianNewUser.class, userno);
     }
     
-    public static List<OldUserChongZhi> OldUserChongZhi.findOldUserChongZhiEntries(int firstResult, int maxResults) {
-        return entityManager().createQuery("SELECT o FROM OldUserChongZhi o", OldUserChongZhi.class).setFirstResult(firstResult).setMaxResults(maxResults).getResultList();
+    public static List<YinLianNewUser> YinLianNewUser.findYinLianNewUserEntries(int firstResult, int maxResults) {
+        return entityManager().createQuery("SELECT o FROM YinLianNewUser o", YinLianNewUser.class).setFirstResult(firstResult).setMaxResults(maxResults).getResultList();
     }
     
 }

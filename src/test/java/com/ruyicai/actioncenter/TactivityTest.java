@@ -62,6 +62,35 @@ public class TactivityTest {
 	@SuppressWarnings("unchecked")
 	public void testCreateTactivity2() {
 		Map<String, Object> map = new LinkedMap();
+		map.put("beforedate", "2014-06-01 00:00:00");
+		map.put("step1", 10000);
+		map.put("step1prize", 500);
+		map.put("step2", 30000);
+		map.put("step2prize", 2000);
+		map.put("step3", 50000);
+		map.put("step3prize", 3000);
+		map.put("step4", 100000);
+		map.put("step4prize", 10000);
+		String express = JsonUtil.toJson(map);
+		tactivityDao.saveOrUpdate(null, null, "00092493", null, ActionJmsType.YinLian_Old_User_Zengsong.value, express, 1,
+				ActionJmsType.YinLian_Old_User_Zengsong.memo);
+	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testCreateTactivity22() {
+		Map<String, Object> map = new LinkedMap();
+		map.put("step", 4000);
+		map.put("prizeamt", 2500);
+		String express = JsonUtil.toJson(map);
+		tactivityDao.saveOrUpdate(null, null, "00092493", null, ActionJmsType.YinLian_New_User_Zengsong.value, express, 1,
+				ActionJmsType.YinLian_New_User_Zengsong.memo);
+	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testCreateTactivity3() {
+		Map<String, Object> map = new LinkedMap();
 		map.put("percent", 15);
 		String express = JsonUtil.toJson(map);
 		tactivityDao.saveOrUpdate(null, null, "00092493", null, ActionJmsType.World_Cup_BigUser.value, express, 1,
