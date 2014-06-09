@@ -274,6 +274,8 @@ public class OrderEncashListener {
 				Integer step6prize = (Integer) activity.get("step6prize");
 				Integer step7 = (Integer) activity.get("step7");
 				Integer step7prize = (Integer) activity.get("step7prize");
+				Integer step8 = (Integer) activity.get("step8");
+				Integer step8prize = (Integer) activity.get("step8prize");
 				if (orderprizeamt >= step1 && orderprizeamt < step2) {
 					prize = new BigDecimal(step1prize);
 				} else if (orderprizeamt >= step2 && orderprizeamt < step3) {
@@ -286,8 +288,10 @@ public class OrderEncashListener {
 					prize = new BigDecimal(step5prize);
 				} else if (orderprizeamt >= step6 && orderprizeamt < step7) {
 					prize = new BigDecimal(step6prize);
-				} else if (orderprizeamt >= step7) {
+				} else if (orderprizeamt >= step7 && orderprizeamt < step8) {
 					prize = new BigDecimal(step7prize);
+				} else if (orderprizeamt >= step8) {
+					prize = new BigDecimal(step8prize);
 				}
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					Tactivity wcbu = tactivityDao.findTactivity(null, null, orderUserInfo.getSubChannel(), null,
