@@ -161,7 +161,7 @@ public class TactionService {
 					prize = new BigDecimal(step4prize);
 				}
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
-					if (Tjmsservice.createTjmsservice(ttransactionid, ActionJmsType.Encash_Jingcai_2Chan1)) {
+					if (Tjmsservice.createTjmsservice(ttransactionid, ActionJmsType.YinLian_Old_User_Zengsong)) {
 						logger.info(tactivity.getMemo() + prize);
 						YinLianOldUser oldUser = new YinLianOldUser();
 						oldUser.setUserno(userno);
@@ -175,7 +175,7 @@ public class TactionService {
 					}
 				}
 			} else {
-				logger.info("用户注册时间" + regtime + "不在" + dateStr + "之前");
+				logger.info("userno:" + userno + "用户注册时间" + regtime + "不在" + dateStr + "之前");
 			}
 			return flag;
 		} else {
