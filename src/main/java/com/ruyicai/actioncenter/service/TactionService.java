@@ -256,35 +256,44 @@ public class TactionService {
 					Integer step = (Integer) activity.get("step");
 					Integer prizeamt = (Integer) activity.get("prizeamt");
 					if (amt.compareTo(new BigDecimal(step)) >= 0 && regtimeStr.equals(todayStr)) {
-						YinLianNewUser newUser = YinLianNewUser.findYinLianNewUser(tuserinfo.getUserno());
-						if (newUser == null) {
-							if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {
-								Chong20Mobile chong20Mobile = Chong20Mobile.findChong20Mobile(tuserinfo.getMobileid());
-								if (chong20Mobile == null) {
-									logger.info("银联第一次充值赠送,userno:{},amt:{},prizeamt:{}",
-											new String[] { tuserinfo.getUserno(), amt + "", prizeamt + "" });
-									Chong20Mobile.createChong20Mobile(tuserinfo.getMobileid(), tuserinfo.getUserno());
-									newUser = new YinLianNewUser();
-									newUser.setUserno(tuserinfo.getUserno());
-									newUser.setAmt(amt);
-									newUser.setCreateTime(new Date());
-									newUser.persist();
-									sendActivityPrizeJms.sendPrize2UserJMS(tuserinfo.getUserno(), new BigDecimal(
-											prizeamt), ActionJmsType.YinLian_New_User_Zengsong, yinliantactivity
-											.getMemo(), ttransactionid, "", ttransactionid);
-									flag = true;
+						Integer count = lotteryService.findTtransaction(tuserinfo.getUserno());
+						if (count == 1 || count == null) {
+							YinLianNewUser newUser = YinLianNewUser.findYinLianNewUser(tuserinfo.getUserno());
+							if (newUser == null) {
+								if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {
+									Chong20Mobile chong20Mobile = Chong20Mobile.findChong20Mobile(tuserinfo
+											.getMobileid());
+									if (chong20Mobile == null) {
+										logger.info("银联第一次充值赠送,userno:{},amt:{},prizeamt:{}",
+												new String[] { tuserinfo.getUserno(), amt + "", prizeamt + "" });
+										Chong20Mobile.createChong20Mobile(tuserinfo.getMobileid(),
+												tuserinfo.getUserno());
+										newUser = new YinLianNewUser();
+										newUser.setUserno(tuserinfo.getUserno());
+										newUser.setAmt(amt);
+										newUser.setCreateTime(new Date());
+										newUser.persist();
+										sendActivityPrizeJms.sendPrize2UserJMS(tuserinfo.getUserno(), new BigDecimal(
+												prizeamt), ActionJmsType.YinLian_New_User_Zengsong, yinliantactivity
+												.getMemo(), ttransactionid, "", ttransactionid);
+										flag = true;
+									} else {
+										logger.info("银联第一次充值活动,用户手机号已赠送过.mobileid:{}amt:{},user:{}", new String[] {
+												tuserinfo.getMobileid(), amt + "", tuserinfo.toString() });
+										return flag;
+									}
 								} else {
-									logger.info("银联第一次充值活动,用户手机号已赠送过.mobileid:{}amt:{},user:{}", new String[] {
-											tuserinfo.getMobileid(), amt + "", tuserinfo.toString() });
-									return flag;
+									logger.info("银联第一次充值活动,用户信息未完善.amt:{},user:{}",
+											new String[] { amt + "", tuserinfo.toString() });
 								}
 							} else {
-								logger.info("银联第一次充值活动,用户信息未完善.amt:{},user:{}",
-										new String[] { amt + "", tuserinfo.toString() });
+								logger.info("银联第一次充值活动已参加过.userno:{},amt:{},count:{}",
+										new String[] { tuserinfo.getUserno(), amt + "" });
+								return flag;
 							}
 						} else {
-							logger.info("银联第一次充值活动已参加过.userno:{},amt:{},count:{}", new String[] {
-									tuserinfo.getUserno(), amt + "" });
+							logger.info("银联不是第一次充值，不参加活动.userno:{},amt:{},count:{}",
+									new String[] { tuserinfo.getUserno(), amt + "", count + "" });
 							return flag;
 						}
 					} else {
