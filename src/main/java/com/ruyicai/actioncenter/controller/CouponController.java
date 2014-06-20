@@ -225,4 +225,24 @@ public class CouponController {
 		}
 		return rd;
 	}
+	
+	/**
+	 * 根据批次渠道ID查询用户集
+	 * @param channelId
+	 * @return
+	 */
+	@RequestMapping(value = "/queryUsersByChannelId")
+	public @ResponseBody
+	ResponseData listCouponsByPage(@RequestParam(value = "channelId", required = true) long channelId) {
+		logger.info("/queryUsersByChannelId:" + channelId);
+		ResponseData rd = new ResponseData();
+		try{
+			rd.setValue(Coupon.queryUsersBychannelId(channelId));
+			rd.setErrorCode(ErrorCode.OK.value);
+		} catch (Exception e) {
+			logger.error("根据批次渠道ID查询用户集", new String[] { e.getMessage() }, e);
+			rd.setErrorCode(ErrorCode.ERROR.value);
+		}
+		return rd;
+	}
 }

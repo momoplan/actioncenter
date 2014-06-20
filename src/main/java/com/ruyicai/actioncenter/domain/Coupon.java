@@ -156,4 +156,13 @@ public class Coupon {
 		page.setList(resultList);
 		page.setTotalResult(count);
 	}
+	
+	public static List<String> queryUsersBychannelId(long channelId){
+		EntityManager em = Coupon.entityManager();
+		String sql = "SELECT o.userno FROM Coupon o where o.state=1 and o.couponbatchchannelid = ? ORDER BY o.usetime DESC ";
+		TypedQuery<String> q = em.createQuery(sql, String.class);
+		q.setParameter(1, channelId);
+		List<String> resultList = q.getResultList();
+		return resultList;
+	}
 }
