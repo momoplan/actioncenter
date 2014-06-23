@@ -85,6 +85,8 @@ public class Fund2DrawService {
 			fund2DrawDao.merge(draw);
 			logger.info("充值增加提现ttransactionid:" + ttransactionid + "已调用lottery完毕");
 		} else {
+			draw.setState(Fund2DrawState.hasError.value());
+			fund2DrawDao.merge(draw);
 			logger.info("充值增加提现ttransactionid:" + ttransactionid + "调用lottery失败");
 		}
 	}

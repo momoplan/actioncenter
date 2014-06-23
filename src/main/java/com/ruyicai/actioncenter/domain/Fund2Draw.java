@@ -41,7 +41,7 @@ public class Fund2Draw {
 
 	@Column(name = "DRAWTIME")
 	private Date drawTime;
-	
+
 	@Column(name = "SUCCESSTIME")
 	private Date successTime;
 

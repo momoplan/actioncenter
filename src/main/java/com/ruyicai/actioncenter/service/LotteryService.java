@@ -452,7 +452,8 @@ public class LotteryService {
 					logger.info("增加可提现金额成功ttransactionid:" + ttransactionid);
 					flag = true;
 				} else {
-					logger.error("增加可提现金额失败" + ttransactionid);
+					logger.error("增加可提现金额失败" + ttransactionid + ",errorCode:" + errorCode);
+					flag = false;
 				}
 			}
 		} catch (Exception e) {
