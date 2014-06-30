@@ -1,20 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true">
+<configuration scan="true" scanPeriod="30 seconds">
+
+	<property name="logbase" value="${catalina.base}/logs/" />
+	
+	<jmxConfigurator />
+	
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%-20(%d{yyyy-MM-dd HH:mm:ss.SSS}) [%thread] %-5level %logger{36}.%method - %msg%n</pattern>
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%method - %msg%n
+			</pattern>
+			<charset>UTF-8</charset>
 		</encoder>
 	</appender>
 
 	<appender name="rollingFile"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>../logs/actioncenter.log</file>
-		<encoder>
-			<pattern>%-20(%d{yyyy-MM-dd HH:mm:ss.SSS}) [%thread] %-5level %logger{36}.%method - %msg%n</pattern>
-		</encoder>
+		<file>${logbase}actioncenter.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>../logs/actioncenter.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<FileNamePattern>
+				${logbase}actioncenter.%d{yyyy-MM-dd}.log
+			</FileNamePattern>
 		</rollingPolicy>
+		<encoder>
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%method - %msg%n
+			</pattern>
+		</encoder>
 	</appender>
 
 	<logger name="org.apache" level="ERROR" />
