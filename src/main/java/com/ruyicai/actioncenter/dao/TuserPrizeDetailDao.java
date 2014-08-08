@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.domain.TuserPrizeDetail;
+import com.ruyicai.actioncenter.util.DateUtil;
 import com.ruyicai.actioncenter.util.Page;
 import com.ruyicai.actioncenter.util.PropertyFilter;
 import com.ruyicai.actioncenter.util.Page.Sort;
@@ -76,7 +77,7 @@ public class TuserPrizeDetailDao {
 	public TuserPrizeDetail createTprizeUserBuyLog(String userno, BigDecimal amt, ActionJmsType actionJmsType,
 			String businessId) {
 		if (StringUtils.isBlank(userno)) {
-			throw new IllegalArgumentException("the argument parentAgentUserno is required");
+			throw new IllegalArgumentException("the argument userno is required");
 		}
 		if (amt == null) {
 			throw new IllegalArgumentException("the argument amt is required");
@@ -105,6 +106,20 @@ public class TuserPrizeDetailDao {
 		} else {
 			return null;
 		}
+	}
+
+	public BigDecimal statisticPrizeDetail(String userno, Integer activityType, Date date) {
+		Date starttime = DateUtil.getDateTheZero(date);
+		Date endtime = DateUtil.getDateTheZero(DateUtil.addDay(date, 1));
+		TypedQuery<BigDecimal> query = this.entityManager
+				.createQuery(
+						"select sum(o.amt) from TuserPrizeDetail o where o.userno = ? and o.activityType = ? and o.createTime between ? and ? ",
+						BigDecimal.class);
+		query.setParameter(1, userno);
+		query.setParameter(2, activityType);
+		query.setParameter(3, starttime);
+		query.setParameter(4, endtime);
+		return query.getSingleResult()==null?new BigDecimal(0):query.getSingleResult();
 	}
 
 	public void findTuserPrizeDetailByPage(Map<String, Object> conditionMap, Page<TuserPrizeDetail> page) {

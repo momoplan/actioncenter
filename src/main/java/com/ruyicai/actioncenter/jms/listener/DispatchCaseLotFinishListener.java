@@ -1,6 +1,7 @@
 package com.ruyicai.actioncenter.jms.listener;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.camel.Body;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.dao.TactivityDao;
+import com.ruyicai.actioncenter.dao.TuserPrizeDetailDao;
 import com.ruyicai.actioncenter.domain.Tactivity;
 import com.ruyicai.actioncenter.domain.Tjmsservice;
 import com.ruyicai.actioncenter.domain.WorldCupBigUser;
@@ -33,6 +35,9 @@ public class DispatchCaseLotFinishListener {
 
 	@Autowired
 	private TactivityDao tactivityDao;
+	
+	@Autowired
+	private TuserPrizeDetailDao tuserPrizeDetailDao;
 
 	@Autowired
 	private SendActivityPrizeJms sendActivityPrizeJms;
@@ -70,6 +75,7 @@ public class DispatchCaseLotFinishListener {
 			addPrizeJingcai2chuan1(caseLot, torder, userInfo);
 			addPrize3D(caseLot, torder, userInfo);
 			addWorldCupBigUser(caseLot, torder, userInfo);
+			addPrizeJingcai(caseLot,torder, userInfo);
 		} catch (Exception e) {
 			logger.error("合买加奖异常", e);
 		}
@@ -142,6 +148,57 @@ public class DispatchCaseLotFinishListener {
 		}
 	}
 
+	@Transactional
+	public void addPrizeJingcai(CaseLot caseLot, Torder torder, Tuserinfo userinfo){
+		String userno = userinfo.getUserno();
+		String lotno = torder.getLotno();
+		if (!lotno.startsWith("J")) {
+			return;
+		}
+		if(lotno.equals("J00001") || lotno.equals("J00002") || lotno.equals("J00003")
+				|| lotno.equals("J00004") || lotno.equals("J00011") || lotno.equals("J00013")){
+			logger.info("五大联赛新赛季竞彩足球合买加奖活动...."+lotno);
+			Tactivity tactivity = tactivityDao.findTactivity(torder.getLotno(), null, userinfo.getSubChannel(), null,
+					ActionJmsType.Encash_JingCai_AddPrize.value);
+			if (tactivity != null) {
+				String caselotId = caseLot.getId();
+				Integer caselotprize = lotteryService.findCaseLotBuyAllPrizeamtById(caselotId, userinfo.getUserno());
+				if (caselotprize > 0) {
+					BigDecimal prize = BigDecimal.ZERO;
+					String express = tactivity.getExpress();
+					Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+					Integer minprize = (Integer) activity.get("minprize");
+					Integer percent = (Integer) activity.get("percent");
+					Integer topprize = (Integer) activity.get("topprize");
+					
+					if(caselotprize >= minprize){
+						BigDecimal amtTotal = tuserPrizeDetailDao.statisticPrizeDetail(torder.getUserno(), ActionJmsType.Encash_JingCai_AddPrize.value, new Date());
+						if(amtTotal.compareTo(new BigDecimal(topprize))<0){
+							prize = new BigDecimal(caselotprize).divide(new BigDecimal(minprize)).setScale(0,BigDecimal.ROUND_DOWN)
+									.multiply(new BigDecimal(minprize)).multiply(new BigDecimal(percent)).divide(new BigDecimal(100));
+							if(prize.compareTo(new BigDecimal(topprize))>=0){
+								prize = new BigDecimal(topprize);
+							}else{
+								if((prize.add(amtTotal)).compareTo(new BigDecimal(topprize))>0){
+									prize = new BigDecimal(topprize).subtract(amtTotal);
+								}
+							}
+							if (Tjmsservice.createTjmsservice(torder.getId(), ActionJmsType.Encash_JingCai_AddPrize)) {
+								logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
+								sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_JingCai_AddPrize,
+										tactivity.getMemo(), torder.getId(), "", "");
+							}
+						}else{
+							logger.info("用户:"+userno+"当日加奖金额已达最高值" + topprize + "不参与活动");
+						}
+					}else{
+						logger.info("中奖金额小于" + minprize + "不参与活动");
+					}
+				}
+			}
+		}
+	}
+	
 	@Transactional
 	public void addPrizeJingcai2chuan1(CaseLot caseLot, Torder torder, Tuserinfo userinfo) {
 		String userno = userinfo.getUserno();
