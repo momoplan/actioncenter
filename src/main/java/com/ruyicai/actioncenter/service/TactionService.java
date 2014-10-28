@@ -251,11 +251,20 @@ public class TactionService {
 					String express = yinliantactivity.getExpress();
 					Map<String, Object> activity = JsonUtil.transferJson2Map(express);
 					Date regtime = tuserinfo.getRegtime();
-					String regtimeStr = DateUtil.format("yyyyMMdd", regtime);
-					String todayStr = DateUtil.format("yyyyMMdd", new Date());
+//					String regtimeStr = DateUtil.format("yyyyMMdd", regtime);
+//					String todayStr = DateUtil.format("yyyyMMdd", new Date());
+					String regtimeStr = DateUtil.format("yyyy-MM-dd", regtime);
+					String todayStr = DateUtil.format("yyyy-MM-dd", new Date());
+					String afterRegTimeStr = DateUtil.format("yyyy-MM-dd", DateUtil.addDay(regtime,7));
+					Date todayDate= DateUtil.parse("yyyy-MM-dd",todayStr);
+					Date afterRegTimeDate= DateUtil.parse("yyyy-MM-dd",afterRegTimeStr);
+					if(todayDate.after(afterRegTimeDate)){
+						logger.info("银联首次充值用户不是在7天内充值today:" + todayStr + ",regtimeStr:" + regtimeStr + ",afterRegTimeStr:" + afterRegTimeStr);
+					}
 					Integer step = (Integer) activity.get("step");
 					Integer prizeamt = (Integer) activity.get("prizeamt");
-					if (amt.compareTo(new BigDecimal(step)) >= 0 && regtimeStr.equals(todayStr)) {
+//					if (amt.compareTo(new BigDecimal(step)) >= 0 && regtimeStr.equals(todayStr)) {
+					if (amt.compareTo(new BigDecimal(step)) >= 0 && !todayDate.after(afterRegTimeDate)) {
 						Integer count = lotteryService.findTtransaction(tuserinfo.getUserno());
 						if (count == 1 || count == null) {
 							YinLianNewUser newUser = YinLianNewUser.findYinLianNewUser(tuserinfo.getUserno());
@@ -312,11 +321,19 @@ public class TactionService {
 					String express = tactivity.getExpress();
 					Map<String, Object> activity = JsonUtil.transferJson2Map(express);
 					Date regtime = tuserinfo.getRegtime();
-					String regtimeStr = DateUtil.format("yyyyMMdd", regtime);
-					String todayStr = DateUtil.format("yyyyMMdd", new Date());
+//					String regtimeStr = DateUtil.format("yyyyMMdd", regtime);
+//					String todayStr = DateUtil.format("yyyyMMdd", new Date());
+					String regtimeStr = DateUtil.format("yyyy-MM-dd", regtime);
+					String todayStr = DateUtil.format("yyyy-MM-dd", new Date());
+					String afterRegTimeStr = DateUtil.format("yyyy-MM-dd", DateUtil.addDay(regtime,7));
+					Date todayDate= DateUtil.parse("yyyy-MM-dd",todayStr);
+					Date afterRegTimeDate= DateUtil.parse("yyyy-MM-dd",afterRegTimeStr);
+					if(todayDate.after(afterRegTimeDate)){
+						logger.info("第一次充值用户不是在7天内充值today:" + todayStr + ",regtimeStr:" + regtimeStr + ",afterRegTimeStr:" + afterRegTimeStr);
+					}
 					Integer step = (Integer) activity.get("step");
 					Integer prizeamt = (Integer) activity.get("prizeamt");
-					if (amt.compareTo(new BigDecimal(step)) >= 0 && regtimeStr.equals(todayStr)) {
+					if (amt.compareTo(new BigDecimal(step)) >= 0 && !todayDate.after(afterRegTimeDate)) {
 						Integer count = lotteryService.findTtransaction(tuserinfo.getUserno());
 						if (count == 1 || count == null) {
 							if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {

@@ -86,10 +86,18 @@ public class UserInfoListener {
 					logger.info("非首次充值用户或已赠送userno:" + userno);
 					return;
 				}
-				String todayStr = DateUtil.format("yyyyMMdd", new Date());
-				String createTimeStr = DateUtil.format("yyyyMMdd", fcu.getCreateTime());
-				if (!todayStr.equals(createTimeStr)) {
-					logger.info("首次充值用户不是在同一天完善的信息today:" + todayStr + ",createTime:" + createTimeStr);
+//				String todayStr = DateUtil.format("yyyyMMdd", new Date());
+//				String createTimeStr = DateUtil.format("yyyyMMdd", fcu.getCreateTime());
+//				if (!todayStr.equals(createTimeStr)) {
+//					logger.info("首次充值用户不是在同一天完善的信息today:" + todayStr + ",createTime:" + createTimeStr);
+//					return;
+//				}
+				String todayStr = DateUtil.format("yyyy-MM-dd", new Date());
+				String afterCreateTimeStr = DateUtil.format("yyyy-MM-dd", DateUtil.addDay(fcu.getCreateTime(),7));
+				Date todayDate= DateUtil.parse("yyyy-MM-dd",todayStr);
+				Date afterCreateTimeDate= DateUtil.parse("yyyy-MM-dd",afterCreateTimeStr);
+				if(todayDate.after(afterCreateTimeDate)){
+					logger.info("首次充值用户不是在7天内完善的信息today:" + todayStr + ",createTime:" + fcu.getCreateTime() + ",afterCreateTimeStr:" + afterCreateTimeStr);
 					return;
 				}
 				logger.info("首次充值后完善信息,userno:" + userno);
