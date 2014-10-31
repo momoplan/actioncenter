@@ -344,17 +344,40 @@ public class OrderEncashListener {
 				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
 				Integer step1min = (Integer) activity.get("step1min");
 				Integer step1max = (Integer) activity.get("step1max");
-				Integer step1prizeamt = (Integer) activity.get("step1prizeamt");
+				Integer step1prize = (Integer) activity.get("step1prize");
+				Integer step2min = (Integer) activity.get("step2min");
+				Integer step2max = (Integer) activity.get("step2max");
+				Integer step2prize = (Integer) activity.get("step2prize");
+				Integer step3min = (Integer) activity.get("step3min");
+				Integer step3max = (Integer) activity.get("step3max");
+				Integer step3prize = (Integer) activity.get("step3prize");
+				Integer step4min = (Integer) activity.get("step4min");
+				Integer step4max = (Integer) activity.get("step4max");
+				Integer step4prize = (Integer) activity.get("step4prize");
+				Integer step5min = (Integer) activity.get("step5min");
+				Integer step5max = (Integer) activity.get("step5max");
+				Integer step5prize = (Integer) activity.get("step5prize");
+				Integer step6min = (Integer) activity.get("step6min");
+				Integer step6max = (Integer) activity.get("step6max");
+				Integer step6prize = (Integer) activity.get("step6prize");
+				Integer step7 = (Integer) activity.get("step7");
+				Integer step7prize = (Integer) activity.get("step7prize");
 				if (orderprizeamt >= step1min && orderprizeamt <= step1max) {
-					prize = new BigDecimal(step1prizeamt);
-				} else {
-					Integer step = (Integer) activity.get("step");
-					Integer prizeamt = (Integer) activity.get("prizeamt");
-					int multiple = orderprizeamt.intValue() / step;
-					if (multiple > 0) {
-						prize = new BigDecimal(multiple * prizeamt);
-					}
+					prize = new BigDecimal(step1prize);
+				} else if (orderprizeamt >= step2min && orderprizeamt <= step2max) {
+					prize = new BigDecimal(step2prize);
+				} else if (orderprizeamt >= step3min && orderprizeamt <= step3max) {
+					prize = new BigDecimal(step3prize);
+				} else if (orderprizeamt >= step4min && orderprizeamt <= step4max) {
+					prize = new BigDecimal(step4prize);
+				} else if (orderprizeamt >= step5min && orderprizeamt <= step5max) {
+					prize = new BigDecimal(step5prize);
+				} else if (orderprizeamt >= step6min && orderprizeamt <= step6max) {
+					prize = new BigDecimal(step6prize);
+				} else if (orderprizeamt >= step7) {
+					prize = new BigDecimal(step7prize);
 				}
+				
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					Tactivity wcbu = tactivityDao.findTactivity(null, null, orderUserInfo.getSubChannel(), null,
 							ActionJmsType.World_Cup_BigUser.value);

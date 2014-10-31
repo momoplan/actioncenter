@@ -307,7 +307,10 @@ public class DispatchCaseLotFinishListener {
 
 	@Transactional
 	public void addPrizeLanQiu(CaseLot caseLot, Torder torder, Tuserinfo userinfo) {
-		Tactivity tactivity = tactivityDao.findTactivity(torder.getLotno(), null, userinfo.getSubChannel(), null,
+		if (!torder.getLotno().startsWith("J")) {
+			return;
+		}
+		Tactivity tactivity = tactivityDao.findTactivity(torder.getLotno(), torder.getPlaytype(), userinfo.getSubChannel(), null,
 				ActionJmsType.Encash_LanQiu_AddPrize.value);
 		if (tactivity != null) {
 			String caselotId = caseLot.getId();
@@ -318,16 +321,38 @@ public class DispatchCaseLotFinishListener {
 				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
 				Integer step1min = (Integer) activity.get("step1min");
 				Integer step1max = (Integer) activity.get("step1max");
-				Integer step1prizeamt = (Integer) activity.get("step1prizeamt");
+				Integer step1prize = (Integer) activity.get("step1prize");
+				Integer step2min = (Integer) activity.get("step2min");
+				Integer step2max = (Integer) activity.get("step2max");
+				Integer step2prize = (Integer) activity.get("step2prize");
+				Integer step3min = (Integer) activity.get("step3min");
+				Integer step3max = (Integer) activity.get("step3max");
+				Integer step3prize = (Integer) activity.get("step3prize");
+				Integer step4min = (Integer) activity.get("step4min");
+				Integer step4max = (Integer) activity.get("step4max");
+				Integer step4prize = (Integer) activity.get("step4prize");
+				Integer step5min = (Integer) activity.get("step5min");
+				Integer step5max = (Integer) activity.get("step5max");
+				Integer step5prize = (Integer) activity.get("step5prize");
+				Integer step6min = (Integer) activity.get("step6min");
+				Integer step6max = (Integer) activity.get("step6max");
+				Integer step6prize = (Integer) activity.get("step6prize");
+				Integer step7 = (Integer) activity.get("step7");
+				Integer step7prize = (Integer) activity.get("step7prize");
 				if (caselotprize >= step1min && caselotprize <= step1max) {
-					prize = new BigDecimal(step1prizeamt);
-				} else {
-					Integer step = (Integer) activity.get("step");
-					Integer prizeamt = (Integer) activity.get("prizeamt");
-					int multiple = caselotprize.intValue() / step;
-					if (multiple > 0) {
-						prize = new BigDecimal(multiple * prizeamt);
-					}
+					prize = new BigDecimal(step1prize);
+				} else if (caselotprize >= step2min && caselotprize <= step2max) {
+					prize = new BigDecimal(step2prize);
+				} else if (caselotprize >= step3min && caselotprize <= step3max) {
+					prize = new BigDecimal(step3prize);
+				} else if (caselotprize >= step4min && caselotprize <= step4max) {
+					prize = new BigDecimal(step4prize);
+				} else if (caselotprize >= step5min && caselotprize <= step5max) {
+					prize = new BigDecimal(step5prize);
+				} else if (caselotprize >= step6min && caselotprize <= step6max) {
+					prize = new BigDecimal(step6prize);
+				} else if (caselotprize >= step7) {
+					prize = new BigDecimal(step7prize);
 				}
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					Tactivity wcbu = tactivityDao.findTactivity(null, null, userinfo.getSubChannel(), null,

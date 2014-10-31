@@ -156,40 +156,68 @@ public class TactivityTest {
 //		}
 //	}
 	
+//	@Test
+//	public void testfindActivity() {
+//		Tactivity tactivity = tactivityDao.findTactivity("J00001", null, "00092493", null,
+//				ActionJmsType.Encash_JingCai_AddPrize.value);
+//		if (tactivity != null) {
+//			Long orderprizeamt = 12384L;
+//			if(orderprizeamt > 0){
+//				BigDecimal prize = BigDecimal.ZERO;
+//				Integer minprize = 4000;
+//				Integer percent = 10;
+//				Integer topprize = 4000000;
+//				if(orderprizeamt >= minprize){
+//					BigDecimal amtTotal = tuserPrizeDetailDao.statisticPrizeDetail("00002746", ActionJmsType.Encash_JingCai_AddPrize.value, new Date());
+//					System.out.println("amtTotal"+amtTotal);
+//					if(amtTotal.compareTo(new BigDecimal(topprize))<0){
+//						prize = new BigDecimal(orderprizeamt).divide(new BigDecimal(minprize)).setScale(0,BigDecimal.ROUND_HALF_DOWN)
+//								.multiply(new BigDecimal(minprize)).multiply(new BigDecimal(percent)).divide(new BigDecimal(100));
+//						System.out.println("prize"+prize);
+//						if(prize.compareTo(new BigDecimal(topprize))>=0){
+//							prize = new BigDecimal(topprize);
+//						}else{
+//							if((prize.add(amtTotal)).compareTo(new BigDecimal(topprize))>0){
+//								prize = new BigDecimal(topprize).subtract(amtTotal);
+//							}
+//						}
+//						if (Tjmsservice.createTjmsservice("00002746", ActionJmsType.Encash_JingCai_AddPrize)) {
+//							sendActivityPrizeJms.sendPrize2UserJMS("00002746", prize, ActionJmsType.Encash_JingCai_AddPrize,
+//									tactivity.getMemo(), "TE2014080801133103", "", "");
+//						}
+//					}else{
+//					}
+//				}else{
+//				}
+//			}
+//		}
+//	}
+	
 	@Test
 	public void testfindActivity() {
-		Tactivity tactivity = tactivityDao.findTactivity("J00001", null, "00092493", null,
-				ActionJmsType.Encash_JingCai_AddPrize.value);
+		Tactivity tactivity = tactivityDao.findTactivity("J00005", null, "00092493", null,
+				ActionJmsType.Encash_LanQiu_AddPrize.value);
 		if (tactivity != null) {
-			Long orderprizeamt = 12384L;
+			Long orderprizeamt = 32384L;
 			if(orderprizeamt > 0){
-				BigDecimal prize = BigDecimal.ZERO;
-				Integer minprize = 4000;
-				Integer percent = 10;
-				Integer topprize = 4000000;
+				Integer minprize = 20000;
+				Integer maxprize = 39900;
 				if(orderprizeamt >= minprize){
-					BigDecimal amtTotal = tuserPrizeDetailDao.statisticPrizeDetail("00002746", ActionJmsType.Encash_JingCai_AddPrize.value, new Date());
-					System.out.println("amtTotal"+amtTotal);
-					if(amtTotal.compareTo(new BigDecimal(topprize))<0){
-						prize = new BigDecimal(orderprizeamt).divide(new BigDecimal(minprize)).setScale(0,BigDecimal.ROUND_HALF_DOWN)
-								.multiply(new BigDecimal(minprize)).multiply(new BigDecimal(percent)).divide(new BigDecimal(100));
-						System.out.println("prize"+prize);
-						if(prize.compareTo(new BigDecimal(topprize))>=0){
-							prize = new BigDecimal(topprize);
-						}else{
-							if((prize.add(amtTotal)).compareTo(new BigDecimal(topprize))>0){
-								prize = new BigDecimal(topprize).subtract(amtTotal);
-							}
-						}
-						if (Tjmsservice.createTjmsservice("00002746", ActionJmsType.Encash_JingCai_AddPrize)) {
-							sendActivityPrizeJms.sendPrize2UserJMS("00002746", prize, ActionJmsType.Encash_JingCai_AddPrize,
-									tactivity.getMemo(), "TE2014080801133103", "", "");
-						}
-					}else{
+					BigDecimal prize = new BigDecimal(1500);
+					if (Tjmsservice.createTjmsservice("00001845", ActionJmsType.Encash_LanQiu_AddPrize)) {
+						sendActivityPrizeJms.sendPrize2UserJMS("00001845", prize, ActionJmsType.Encash_LanQiu_AddPrize,
+								tactivity.getMemo(), "TE2014101601238138", "", "");
 					}
 				}else{
 				}
 			}
 		}
+		BigDecimal prize1 = new BigDecimal(1999.01);
+		BigDecimal prize2 = new BigDecimal(1999.99);
+		BigDecimal prize3 = new BigDecimal(1999.50);
+		System.out.println(prize1.setScale(0,BigDecimal.ROUND_DOWN));
+		System.out.println(prize3.setScale(0,BigDecimal.ROUND_DOWN));
+		System.out.println(prize2.setScale(0,BigDecimal.ROUND_DOWN));
 	}
+	
 }
