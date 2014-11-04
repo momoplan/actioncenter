@@ -215,38 +215,40 @@ public class DispatchCaseLotFinishListener {
 				BigDecimal prize = BigDecimal.ZERO;
 				String express = tactivity.getExpress();
 				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
-				Integer step1 = (Integer) activity.get("step1");
+				Integer step1min = (Integer) activity.get("step1min");
+				Integer step1max = (Integer) activity.get("step1max");
 				Integer step1prize = (Integer) activity.get("step1prize");
-				Integer step2 = (Integer) activity.get("step2");
+				Integer step2min = (Integer) activity.get("step2min");
+				Integer step2max = (Integer) activity.get("step2max");
 				Integer step2prize = (Integer) activity.get("step2prize");
-				Integer step3 = (Integer) activity.get("step3");
+				Integer step3min = (Integer) activity.get("step3min");
+				Integer step3max = (Integer) activity.get("step3max");
 				Integer step3prize = (Integer) activity.get("step3prize");
-				Integer step4 = (Integer) activity.get("step4");
+				Integer step4min = (Integer) activity.get("step4min");
+				Integer step4max = (Integer) activity.get("step4max");
 				Integer step4prize = (Integer) activity.get("step4prize");
-				Integer step5 = (Integer) activity.get("step5");
+				Integer step5min = (Integer) activity.get("step5min");
+				Integer step5max = (Integer) activity.get("step5max");
 				Integer step5prize = (Integer) activity.get("step5prize");
-				Integer step6 = (Integer) activity.get("step6");
+				Integer step6min = (Integer) activity.get("step6min");
+				Integer step6max = (Integer) activity.get("step6max");
 				Integer step6prize = (Integer) activity.get("step6prize");
 				Integer step7 = (Integer) activity.get("step7");
 				Integer step7prize = (Integer) activity.get("step7prize");
-				Integer step8 = (Integer) activity.get("step8");
-				Integer step8prize = (Integer) activity.get("step8prize");
-				if (caselotprize >= step1 && caselotprize < step2) {
+				if (caselotprize >= step1min && caselotprize <= step1max) {
 					prize = new BigDecimal(step1prize);
-				} else if (caselotprize >= step2 && caselotprize < step3) {
+				} else if (caselotprize >= step2min && caselotprize <= step2max) {
 					prize = new BigDecimal(step2prize);
-				} else if (caselotprize >= step3 && caselotprize < step4) {
+				} else if (caselotprize >= step3min && caselotprize <= step3max) {
 					prize = new BigDecimal(step3prize);
-				} else if (caselotprize >= step4 && caselotprize < step5) {
+				} else if (caselotprize >= step4min && caselotprize <= step4max) {
 					prize = new BigDecimal(step4prize);
-				} else if (caselotprize >= step5 && caselotprize < step6) {
+				} else if (caselotprize >= step5min && caselotprize <= step5max) {
 					prize = new BigDecimal(step5prize);
-				} else if (caselotprize >= step6 && caselotprize < step7) {
+				} else if (caselotprize >= step6min && caselotprize <= step6max) {
 					prize = new BigDecimal(step6prize);
-				} else if (caselotprize >= step7 && caselotprize < step8) {
+				} else if (caselotprize >= step7) {
 					prize = new BigDecimal(step7prize);
-				} else if (caselotprize >= step8) {
-					prize = new BigDecimal(step8prize);
 				}
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					Tactivity wcbu = tactivityDao.findTactivity(null, null, userinfo.getSubChannel(), null,
