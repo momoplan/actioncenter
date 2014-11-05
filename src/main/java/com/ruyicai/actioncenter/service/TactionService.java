@@ -569,6 +569,8 @@ public class TactionService {
 				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
 				Integer step = (Integer) activity.get("step");
 				Integer present = (Integer) activity.get("present");
+				Integer step2 = (Integer) activity.get("step2");
+				Integer present2 = (Integer) activity.get("present2");
 				Calendar calendar = Calendar.getInstance();
 
 				calendar.add(Calendar.MONTH, -1);
@@ -577,8 +579,15 @@ public class TactionService {
 				if (lastMonthVipUser != null && lastMonthVipUser.getBuyamt().compareTo(new BigDecimal(step)) >= 0) {
 					if (amt.compareTo(BigDecimal.ZERO) >= 0) {
 						flag = true;
-						BigDecimal prizeamt = amt.multiply(new BigDecimal(present)).divideToIntegralValue(
-								new BigDecimal(100));
+						BigDecimal prizeamt = BigDecimal.ZERO;
+						if("01654244".equals(lastMonthVipUser.getId().getUserno()) && 
+								lastMonthVipUser.getBuyamt().compareTo(new BigDecimal(step2)) >= 0){//按3返点
+							prizeamt =	amt.multiply(new BigDecimal(present2)).divideToIntegralValue(
+									new BigDecimal(100));
+						}else{
+							prizeamt =	amt.multiply(new BigDecimal(present)).divideToIntegralValue(
+									new BigDecimal(100));
+						}
 						logger.info("大客户userno:{},时间:{},总购彩金额:{},本次购彩:{},赠送金额:{}", new String[] {
 								lastMonthVipUser.getId().getUserno(), lastMonthVipUser.getId().getYearAndMonth(),
 								lastMonthVipUser.getBuyamt() + "", amt + "", prizeamt + "" });
