@@ -35,7 +35,8 @@ public enum ActionJmsType {
 	World_Cup_BigUser(27,"世界杯大户加奖"),
 	YinLian_New_User_Zengsong(28,"银联手机充值新用户赠送"),
 	YinLian_Old_User_Zengsong(29,"银联手机充值老用户赠送"),
-	Encash_JingCai_AddPrize(30,"竞彩足球全面加奖");
+	Encash_JingCai_AddPrize(30,"竞彩足球全面加奖"),
+	Encash_JingCaiDanGuan_AddPrize(31,"竞彩单关固赔加奖");
 
 	public int value;
 
