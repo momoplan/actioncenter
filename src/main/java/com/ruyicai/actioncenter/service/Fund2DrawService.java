@@ -19,6 +19,7 @@ import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.consts.Fund2DrawState;
 import com.ruyicai.actioncenter.dao.Fund2DrawDao;
 import com.ruyicai.actioncenter.dao.TactivityDao;
+import com.ruyicai.actioncenter.domain.FirstChargeUser;
 import com.ruyicai.actioncenter.domain.Fund2Draw;
 import com.ruyicai.actioncenter.domain.FundAndJoinAction;
 import com.ruyicai.actioncenter.domain.Tactivity;
@@ -117,6 +118,13 @@ public class Fund2DrawService {
 		Map<String, Object> conditionMap = JsonUtil.transferJson2Map(condition);
 		fund2DrawDao.findFund2DrawByPage(conditionMap, page);
 		return page;
+	}
+	
+	public FirstChargeUser findFirstChargeUser(String userno, Integer state) {
+		if(StringUtils.isBlank(userno)) {
+			throw new IllegalArgumentException("The argument userno is required.");
+		}
+		return FirstChargeUser.findFirstChargeUser(userno, state);
 	}
 
 }

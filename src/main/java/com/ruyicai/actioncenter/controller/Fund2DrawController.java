@@ -113,4 +113,22 @@ public class Fund2DrawController {
 		rd.setErrorCode(result.value);
 		return rd;
 	}
+	
+	@RequestMapping(value = "/findFirstChargeUser", method = RequestMethod.POST)
+	public @ResponseBody
+	ResponseData findFirstChargeUserExists(@RequestParam("userno") String userno,@RequestParam("state") Integer state) {
+		logger.info("/fund2draw/findFirstChargeUser condition:{} userno:{} state:{}", new String[] {userno, state + " "});
+		ResponseData rd = new ResponseData();
+		ErrorCode result = ErrorCode.OK;
+		try{
+			rd.setValue(fund2DrawService.findFirstChargeUser(userno, state));
+		} catch (Exception e) {
+			logger.error("findFirstChargeUser error", e);
+			result = ErrorCode.ERROR;
+			rd.setValue(e.getMessage());
+		}
+		rd.setErrorCode(result.value);
+		return rd;
+	}
+	
 }
