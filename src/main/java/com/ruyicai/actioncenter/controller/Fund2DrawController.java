@@ -131,4 +131,21 @@ public class Fund2DrawController {
 		return rd;
 	}
 	
+	@RequestMapping(value = "/findChong20Mobile", method = RequestMethod.POST)
+	public @ResponseBody
+	ResponseData findChong20MobileExists(@RequestParam("mobileid") String mobileid) {
+		logger.info("/fund2draw/findChong20Mobile condition:{} userno:{}", new String[] {mobileid});
+		ResponseData rd = new ResponseData();
+		ErrorCode result = ErrorCode.OK;
+		try{
+			rd.setValue(fund2DrawService.findChong20Mobile(mobileid));
+		} catch (Exception e) {
+			logger.error("findChong20Mobile error", e);
+			result = ErrorCode.ERROR;
+			rd.setValue(e.getMessage());
+		}
+		rd.setErrorCode(result.value);
+		return rd;
+	}
+	
 }

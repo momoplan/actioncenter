@@ -19,6 +19,7 @@ import com.ruyicai.actioncenter.consts.ActionJmsType;
 import com.ruyicai.actioncenter.consts.Fund2DrawState;
 import com.ruyicai.actioncenter.dao.Fund2DrawDao;
 import com.ruyicai.actioncenter.dao.TactivityDao;
+import com.ruyicai.actioncenter.domain.Chong20Mobile;
 import com.ruyicai.actioncenter.domain.FirstChargeUser;
 import com.ruyicai.actioncenter.domain.Fund2Draw;
 import com.ruyicai.actioncenter.domain.FundAndJoinAction;
@@ -125,6 +126,13 @@ public class Fund2DrawService {
 			throw new IllegalArgumentException("The argument userno is required.");
 		}
 		return FirstChargeUser.findFirstChargeUser(userno, state);
+	}
+	
+	public Chong20Mobile findChong20Mobile(String mobileid) {
+		if(StringUtils.isBlank(mobileid)) {
+			throw new IllegalArgumentException("The argument mobileid is required.");
+		}
+		return Chong20Mobile.findChong20Mobile(mobileid);
 	}
 
 }
