@@ -74,6 +74,10 @@ public class UserInfoListener {
 				logger.info("第一次充值活动，用户未绑定身份证号 userno:" + userno);
 				return;
 			}
+			if (StringUtils.isBlank(tuserinfo.getName())) {
+				logger.info("第一次充值活动，用户未绑定姓名 userno:" + userno);
+				return;
+			}
 			if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {
 				Chong20Mobile chong20Mobile = Chong20Mobile.findChong20Mobile(tuserinfo.getMobileid());
 				if (chong20Mobile != null) {

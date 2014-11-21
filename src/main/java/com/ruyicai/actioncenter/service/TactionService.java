@@ -269,7 +269,8 @@ public class TactionService {
 						if (count == 1 || count == null) {
 							YinLianNewUser newUser = YinLianNewUser.findYinLianNewUser(tuserinfo.getUserno());
 							if (newUser == null) {
-								if (StringUtils.isNotBlank(tuserinfo.getMobileid())) {
+								if (StringUtils.isNotBlank(tuserinfo.getMobileid()) && StringUtils.isNotBlank(tuserinfo.getCertid())
+										&& StringUtils.isNotBlank(tuserinfo.getName())) {
 									Chong20Mobile chong20Mobile = Chong20Mobile.findChong20Mobile(tuserinfo
 											.getMobileid());
 									if (chong20Mobile == null) {
