@@ -18,7 +18,7 @@ public enum ActionJmsType {
 	OLD_USER_CHONGZHI_ZENGSONG(8, "老用户充值赠送"),
 	VIP_USER_GOUCAI_ZENGSONG(9, "大户购彩赠送"),
 	Encash_2chuan1_AddPrize(10, "竞彩足球2串1加奖"),
-	Encash_DuoLeCai_AddPrize(11, "广东11选5加奖"),
+	Encash_DuoLeCai_AddPrize(11, "重庆11选5加奖"),
 	Encash_DaXiaoDanShuang_AddPrize(12, "大小单双加奖"),
 	Encash_ZuCai_AddPrize(13, "足彩加奖"),
 	Friday_SSQ_ZENGSONG(15,"购买双色球赠送"),
@@ -36,7 +36,10 @@ public enum ActionJmsType {
 	YinLian_New_User_Zengsong(28,"银联手机充值新用户赠送"),
 	YinLian_Old_User_Zengsong(29,"银联手机充值老用户赠送"),
 	Encash_JingCai_AddPrize(30,"竞彩足球全面加奖"),
-	Encash_JingCaiDanGuan_AddPrize(31,"竞彩单关固赔加奖");
+	Encash_JingCaiDanGuan_AddPrize(31,"竞彩单关固赔加奖"),
+	Xingyunsaiche_AddPrize(32,"幸运赛车加奖"),
+	XinKuai3_AddPrize(33,"新快三加奖"),
+	Shiyiyunduojin_AddPrize(34,"山东11运夺金加奖");
 
 	public int value;
 

@@ -67,16 +67,19 @@ public class OrderEncashListener {
 			addPrizeSSC(order, orderUserInfo);
 			addPrize2Chuan1(order, orderUserInfo);
 			addPrize11Xuan5(order, orderUserInfo);
+			addPrizeShiyiyunDuojin(order, orderUserInfo);
 			addPrizeDaXiaoDanShuang(order, orderUserInfo);
 			addPrizeZuCai(order, orderUserInfo);
 			addPrizeLanQiu(order, orderUserInfo);
 			addPrizeJingcai2chuan1(order, orderUserInfo);
 			addPrizeKuai3(order, orderUserInfo);
+			addPrizeXinKuai3(order, orderUserInfo);
 			addPrize3D(order, orderUserInfo);
 			addBeiDan(order, orderUserInfo);
 			addWorldCupBigUser(order, orderUserInfo);
 			addPrizeJingcai(order, orderUserInfo);
 			addPrizeJingcaiDanguan(order, orderUserInfo);
+			addPrizeXingyunsaiche(order, orderUserInfo);
 		} catch (Exception e) {
 			logger.error("加奖活动异常", e);
 		}
@@ -236,6 +239,45 @@ public class OrderEncashListener {
 					logger.info("中奖金额小于" + minprize + "不参与活动");
 				}
 
+			}
+		}
+	}
+	
+	@Transactional
+	public void addPrizeXinKuai3(Torder order, Tuserinfo orderUserInfo) {
+		String userno = orderUserInfo.getUserno();
+		if (userno.equals(ruyicaiUserno)) {
+			logger.info("如意彩账户购买,不加奖");
+			return;
+		}
+		Tuserinfo tuserinfo = orderUserInfo;
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
+				ActionJmsType.XinKuai3_AddPrize.value);
+		if (tactivity != null) {
+			Long orderprizeamt = order.getOrderprizeamt().longValue();
+			if (orderprizeamt > 0) {
+				BigDecimal prize = BigDecimal.ZERO;
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Integer minprize = (Integer) activity.get("minprize");
+				Integer percent = (Integer) activity.get("percent");
+				Integer topprize = (Integer) activity.get("topprize");
+
+				if (orderprizeamt >= minprize) {
+					prize = new BigDecimal(orderprizeamt).multiply(new BigDecimal(percent)).divide(new BigDecimal(100));
+					if (prize.compareTo(new BigDecimal(topprize)) > 0) {
+						prize = new BigDecimal(topprize);
+					}
+					if (prize.compareTo(BigDecimal.ZERO) > 0) {
+						if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.XinKuai3_AddPrize)) {
+							logger.info(tactivity.getMemo() + "新快三prize:" + prize.longValue());
+							sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.XinKuai3_AddPrize,
+									tactivity.getMemo(), order.getId(), "", "");
+						}
+					}
+				} else {
+					logger.info("中奖金额小于" + minprize + "不参与活动");
+				}
 			}
 		}
 	}
@@ -583,20 +625,77 @@ public class OrderEncashListener {
 				} else if (orderprizeamt >= step4) {
 					prize = new BigDecimal(step4prize);
 				}
-				// 如果用户当天赠送金额大于600元。则不再赠送
+				// 如果用户当天赠送金额大于800元。则不再赠送
 				String day = DateUtil.format("yyyy-MM-dd", new Date());
 				SSCPrizedDetail detail = SSCPrizedDetail.findSSCPrizedDetail(new SSCPrizedDetailPK(userno, day));
 				if (detail != null && detail.getTotalPrizeAmt() != null) {
-					if (detail.getTotalPrizeAmt().compareTo(new BigDecimal(60000)) > 0) {
-						logger.info("赠送超过600元，不再赠送.userno:{},day:{},totalPrizeAmt:{}", new String[] { userno, day,
+					if (detail.getTotalPrizeAmt().compareTo(new BigDecimal(80000)) > 0) {
+						logger.info("赠送超过800元，不再赠送.userno:{},day:{},totalPrizeAmt:{}", new String[] { userno, day,
 								detail.getTotalPrizeAmt() + "" });
 						return;
 					}
 				}
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
 					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_DuoLeCai_AddPrize)) {
-						logger.info(tactivity.getMemo() + "中奖加奖prize:" + prize.longValue());
+						logger.info(tactivity.getMemo() + "重庆11选5中奖加奖prize:" + prize.longValue());
 						sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_DuoLeCai_AddPrize,
+								tactivity.getMemo(), order.getId(), "", "");
+					}
+				}
+			}
+		}
+	}
+	
+	@Transactional
+	public void addPrizeShiyiyunDuojin(Torder order, Tuserinfo orderUserInfo) {
+		String userno = orderUserInfo.getUserno();
+		if (userno.equals(ruyicaiUserno)) {
+			logger.info("如意彩账户购买,不加奖");
+			return;
+		}
+		Tuserinfo tuserinfo = orderUserInfo;
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
+				ActionJmsType.Shiyiyunduojin_AddPrize.value);
+		if (tactivity != null) {
+			Long orderprizeamt = order.getOrderprizeamt().longValue();
+			if (orderprizeamt > 0) {
+				BigDecimal prize = BigDecimal.ZERO;
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Integer step1min = (Integer) activity.get("step1min");
+				Integer step1max = (Integer) activity.get("step1max");
+				Integer step1prize = (Integer) activity.get("step1prize");
+				Integer step2min = (Integer) activity.get("step2min");
+				Integer step2max = (Integer) activity.get("step2max");
+				Integer step2prize = (Integer) activity.get("step2prize");
+				Integer step3min = (Integer) activity.get("step3min");
+				Integer step3max = (Integer) activity.get("step3max");
+				Integer step3prize = (Integer) activity.get("step3prize");
+				Integer step4 = (Integer) activity.get("step4");
+				Integer step4prize = (Integer) activity.get("step4prize");
+				if (orderprizeamt >= step1min && orderprizeamt <= step1max) {
+					prize = new BigDecimal(step1prize);
+				} else if (orderprizeamt >= step2min && orderprizeamt <= step2max) {
+					prize = new BigDecimal(step2prize);
+				} else if (orderprizeamt >= step3min && orderprizeamt <= step3max) {
+					prize = new BigDecimal(step3prize);
+				} else if (orderprizeamt >= step4) {
+					prize = new BigDecimal(step4prize);
+				}
+				// 如果用户当天赠送金额大于800元。则不再赠送
+				String day = DateUtil.format("yyyy-MM-dd", new Date());
+				SSCPrizedDetail detail = SSCPrizedDetail.findSSCPrizedDetail(new SSCPrizedDetailPK(userno, day));
+				if (detail != null && detail.getTotalPrizeAmt() != null) {
+					if (detail.getTotalPrizeAmt().compareTo(new BigDecimal(80000)) > 0) {
+						logger.info("赠送超过800元，不再赠送.userno:{},day:{},totalPrizeAmt:{}", new String[] { userno, day,
+								detail.getTotalPrizeAmt() + "" });
+						return;
+					}
+				}
+				if (prize.compareTo(BigDecimal.ZERO) > 0) {
+					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Shiyiyunduojin_AddPrize)) {
+						logger.info(tactivity.getMemo() + "十一运夺金中奖加奖prize:" + prize.longValue());
+						sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Shiyiyunduojin_AddPrize,
 								tactivity.getMemo(), order.getId(), "", "");
 					}
 				}
@@ -738,4 +837,52 @@ public class OrderEncashListener {
 			}
 		}
 	}
+	
+	@Transactional
+	public void addPrizeXingyunsaiche(Torder order, Tuserinfo orderUserInfo){
+		String userno = orderUserInfo.getUserno();
+		if (userno.equals(ruyicaiUserno)) {
+			logger.info("如意彩账户购买,不加奖");
+			return;
+		}
+		Tuserinfo tuserinfo = orderUserInfo;
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(), null,
+				ActionJmsType.Xingyunsaiche_AddPrize.value);
+		if (tactivity != null) {
+			Long orderprizeamt = order.getOrderprizeamt().longValue();
+			if (orderprizeamt > 0) {
+				BigDecimal prize = BigDecimal.ZERO;
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Integer step1min = (Integer) activity.get("step1min");
+				Integer step1max = (Integer) activity.get("step1max");
+				Integer step1prize = (Integer) activity.get("step1prize");
+				Integer step2min = (Integer) activity.get("step2min");
+				Integer step2max = (Integer) activity.get("step2max");
+				Integer step2prize = (Integer) activity.get("step2prize");
+				Integer step3min = (Integer) activity.get("step3min");
+				Integer step3max = (Integer) activity.get("step3max");
+				Integer step3prize = (Integer) activity.get("step3prize");
+				Integer step4 = (Integer) activity.get("step4");
+				Integer step4prize = (Integer) activity.get("step4prize");
+				if (orderprizeamt >= step1min && orderprizeamt <= step1max) {
+					prize = new BigDecimal(step1prize);
+				} else if (orderprizeamt >= step2min && orderprizeamt <= step2max) {
+					prize = new BigDecimal(step2prize);
+				} else if (orderprizeamt >= step3min && orderprizeamt <= step3max) {
+					prize = new BigDecimal(step3prize);
+				} else if (orderprizeamt >= step4) {
+					prize = new BigDecimal(step4prize);
+				}
+				if (prize.compareTo(BigDecimal.ZERO) > 0) {
+					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Xingyunsaiche_AddPrize)) {
+						logger.info(tactivity.getMemo() + "幸运赛车prize:" + prize.longValue());
+						sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Xingyunsaiche_AddPrize,
+								tactivity.getMemo(), order.getId(), "", "");
+					}
+				}
+			}
+		}
+	}
+	
 }
