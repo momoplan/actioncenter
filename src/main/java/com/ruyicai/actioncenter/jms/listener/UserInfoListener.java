@@ -65,6 +65,10 @@ public class UserInfoListener {
 			logger.info("如意彩大户渠道不参加活动");
 			return;
 		}
+		if (tuserinfo != null && tuserinfo.getChannel() != null && tuserinfo.getChannel().equals("1137")) {
+			logger.info("电信O2O渠道不参加活动");
+			return;
+		}
 		String userno = tuserinfo.getUserno();
 		Tactivity tactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 				ActionJmsType.FIRST_CHONGZHI_ZENGSONG.value);
@@ -157,14 +161,17 @@ public class UserInfoListener {
 					}
 					SuningRegister register = SuningRegister.findSuningRegister(tuserinfo.getMobileid());
 					if (register == null) {
-						String express = suningtactivity.getExpress();
-						Map<String, Object> activity = JsonUtil.transferJson2Map(express);
-						Integer prizeamt = (Integer) activity.get("prizeamt");
-						logger.info("苏宁完善用户信息赠送userno:{},mobileid:{},prizeamt:{}",
-								new String[] { userno, tuserinfo.getMobileid(), prizeamt + "" });
-						SuningRegister.createSuningRegister(tuserinfo.getMobileid(), userno);
-						sendActivityPrizeJms.sendPrize2UserJMS(userno, new BigDecimal(prizeamt),
-								ActionJmsType.NEW_USER_REGISTER, suningtactivity.getMemo(), "", "", "");
+						if (StringUtils.isNotBlank(tuserinfo.getMobileid())	&& StringUtils.isNotBlank(tuserinfo.getCertid())
+								&& StringUtils.isNotBlank(tuserinfo.getName())) {	//赠送所需硬性条件，缺一不可
+							String express = suningtactivity.getExpress();
+							Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+							Integer prizeamt = (Integer) activity.get("prizeamt");
+							logger.info("苏宁完善用户信息赠送userno:{},mobileid:{},prizeamt:{}",
+									new String[] { userno, tuserinfo.getMobileid(), prizeamt + "" });
+							SuningRegister.createSuningRegister(tuserinfo.getMobileid(), userno);
+							sendActivityPrizeJms.sendPrize2UserJMS(userno, new BigDecimal(prizeamt),
+									ActionJmsType.NEW_USER_REGISTER, suningtactivity.getMemo(), "", "", "");
+						}
 					} else {
 						logger.info("苏宁渠道完善信息赠送3元,用户手机号已赠送过.mobileid:{},user:{}",
 								new String[] { tuserinfo.getMobileid(), tuserinfo.toString() });

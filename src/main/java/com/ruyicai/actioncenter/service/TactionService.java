@@ -243,6 +243,10 @@ public class TactionService {
 			logger.info("U付如意彩用户不参与活动,user:" + tuserinfo.getUserno());
 			return flag;
 		}
+		if (tuserinfo.getChannel().equals("1137")) {
+			logger.info("电信O2O渠道用户不参与活动,user:" + tuserinfo.getUserno());
+			return flag;
+		}
 		if (tuserinfo != null) {
 			Tactivity yinliantactivity = tactivityDao.findTactivity(null, null, tuserinfo.getSubChannel(), null,
 					ActionJmsType.YinLian_New_User_Zengsong.value);
