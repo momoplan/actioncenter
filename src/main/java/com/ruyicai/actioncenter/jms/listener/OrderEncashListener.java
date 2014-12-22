@@ -865,11 +865,11 @@ public class OrderEncashListener {
 				Integer step3prize = (Integer) activity.get("step3prize");
 				Integer step4 = (Integer) activity.get("step4");
 				Integer step4prize = (Integer) activity.get("step4prize");
-				if (orderprizeamt >= step1min && orderprizeamt <= step1max) {
+				if (orderprizeamt >= step1min && orderprizeamt < step1max) {
 					prize = new BigDecimal(step1prize);
-				} else if (orderprizeamt >= step2min && orderprizeamt <= step2max) {
+				} else if (orderprizeamt >= step2min && orderprizeamt < step2max) {
 					prize = new BigDecimal(step2prize);
-				} else if (orderprizeamt >= step3min && orderprizeamt <= step3max) {
+				} else if (orderprizeamt >= step3min && orderprizeamt < step3max) {
 					prize = new BigDecimal(step3prize);
 				} else if (orderprizeamt >= step4) {
 					prize = new BigDecimal(step4prize);
