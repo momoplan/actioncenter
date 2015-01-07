@@ -298,65 +298,65 @@ public class OrderEncashListener {
 			return;
 		}
 		String lotno = order.getLotno();
-		if (!lotno.startsWith("J")) {
-			return;
-		}
-		Tactivity tactivity = tactivityDao.findTactivity(null, order.getPlaytype(), tuserinfo.getSubChannel(), null,
-				ActionJmsType.Encash_Jingcai_2Chan1.value);
-		if (tactivity != null) {
-			if (orderprizeamt > 0) {
-				BigDecimal prize = BigDecimal.ZERO;
-				String express = tactivity.getExpress();
-				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
-				Integer step1min = (Integer) activity.get("step1min");
-				Integer step1max = (Integer) activity.get("step1max");
-				Integer step1prize = (Integer) activity.get("step1prize");
-				Integer step2min = (Integer) activity.get("step2min");
-				Integer step2max = (Integer) activity.get("step2max");
-				Integer step2prize = (Integer) activity.get("step2prize");
-				Integer step3min = (Integer) activity.get("step3min");
-				Integer step3max = (Integer) activity.get("step3max");
-				Integer step3prize = (Integer) activity.get("step3prize");
-				Integer step4min = (Integer) activity.get("step4min");
-				Integer step4max = (Integer) activity.get("step4max");
-				Integer step4prize = (Integer) activity.get("step4prize");
-				Integer step5min = (Integer) activity.get("step5min");
-				Integer step5max = (Integer) activity.get("step5max");
-				Integer step5prize = (Integer) activity.get("step5prize");
-				Integer step6min = (Integer) activity.get("step6min");
-				Integer step6max = (Integer) activity.get("step6max");
-				Integer step6prize = (Integer) activity.get("step6prize");
-				Integer step7 = (Integer) activity.get("step7");
-				Integer step7prize = (Integer) activity.get("step7prize");
-				if (orderprizeamt >= step1min && orderprizeamt <= step1max) {
-					prize = new BigDecimal(step1prize);
-				} else if (orderprizeamt >= step2min && orderprizeamt <= step2max) {
-					prize = new BigDecimal(step2prize);
-				} else if (orderprizeamt >= step3min && orderprizeamt <= step3max) {
-					prize = new BigDecimal(step3prize);
-				} else if (orderprizeamt >= step4min && orderprizeamt <= step4max) {
-					prize = new BigDecimal(step4prize);
-				} else if (orderprizeamt >= step5min && orderprizeamt <= step5max) {
-					prize = new BigDecimal(step5prize);
-				} else if (orderprizeamt >= step6min && orderprizeamt <= step6max) {
-					prize = new BigDecimal(step6prize);
-				} else if (orderprizeamt >= step7) {
-					prize = new BigDecimal(step7prize);
-				}
-				if (prize.compareTo(BigDecimal.ZERO) > 0) {
-					Tactivity wcbu = tactivityDao.findTactivity(null, null, orderUserInfo.getSubChannel(), null,
-							ActionJmsType.World_Cup_BigUser.value);
-					if (wcbu != null) {
-						WorldCupBigUser worldCupBigUser = WorldCupBigUser.findWorldCupBigUser(userno);
-						if (worldCupBigUser != null) {
-							logger.info("参与世界杯大户活动，不再参加此活动userno:" + userno);
-							return;
-						}
+		if (lotno.equals("J00001") || lotno.equals("J00002") || lotno.equals("J00003") || lotno.equals("J00004")
+				|| lotno.equals("J00011") || lotno.equals("J00013")) {
+			Tactivity tactivity = tactivityDao.findTactivity(null, order.getPlaytype(), tuserinfo.getSubChannel(), null,
+					ActionJmsType.Encash_Jingcai_2Chan1.value);
+			if (tactivity != null) {
+				if (orderprizeamt > 0) {
+					BigDecimal prize = BigDecimal.ZERO;
+					String express = tactivity.getExpress();
+					Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+					Integer step1min = (Integer) activity.get("step1min");
+					Integer step1max = (Integer) activity.get("step1max");
+					Integer step1prize = (Integer) activity.get("step1prize");
+					Integer step2min = (Integer) activity.get("step2min");
+					Integer step2max = (Integer) activity.get("step2max");
+					Integer step2prize = (Integer) activity.get("step2prize");
+					Integer step3min = (Integer) activity.get("step3min");
+					Integer step3max = (Integer) activity.get("step3max");
+					Integer step3prize = (Integer) activity.get("step3prize");
+					Integer step4min = (Integer) activity.get("step4min");
+					Integer step4max = (Integer) activity.get("step4max");
+					Integer step4prize = (Integer) activity.get("step4prize");
+					Integer step5min = (Integer) activity.get("step5min");
+					Integer step5max = (Integer) activity.get("step5max");
+					Integer step5prize = (Integer) activity.get("step5prize");
+					Integer step6min = (Integer) activity.get("step6min");
+					Integer step6max = (Integer) activity.get("step6max");
+					Integer step6prize = (Integer) activity.get("step6prize");
+					Integer step7 = (Integer) activity.get("step7");
+					Integer step7prize = (Integer) activity.get("step7prize");
+					if (orderprizeamt >= step1min && orderprizeamt <= step1max) {
+						prize = new BigDecimal(step1prize);
+					} else if (orderprizeamt >= step2min && orderprizeamt <= step2max) {
+						prize = new BigDecimal(step2prize);
+					} else if (orderprizeamt >= step3min && orderprizeamt <= step3max) {
+						prize = new BigDecimal(step3prize);
+					} else if (orderprizeamt >= step4min && orderprizeamt <= step4max) {
+						prize = new BigDecimal(step4prize);
+					} else if (orderprizeamt >= step5min && orderprizeamt <= step5max) {
+						prize = new BigDecimal(step5prize);
+					} else if (orderprizeamt >= step6min && orderprizeamt <= step6max) {
+						prize = new BigDecimal(step6prize);
+					} else if (orderprizeamt >= step7) {
+						prize = new BigDecimal(step7prize);
 					}
-					if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_Jingcai_2Chan1)) {
-						logger.info(tactivity.getMemo() + prize);
-						sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_Jingcai_2Chan1,
-								tactivity.getMemo(), order.getId(), "", "");
+					if (prize.compareTo(BigDecimal.ZERO) > 0) {
+						Tactivity wcbu = tactivityDao.findTactivity(null, null, orderUserInfo.getSubChannel(), null,
+								ActionJmsType.World_Cup_BigUser.value);
+						if (wcbu != null) {
+							WorldCupBigUser worldCupBigUser = WorldCupBigUser.findWorldCupBigUser(userno);
+							if (worldCupBigUser != null) {
+								logger.info("参与世界杯大户活动，不再参加此活动userno:" + userno);
+								return;
+							}
+						}
+						if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_Jingcai_2Chan1)) {
+							logger.info(tactivity.getMemo() + prize);
+							sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_Jingcai_2Chan1,
+									tactivity.getMemo(), order.getId(), "", "");
+						}
 					}
 				}
 			}
