@@ -39,7 +39,8 @@ public enum ActionJmsType {
 	Encash_JingCaiDanGuan_AddPrize(31,"竞彩单关固赔加奖"),
 	Xingyunsaiche_AddPrize(32,"幸运赛车加奖"),
 	XinKuai3_AddPrize(33,"新快三加奖"),
-	Shiyiyunduojin_AddPrize(34,"山东11运夺金加奖");
+	Shiyiyunduojin_AddPrize(34,"山东11运夺金加奖"),
+	Encash_JXSSC_AddPrize(35,"新时时彩加奖");
 
 	public int value;
 

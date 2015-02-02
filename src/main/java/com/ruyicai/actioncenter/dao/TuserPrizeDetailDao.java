@@ -121,6 +121,20 @@ public class TuserPrizeDetailDao {
 		query.setParameter(4, endtime);
 		return query.getSingleResult()==null?new BigDecimal(0):query.getSingleResult();
 	}
+	
+	public Long statisticPrizeDetailNumber(String userno, Integer activityType, Date date) {
+		Date starttime = DateUtil.getDateTheZero(date);
+		Date endtime = DateUtil.getDateTheZero(DateUtil.addDay(date, 1));
+		TypedQuery<Long> query = this.entityManager
+				.createQuery(
+						"select count(*) from TuserPrizeDetail o where o.userno = ? and o.activityType = ? and o.createTime between ? and ? ",
+						Long.class);
+		query.setParameter(1, userno);
+		query.setParameter(2, activityType);
+		query.setParameter(3, starttime);
+		query.setParameter(4, endtime);
+		return query.getSingleResult()==null?0:query.getSingleResult();
+	}
 
 	public void findTuserPrizeDetailByPage(Map<String, Object> conditionMap, Page<TuserPrizeDetail> page) {
 		String sql = "SELECT o FROM TuserPrizeDetail o ";

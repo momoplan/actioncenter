@@ -49,6 +49,7 @@ public class Lottype {
 		map.put("T01015", "广东快乐十分");
 		map.put("T01016", "重庆十一选五");
 		map.put("T01018", "幸运赛车");
+		map.put("T01019", "江西时时彩");//新时时彩
 		map.put("T01020", "快乐扑克3");
 	}
 

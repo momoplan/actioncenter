@@ -251,19 +251,24 @@ public class DispatchCaseLotFinishListener {
 						prize = new BigDecimal(step7prize);
 					}
 					if (prize.compareTo(BigDecimal.ZERO) > 0) {
-						Tactivity wcbu = tactivityDao.findTactivity(null, null, userinfo.getSubChannel(), null,
-								ActionJmsType.World_Cup_BigUser.value);
-						if (wcbu != null) {
-							WorldCupBigUser worldCupBigUser = WorldCupBigUser.findWorldCupBigUser(userno);
-							if (worldCupBigUser != null) {
-								logger.info("参与世界杯大户活动，不再参加此活动userno:" + userno);
-								return;
+						Long numberTotal = tuserPrizeDetailDao.statisticPrizeDetailNumber(torder.getUserno(), ActionJmsType.Encash_Jingcai_2Chan1.value, new Date());
+						if (numberTotal < 10) { // 只对用户前十个方案加奖
+							Tactivity wcbu = tactivityDao.findTactivity(null, null, userinfo.getSubChannel(), null,
+									ActionJmsType.World_Cup_BigUser.value);
+							if (wcbu != null) {
+								WorldCupBigUser worldCupBigUser = WorldCupBigUser.findWorldCupBigUser(userno);
+								if (worldCupBigUser != null) {
+									logger.info("参与世界杯大户活动，不再参加此活动userno:" + userno);
+									return;
+								}
 							}
-						}
-						if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_Jingcai_2Chan1)) {
-							logger.info(tactivity.getMemo() + prize);
-							sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_Jingcai_2Chan1,
-									tactivity.getMemo(), caselotId, "", "");
+							if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_Jingcai_2Chan1)) {
+								logger.info(tactivity.getMemo() + prize);
+								sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_Jingcai_2Chan1,
+										tactivity.getMemo(), caselotId, "", "");
+							}
+						} else {
+							logger.info("用户:" + torder.getUserno() + "当日前十个方案已加奖,不再享受加奖活动。");
 						}
 					}
 				}
@@ -358,19 +363,24 @@ public class DispatchCaseLotFinishListener {
 					prize = new BigDecimal(step7prize);
 				}
 				if (prize.compareTo(BigDecimal.ZERO) > 0) {
-					Tactivity wcbu = tactivityDao.findTactivity(null, null, userinfo.getSubChannel(), null,
-							ActionJmsType.World_Cup_BigUser.value);
-					if (wcbu != null) {
-						WorldCupBigUser worldCupBigUser = WorldCupBigUser.findWorldCupBigUser(userinfo.getUserno());
-						if (worldCupBigUser != null) {
-							logger.info("参与世界杯大户活动，不再参加此活动userno:" + userinfo.getUserno());
-							return;
+					Long numberTotal = tuserPrizeDetailDao.statisticPrizeDetailNumber(torder.getUserno(), ActionJmsType.Encash_LanQiu_AddPrize.value, new Date());
+					if (numberTotal < 10) { // 只对用户前十个方案加奖
+						Tactivity wcbu = tactivityDao.findTactivity(null, null, userinfo.getSubChannel(), null,
+								ActionJmsType.World_Cup_BigUser.value);
+						if (wcbu != null) {
+							WorldCupBigUser worldCupBigUser = WorldCupBigUser.findWorldCupBigUser(userinfo.getUserno());
+							if (worldCupBigUser != null) {
+								logger.info("参与世界杯大户活动，不再参加此活动userno:" + userinfo.getUserno());
+								return;
+							}
 						}
-					}
-					if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_LanQiu_AddPrize)) {
-						logger.info(tactivity.getMemo() + "合买中奖加奖prize:" + prize.longValue());
-						sendActivityPrizeJms.sendPrize2UserJMS(userinfo.getUserno(), prize,
-								ActionJmsType.Encash_LanQiu_AddPrize, tactivity.getMemo(), caselotId, "", "");
+						if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_LanQiu_AddPrize)) {
+							logger.info(tactivity.getMemo() + "合买中奖加奖prize:" + prize.longValue());
+							sendActivityPrizeJms.sendPrize2UserJMS(userinfo.getUserno(), prize,
+									ActionJmsType.Encash_LanQiu_AddPrize, tactivity.getMemo(), caselotId, "", "");
+						}
+					} else {
+						logger.info("用户:" + torder.getUserno() + "当日前十个方案已加奖,不再享受加奖活动。");
 					}
 				}
 			}
