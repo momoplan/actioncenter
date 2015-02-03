@@ -80,6 +80,7 @@ public class OrderEncashListener {
 			addWorldCupBigUser(order, orderUserInfo);
 			addPrizeJingcai(order, orderUserInfo);
 			addPrizeJingcaiDanguan(order, orderUserInfo);
+			addPrizeLanQiuDanguan(order, orderUserInfo);
 			addPrizeXingyunsaiche(order, orderUserInfo);
 		} catch (Exception e) {
 			logger.error("加奖活动异常", e);
@@ -393,7 +394,7 @@ public class OrderEncashListener {
 			logger.info("如意彩账户购买,不加奖");
 			return;
 		}
-		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), null, tuserinfo.getSubChannel(), null,
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(), null,
 				ActionJmsType.Encash_LanQiu_AddPrize.value);
 		if (tactivity != null) {
 			// Long orderprizeamt = order.getOrderprizeamt().longValue();
@@ -901,6 +902,44 @@ public class OrderEncashListener {
 						if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_JingCaiDanGuan_AddPrize)) {
 							logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
 							sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_JingCaiDanGuan_AddPrize,
+									tactivity.getMemo(), order.getId(), "", "");
+						}
+					}
+				} else {
+					logger.info("中奖金额小于" + minprize + "不参与活动");
+				}
+			}
+		}
+	}
+	
+	@Transactional
+	public void addPrizeLanQiuDanguan(Torder order, Tuserinfo orderUserInfo) {
+		String userno = orderUserInfo.getUserno();
+		if (userno.equals(ruyicaiUserno)) {
+			logger.info("如意彩账户购买,不加奖");
+			return;
+		}
+		Tuserinfo tuserinfo = orderUserInfo;
+		Tactivity tactivity = tactivityDao.findTactivity(order.getLotno(), order.getPlaytype(), tuserinfo.getSubChannel(), null,
+				ActionJmsType.Encash_LanQiuDanGuan_AddPrize.value);
+		if (tactivity != null) {
+			Long orderprizeamt = order.getOrderprizeamt().longValue();
+			if (orderprizeamt > 0) {
+				BigDecimal prize = BigDecimal.ZERO;
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Integer minprize = (Integer) activity.get("minprize");
+				Integer percent = (Integer) activity.get("percent");
+				Integer topprize = (Integer) activity.get("topprize");
+				if (orderprizeamt >= minprize) {
+					prize = new BigDecimal(orderprizeamt).multiply(new BigDecimal(percent)).divide(new BigDecimal(100));
+					if (prize.compareTo(new BigDecimal(topprize)) > 0) {
+						prize = new BigDecimal(topprize);
+					}
+					if (prize.compareTo(BigDecimal.ZERO) > 0) {
+						if (Tjmsservice.createTjmsservice(order.getId(), ActionJmsType.Encash_LanQiuDanGuan_AddPrize)) {
+							logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
+							sendActivityPrizeJms.sendPrize2UserJMS(userno, prize, ActionJmsType.Encash_LanQiuDanGuan_AddPrize,
 									tactivity.getMemo(), order.getId(), "", "");
 						}
 					}

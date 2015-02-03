@@ -77,6 +77,7 @@ public class DispatchCaseLotFinishListener {
 			addWorldCupBigUser(caseLot, torder, userInfo);
 			addPrizeJingcai(caseLot,torder, userInfo);
 			addPrizeJingcaiDanguan(caseLot,torder, userInfo);
+			addPrizeLanQiuDanguan(caseLot,torder, userInfo);
 		} catch (Exception e) {
 			logger.error("合买加奖异常", e);
 		}
@@ -413,6 +414,42 @@ public class DispatchCaseLotFinishListener {
 						if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_JingCaiDanGuan_AddPrize)) {
 							logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
 							sendActivityPrizeJms.sendPrize2UserJMS(userinfo.getUserno(), prize, ActionJmsType.Encash_JingCaiDanGuan_AddPrize,
+									tactivity.getMemo(), caselotId, "", "");
+						}
+					}
+				} else {
+					logger.info("中奖金额小于" + minprize + "不参与活动");
+				}
+			}
+		}
+	}
+	
+	@Transactional
+	public void addPrizeLanQiuDanguan(CaseLot caseLot, Torder torder, Tuserinfo userinfo){
+		if (!torder.getLotno().startsWith("J")) {
+			return;
+		}
+		Tactivity tactivity = tactivityDao.findTactivity(torder.getLotno(), torder.getPlaytype(), userinfo.getSubChannel(), null,
+				ActionJmsType.Encash_LanQiuDanGuan_AddPrize.value);
+		if (tactivity != null) {
+			String caselotId = caseLot.getId();
+			Integer caselotprize = lotteryService.findCaseLotBuyAllPrizeamtById(caselotId, userinfo.getUserno());
+			if (caselotprize > 0) {
+				BigDecimal prize = BigDecimal.ZERO;
+				String express = tactivity.getExpress();
+				Map<String, Object> activity = JsonUtil.transferJson2Map(express);
+				Integer minprize = (Integer) activity.get("minprize");
+				Integer percent = (Integer) activity.get("percent");
+				Integer topprize = (Integer) activity.get("topprize");
+				if (caselotprize >= minprize) {
+					prize = new BigDecimal(caselotprize).multiply(new BigDecimal(percent)).divide(new BigDecimal(100));
+					if (prize.compareTo(new BigDecimal(topprize)) > 0) {
+						prize = new BigDecimal(topprize);
+					}
+					if (prize.compareTo(BigDecimal.ZERO) > 0) {
+						if (Tjmsservice.createTjmsservice(caselotId, ActionJmsType.Encash_LanQiuDanGuan_AddPrize)) {
+							logger.info(tactivity.getMemo() + "prize:" + prize.longValue());
+							sendActivityPrizeJms.sendPrize2UserJMS(userinfo.getUserno(), prize, ActionJmsType.Encash_LanQiuDanGuan_AddPrize,
 									tactivity.getMemo(), caselotId, "", "");
 						}
 					}
